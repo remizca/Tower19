@@ -17,13 +17,18 @@ Current Status
 - ✅ Project scaffold with React + TypeScript + Three.js + Vite
 - ✅ Basic beginner generator (blocks with cylinder holes)
 - ✅ Interactive 3D viewer with OrbitControls
-- ✅ Local bookmarking with localStorage
+- ✅ Local bookmarking with localStorage (short-term)
 - ✅ Deployed to Vercel
+- ✅ CSG boolean subtraction for holes implemented (@react-three/csg)
 
-Next steps
-1. Implement proper CSG Boolean operations for holes
-2. Switch to IndexedDB for robust offline storage
-3. Create 2D SVG drawing generator with ISO standards
-4. Add timer functionality
+Notes from the recent test run
+- Production build completed successfully. There is a large JS chunk (~1 MB) flagged by Rollup — we should consider code-splitting heavy modules (CSG, Three.js) to reduce initial bundle size.
+
+Next steps (prioritized)
+1. Migrate bookmarking/storage from localStorage to IndexedDB and provide a migration path for existing bookmarks
+2. Implement 2D SVG drawing generator (ISO-compliant orthographic views, dimensioning, title block)
+3. Add timer functionality and local records storage (start when viewing 2D drawing)
+4. Add CI (GitHub Actions) that runs `npm run build` on PRs
+5. Add tests, documentation and small example models
 
 See `TODO.md` and `docs/` for project tracking and technical notes.

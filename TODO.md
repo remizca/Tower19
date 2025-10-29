@@ -8,17 +8,17 @@ This file mirrors the managed todo list and acts as the project's on-disk tracke
 - [-] Design core data model
   - Basic BeginnerRecipe type implemented
   - Need to add operations, parameters schema
-- [-] Specify 3D generator algorithms
+ - [-] Specify 3D generator algorithms
   - Basic cylinder holes working
-  - Need CSG for proper Boolean operations
+  - CSG boolean subtraction implemented (see App.tsx using @react-three/csg)
 - [ ] Specify 2D drawing engine & ISO conventions
 - [-] UI/UX and interactions
   - OrbitControls implemented
   - Basic Generate/Save UI working
   - Need view presets, 2D viewer
-- [-] Persistence and export
-  - localStorage bookmarks working
-  - Need IndexedDB, PDF/SVG export
+ - [-] Persistence and export
+  - localStorage bookmarks working (temporary)
+  - Migration to IndexedDB planned; PDF/SVG export pending
 - [ ] Scoring, timer, and leaderboards
 - [x] MVP roadmap and tech stack
   - React + Three.js + Vite implemented
