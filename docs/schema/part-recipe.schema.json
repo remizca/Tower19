@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PartRecipe",
+  "type": "object",
+  "required": ["id", "seed", "name", "difficulty", "units", "bounding_mm", "primitives", "operations", "createdAt"],
+  "properties": {
+    "id": { "type": "string" },
+    "seed": { "type": "number" },
+    "name": { "type": "string" },
+    "difficulty": { "type": "string", "enum": ["Beginner", "Intermediate", "Expert"] },
+    "units": { "type": "string", "enum": ["mm"] },
+    "bounding_mm": {
+      "type": "object",
+      "required": ["x", "y", "z"],
+      "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "z": { "type": "number" } }
+    },
+    "primitives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "params"],
+        "properties": {
+          "id": { "type": "string" },
+          "kind": { "type": "string", "enum": ["box", "cylinder", "sphere", "custom"] },
+          "params": { "type": "object" },
+          "transform": {
+            "type": "object",
+            "properties": {
+              "position": { "type": "object" },
+              "rotation": { "type": "object" },
+              "scale": { "type": "object" }
+            }
+          }
+        }
+      }
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "op", "targetId", "toolId"],
+        "properties": {
+          "id": { "type": "string" },
+          "op": { "type": "string", "enum": ["union", "subtract", "intersect"] },
+          "targetId": { "type": "string" },
+          "toolId": { "type": "string" }
+        }
+      }
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "metadata": { "type": "object" }
+  }
+}
