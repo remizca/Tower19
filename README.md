@@ -13,9 +13,17 @@ Key features
 Deployment
 - Intended to deploy as a static web app (Vercel recommended) so users can access it without installation.
 
+Current Status
+- ✅ Project scaffold with React + TypeScript + Three.js + Vite
+- ✅ Basic beginner generator (blocks with cylinder holes)
+- ✅ Interactive 3D viewer with OrbitControls
+- ✅ Local bookmarking with localStorage
+- ✅ Deployed to Vercel
+
 Next steps
-1. Create project scaffold (React + TypeScript + Three.js)
-2. Implement beginner generator and 3D viewer
-3. Implement 2D SVG drawing export and PDF generation
+1. Implement proper CSG Boolean operations for holes
+2. Switch to IndexedDB for robust offline storage
+3. Create 2D SVG drawing generator with ISO standards
+4. Add timer functionality
 
 See `TODO.md` and `docs/` for project tracking and technical notes.

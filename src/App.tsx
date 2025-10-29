@@ -2,6 +2,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { OrbitControls as ThreeOrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { useEffect, useRef, useState } from 'react'
 import { generateBeginner, type BeginnerRecipe } from './generators/beginner'
+import { Geometry, Base, Subtraction } from '@react-three/csg'
 
 function Controls() {
   const { camera, gl } = useThree()
@@ -20,18 +21,27 @@ function Controls() {
 
 function ModelRenderer({ recipe }: { recipe: BeginnerRecipe | null }) {
   if (!recipe) return null
+  
+  // Calculate a generous length for the holes to ensure complete subtraction
+  const maxDimension = Math.max(recipe.bounding_mm.x, recipe.bounding_mm.y, recipe.bounding_mm.z)
+  const holeLength = maxDimension * 2
+
   return (
     <group position={[0, 0, 0]}>
       <mesh>
-        <boxGeometry args={[recipe.bounding_mm.x / 10, recipe.bounding_mm.y / 10, recipe.bounding_mm.z / 10]} />
-        <meshStandardMaterial color="#8888cc" metalness={0.2} roughness={0.6} />
+        <Geometry>
+          <Base>
+            <boxGeometry args={[recipe.bounding_mm.x / 10, recipe.bounding_mm.y / 10, recipe.bounding_mm.z / 10]} />
+            <meshStandardMaterial color="#8888cc" metalness={0.2} roughness={0.6} />
+          </Base>
+          {recipe.holes.map((h, idx) => (
+            <Subtraction key={idx} position={[h.x / 10, h.y / 10, h.z / 10]} rotation={h.axis === 'x' ? [0, 0, Math.PI / 2] : h.axis === 'y' ? [Math.PI / 2, 0, 0] : [0, 0, 0]}>
+              <cylinderGeometry args={[h.r / 10, h.r / 10, holeLength / 10, 32]} />
+              <meshStandardMaterial color="#333" />
+            </Subtraction>
+          ))}
+        </Geometry>
       </mesh>
-      {recipe.holes.map((h, idx) => (
-        <mesh key={idx} position={[h.x / 10, h.y / 10, h.z / 10]} rotation={h.axis === 'x' ? [0, 0, Math.PI / 2] : h.axis === 'y' ? [Math.PI / 2, 0, 0] : [0, 0, 0]}>
-          <cylinderGeometry args={[h.r / 10, h.r / 10, Math.max(recipe.bounding_mm.x, recipe.bounding_mm.y, recipe.bounding_mm.z) / 5, 32]} />
-          <meshBasicMaterial color="#333" />
-        </mesh>
-      ))}
     </group>
   )
 }

@@ -5,13 +5,24 @@ This file mirrors the managed todo list and acts as the project's on-disk tracke
 ## Overall Checklist
 
 - [x] Draft app outline & feature suggestions
-- [ ] Design core data model
-- [ ] Specify 3D generator algorithms
+- [-] Design core data model
+  - Basic BeginnerRecipe type implemented
+  - Need to add operations, parameters schema
+- [-] Specify 3D generator algorithms
+  - Basic cylinder holes working
+  - Need CSG for proper Boolean operations
 - [ ] Specify 2D drawing engine & ISO conventions
-- [ ] UI/UX and interactions
-- [ ] Persistence and export
+- [-] UI/UX and interactions
+  - OrbitControls implemented
+  - Basic Generate/Save UI working
+  - Need view presets, 2D viewer
+- [-] Persistence and export
+  - localStorage bookmarks working
+  - Need IndexedDB, PDF/SVG export
 - [ ] Scoring, timer, and leaderboards
-- [ ] MVP roadmap and tech stack
+- [x] MVP roadmap and tech stack
+  - React + Three.js + Vite implemented
+  - Successfully deployed to Vercel
 - [ ] Testing, validation, and documentation
 
 ## Notes
