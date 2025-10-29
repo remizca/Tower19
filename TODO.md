@@ -5,9 +5,11 @@ This file mirrors the managed todo list and acts as the project's on-disk tracke
 ## Overall Checklist
 
 - [x] Draft app outline & feature suggestions
-- [-] Design core data model
-  - Basic BeginnerRecipe type implemented
-  - Need to add operations, parameters schema
+ - [x] Design core data model
+  - PartRecipe TypeScript types added (`src/types/part.ts`)
+  - JSON Schema added (`docs/schema/part-recipe.schema.json`)
+  - Migration helper from legacy BeginnerRecipe implemented (`src/storage/migrate.ts`)
+  - Runtime validation with Ajv available (`src/schema/validate.ts`)
  - [-] Specify 3D generator algorithms
   - Basic cylinder holes working
   - CSG boolean subtraction implemented (see App.tsx using @react-three/csg)
