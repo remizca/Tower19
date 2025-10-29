@@ -44,3 +44,13 @@ export function generateBeginner(seed = Date.now()): BeginnerRecipe {
     createdAt: new Date().toISOString(),
   }
 }
+
+// New: produce the canonical PartRecipe shape (primitives + operations)
+import type { PartRecipe } from '../types/part'
+import { migrateLegacyBeginnerToPartRecipe } from '../storage/migrate'
+
+export function generateBeginnerPartRecipe(seed = Date.now()): PartRecipe {
+  // reuse existing generator to create legacy shape, then migrate
+  const legacy = generateBeginner(seed)
+  return migrateLegacyBeginnerToPartRecipe(legacy)
+}

@@ -22,13 +22,46 @@
         "properties": {
           "id": { "type": "string" },
           "kind": { "type": "string", "enum": ["box", "cylinder", "sphere", "custom"] },
-          "params": { "type": "object" },
+          "params": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "width": { "type": "number" },
+                  "depth": { "type": "number" },
+                  "height": { "type": "number" }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "radius": { "type": "number" },
+                  "height": { "type": "number" },
+                  "axis": { "type": "string", "enum": ["x","y","z"] }
+                }
+              },
+              {
+                "type": "object",
+                "properties": { "radius": { "type": "number" } }
+              },
+              { "type": "object" }
+            ]
+          },
           "transform": {
             "type": "object",
             "properties": {
-              "position": { "type": "object" },
-              "rotation": { "type": "object" },
-              "scale": { "type": "object" }
+              "position": {
+                "type": "object",
+                "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "z": { "type": "number" } }
+              },
+              "rotation": {
+                "type": "object",
+                "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "z": { "type": "number" } }
+              },
+              "scale": {
+                "type": "object",
+                "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "z": { "type": "number" } }
+              }
             }
           }
         }

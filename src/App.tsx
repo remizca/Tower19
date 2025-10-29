@@ -1,7 +1,10 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { OrbitControls as ThreeOrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { useEffect, useRef, useState } from 'react'
-import { generateBeginner, type BeginnerRecipe } from './generators/beginner'
+import { generateBeginnerPartRecipe } from './generators/beginner'
+import type PartRecipe from './types/part'
+import { validatePartRecipe } from './schema/validate'
+import migrateLegacyBeginnerToPartRecipe from './storage/migrate'
 import { Geometry, Base, Subtraction } from '@react-three/csg'
 
 function Controls() {
@@ -19,27 +22,53 @@ function Controls() {
   return null
 }
 
-function ModelRenderer({ recipe }: { recipe: BeginnerRecipe | null }) {
+function ModelRenderer({ recipe }: { recipe: PartRecipe | null }) {
   if (!recipe) return null
-  
-  // Calculate a generous length for the holes to ensure complete subtraction
-  const maxDimension = Math.max(recipe.bounding_mm.x, recipe.bounding_mm.y, recipe.bounding_mm.z)
-  const holeLength = maxDimension * 2
+
+  // Find a base primitive (box) or fallback to the first primitive
+  const base = recipe.primitives.find((p) => p.kind === 'box') || recipe.primitives[0]
+  if (!base) return null
+
+  // Compute base box dims
+  const boxParams: any = base.params
+  const width = (boxParams.width || 100) / 10
+  const depth = (boxParams.depth || 50) / 10
+  const height = (boxParams.height || 25) / 10
+
+  // For each subtract operation, find its tool primitive
+  const subtractOps = recipe.operations.filter((op) => op.op === 'subtract')
 
   return (
     <group position={[0, 0, 0]}>
       <mesh>
         <Geometry>
           <Base>
-            <boxGeometry args={[recipe.bounding_mm.x / 10, recipe.bounding_mm.y / 10, recipe.bounding_mm.z / 10]} />
+            <boxGeometry args={[width, depth, height]} />
             <meshStandardMaterial color="#8888cc" metalness={0.2} roughness={0.6} />
           </Base>
-          {recipe.holes.map((h, idx) => (
-            <Subtraction key={idx} position={[h.x / 10, h.y / 10, h.z / 10]} rotation={h.axis === 'x' ? [0, 0, Math.PI / 2] : h.axis === 'y' ? [Math.PI / 2, 0, 0] : [0, 0, 0]}>
-              <cylinderGeometry args={[h.r / 10, h.r / 10, holeLength / 10, 32]} />
-              <meshStandardMaterial color="#333" />
-            </Subtraction>
-          ))}
+
+          {subtractOps.map((op) => {
+            const tool = recipe.primitives.find((p) => p.id === op.toolId)
+            if (!tool) return null
+
+            if (tool.kind === 'cylinder') {
+              const params: any = tool.params
+              const axis = params.axis || 'z'
+              const r = (params.radius || 5) / 10
+              const h = (params.height || Math.max(recipe.bounding_mm.x, recipe.bounding_mm.y, recipe.bounding_mm.z) * 2) / 10
+              const pos = tool.transform?.position ? [tool.transform.position.x / 10, tool.transform.position.y / 10, tool.transform.position.z / 10] : [0, 0, 0]
+              const rot = axis === 'x' ? [0, 0, Math.PI / 2] : axis === 'y' ? [Math.PI / 2, 0, 0] : [0, 0, 0]
+              return (
+                <Subtraction key={op.id} position={pos as any} rotation={rot as any}>
+                  <cylinderGeometry args={[r, r, h, 32]} />
+                  <meshStandardMaterial color="#333" />
+                </Subtraction>
+              )
+            }
+
+            // For unknown tool kinds, skip rendering the subtraction
+            return null
+          })}
         </Geometry>
       </mesh>
     </group>
@@ -47,17 +76,34 @@ function ModelRenderer({ recipe }: { recipe: BeginnerRecipe | null }) {
 }
 
 function App() {
-  const [recipe, setRecipe] = useState<BeginnerRecipe | null>(() => generateBeginner(Date.now()))
-  const [bookmarks, setBookmarks] = useState<BeginnerRecipe[]>(() => {
+  const [recipe, setRecipe] = useState<PartRecipe | null>(() => generateBeginnerPartRecipe(Date.now()))
+  const [bookmarks, setBookmarks] = useState<PartRecipe[]>(() => {
     try {
       const raw = localStorage.getItem('tower19:bookmarks')
-      return raw ? JSON.parse(raw) : []
+      if (!raw) return []
+      const parsed = JSON.parse(raw)
+      if (!Array.isArray(parsed)) return []
+
+      // Validate / migrate each entry
+      const candidates = parsed.map((p: any) => {
+        const { valid } = validatePartRecipe(p)
+        if (valid) return p as PartRecipe
+        if (p && Array.isArray(p.holes)) {
+          // legacy shape - migrate
+          return migrateLegacyBeginnerToPartRecipe(p)
+        }
+        // otherwise skip
+        return null
+      })
+
+      const normalized = candidates.filter((x): x is PartRecipe => x !== null)
+      return normalized
     } catch (e) {
       return []
     }
   })
 
-  const generate = () => setRecipe(generateBeginner(Date.now()))
+  const generate = () => setRecipe(generateBeginnerPartRecipe(Date.now()))
 
   const saveBookmark = () => {
     if (!recipe) return
