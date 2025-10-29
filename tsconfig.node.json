@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "types": ["node"]
+  },
+  "include": ["env.d.ts", "vite.config.ts"]
+}
