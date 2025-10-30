@@ -4,6 +4,12 @@ This file mirrors the managed todo list and acts as the project's on-disk tracke
 
 ## Overall Checklist
 
+# Todo List
+
+> Note: This is the main task tracking file. For detailed implementation progress, see:
+> - [Implementation Progress](docs/progress/PROGRESS.md)
+> - [Technical Specifications](docs/specs/)
+
 - [x] Draft app outline & feature suggestions
  - [x] Design core data model
   - PartRecipe TypeScript types added (`src/types/part.ts`)

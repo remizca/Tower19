@@ -1,0 +1,26 @@
+# Todo List
+
+- [x] Draft app outline & feature suggestions
+  - Produce a detailed outline of the app's features, UI flows, data model, ISO-compliant 2D drawing approach, difficulty levels, timer/bookmark/export behavior, and a prioritized roadmap.
+- [x] Setup deployment pipeline
+  - Configure GitHub repository, setup Vercel integration, configure build process for static deployment.
+- [x] Design core data model
+  - Define JSON schema for generated parts (primitives, operations, parameters, units mm, seed, difficulty, name, function, timestamps).
+- [x] Specify 3D generator algorithms
+  - Describe algorithms and heuristics for random model generation per difficulty (primitives, Boolean ops, lofts, splines, internal features), and list libraries to use (Three.js, CSG).
+- [x] Implement CSG boolean holes
+  - Use @react-three/csg to apply subtraction operations so holes are true booleans on generated parts and render correctly in R3F.
+- [ ] Specify 2D drawing engine & ISO conventions
+  - Detail projection (ISO first-angle), standards to follow (ISO 128, 129, 5456, 7200), dimensioning rules, line types, title block, section-view rules and how to generate them programmatically.
+- [-] UI/UX and interactions
+  - Define interactions: orbit, pan, zoom, view presets; 2D viewer with scale selection; start timer on 2D view; save/bookmark; export to PDF/DXF/STP; difficulty selector.
+- [-] Client-side persistence and export
+  - Implement bookmarking with IndexedDB, client-side PDF/SVG generation, and offline support.
+- [ ] Scoring and timer implementation
+  - Implement client-side timer, local records storage, prepare for optional cloud features later.
+- [-] MVP implementation
+  - Build static web app with React + Three.js + Vite, ensure it works fully client-side.
+- [ ] Testing and documentation
+  - Implement browser tests, document offline capabilities, create example models.
+- [x] Add `tsconfig.node.json` for project reference
+  - Create the node-specific tsconfig file so `tsconfig.json` project reference resolves (fix missing reference error).
