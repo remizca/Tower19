@@ -41,6 +41,8 @@ This document tracks detailed implementation progress and technical decisions fo
 - [ ] Offline support configuration
 
 ## 2D Drawing Engine (In Progress)
+A centralized, actionable checklist for the 2D drawing engine lives here. Subtasks are tracked in the managed todo list as well (see in-repo todo). The high-level objective is to produce ISO-compliant orthographic drawings (SVG) with dimensions, title block, and optional sections.
+
 - [x] ISO standard compliance (references added)
 - [x] Projection system documented (first-angle)
 - [x] Dimensioning rules (heuristics drafted)
@@ -48,8 +50,36 @@ This document tracks detailed implementation progress and technical decisions fo
 - [x] Title block generation (template drafted)
 - [ ] Section view generation (algorithm drafted, needs prototyping)
 
+Detailed sub-tasks (tree):
+
+1. Prototype & renderer
+   - [~] 2D-15: Prototype Block+Hole SVG renderer (minimal projection + hidden-line) — in-progress
+     - goal: output single-page SVG for Block+Hole fixture
+     - acceptance: SVG contains expected visible/hidden edge counts and a title block
+
+2. Tests & fixtures
+   - [ ] 2D-16: Add unit test fixtures (Block+Hole, L-shape, internal pocket)
+     - goal: provide deterministic geometry fixtures and test assertions
+     - acceptance: tests assert visible edge counts and at least one axis dimension
+
+3. Export & examples
+   - [ ] 2D-17: Implement rendering/export examples (SVG → PDF, DXF) for prototype
+     - goal: show scale-preserved PDF and a DXF with layers for line types
+
+4. Dimensioning refinement
+   - [ ] 2D-18: Dimension collision heuristics
+     - goal: implement simple collision detection and automatic relocation of overlapping dims
+
+5. Sections & hatch
+   - [ ] 2D-19: Section generation prototype
+     - goal: select cutting plane, extract contour, render 45° hatch for cut faces
+
+Notes:
+- Each numbered sub-task maps to the managed in-repo todo items (2D-15..2D-19) so status is visible in both the todo list and this PROGRESS document.
+- When a sub-task moves, update both the managed todo and the checklist here to keep them synchronized.
+
 Files changed:
-- `docs/specs/2d-drawing.md` — detailed specification and checklist
+- `docs/specs/2d-drawing.md` — detailed specification (progress & next steps moved to this file)
 
 ## Testing (Not Started)
 - [ ] Unit test framework setup

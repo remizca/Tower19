@@ -130,21 +130,12 @@ interface TitleBlock { drawingNumber?: string; partName?: string; scale: string;
 
 ## Tests / Fixtures
 
-- Provide small geometry fixtures for unit tests:
+- Provide small geometry fixtures for unit tests (defined in `docs/progress/PROGRESS.md`):
   - Simple block with a centered hole
   - L-shaped part
   - Part with internal pocket requiring section
 - For each fixture, assert that produced SVG contains expected number of visible edges, hidden lines, and at least one dimension for each primary axis.
 
-## Checklist (progress)
-- [x] Drafted high-level requirements (ISO references)
-- [x] Created an initial draft file (`docs/specs/2d-drawing.md`)
-- [x] Added data shapes and projection math
-- [x] Added algorithms for edge classification and dimensioning
-- [ ] Implement rendering/export examples (SVG/PDF/DXF)
-- [ ] Add unit tests and fixtures
+> Progress tracking and actionable next steps for implementation have been centralized in `docs/progress/PROGRESS.md`.
+> Please consult that file for the detailed tree-style checklist, prototyping tasks, tests, and export work.
 
-## Next steps (implementation)
-1. Implement a small prototype that takes a Block+Hole fixture and outputs an SVG page.
-2. Add unit tests to validate edge counts and dimension placement.
-3. Iterate on dimension collision heuristics and section generation.
