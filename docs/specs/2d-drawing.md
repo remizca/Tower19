@@ -1,121 +1,150 @@
-# 2D Drawing Engine Specification
+# 2D Drawing Engine Specification (Detailed)
 
-## ISO Standards Compliance
+This document defines the 2D drawing engine for producing ISO-style orthographic drawings from generated 3D PartRecipes. It is written to be implementable in code and includes data shapes, projection math, algorithms for view/layout, dimensioning heuristics, and export considerations (SVG, PDF, DXF).
 
-### Required Standards
-- ISO 128: Technical drawings - General principles of presentation
-- ISO 129: Technical drawings - Dimensioning
-- ISO 5456: Technical drawings - Projection methods
-- ISO 7200: Technical documentation - Data fields in title blocks
+## Goals / Contract
+- Input: Part geometry (Three.js BufferGeometry or equivalent) and `PartRecipe` metadata (units in mm, scale, name, seed).
+- Output: One or more 2D drawing pages (SVG primary, optionally exported to PDF/DXF) containing orthographic views, dimensions, title block, and optional section views.
+- Error modes: missing geometry, extremely small features (near-zero), invalid units. Engine should return a validation error rather than a broken drawing.
 
-### Projection System
-- First angle projection (European)
-- Three standard views minimum
-- Additional views as needed for clarity
+## Standards
+- Primary: ISO 128 (presentation), ISO 129 (dimensioning), ISO 5456 (projection), ISO 7200 (title block metadata).
+- Use first-angle projection by default (configurable to third-angle if needed).
 
-## Drawing Elements
+## Data shapes
 
-### Line Types
-1. **Visible Lines**
-   - Solid, thick
-   - Weight: 0.7mm
+Part input (conceptual):
 
-2. **Hidden Lines**
-   - Dashed
-   - Weight: 0.35mm
-   - Pattern: 3mm dash, 1mm gap
+```ts
+interface DrawingInput {
+  id: string;
+  geometry: BufferGeometry; // indexed or non-indexed
+  units: 'mm' | 'inch';
+  scale?: number; // e.g., 1 means 1:1
+  name?: string;
+  seed?: number;
+}
+```
 
-3. **Center Lines**
-   - Chain
-   - Weight: 0.35mm
-   - Pattern: 10mm dash, 2mm gap
+Generated output structure:
 
-4. **Section Lines**
-   - Solid, thin
-   - Weight: 0.35mm
-   - 45° angle standard
+```ts
+interface DrawingPage {
+  widthMm: number;
+  heightMm: number;
+  viewports: Viewport[];
+  titleBlock: TitleBlock;
+}
 
-### Dimensioning
-1. **Linear Dimensions**
-   - Extension lines
-   - Dimension lines
-   - Arrowheads
-   - Text placement
+interface Viewport {
+  name: 'Front' | 'Top' | 'Right' | 'Isometric' | string;
+  transform: string; // SVG transform or view transform matrix
+  paths: string[]; // SVG path data for visible edges, hidden, centers
+  dimensions: Dimension[];
+}
+```
 
-2. **Angular Dimensions**
-   - Radius indicators
-   - Degree symbols
-   - Arc length
+## Projection math
 
-3. **Special Dimensions**
-   - Diameters
-   - Radii
-   - Chamfers
-   - Threads
+- Use first-angle projection:
+  - Front view: project onto YZ plane (camera along +X)
+  - Top view: project onto XZ plane (camera along -Y)
+  - Right view: project onto YZ plane from +X (or XZ depending on conventions)
+- Implementation: transform all 3D vertices by view matrix, then orthographically project by dropping one coordinate and scaling by units.
 
-## Title Block
-1. **Required Fields**
-   - Drawing number
-   - Part name
-   - Scale
-   - Units
-   - Date
-   - Author
+Pseudocode for orthographic projection (front):
 
-2. **Optional Fields**
-   - Material
-   - Surface finish
-   - Tolerances
-   - Revision history
+```
+for each vertex v in geometry:
+  v_view = camera_matrix * v
+  projected = (v_view.y * scale, v_view.z * scale) // mm -> drawing units
 
-## Section Views
-1. **Cutting Plane**
-   - Line indication
-   - Direction arrows
-   - Section identifiers
+collect edges by triangle adjacency; compute visible edges by backface culling and edge-face counts
+```
 
-2. **Section Types**
-   - Full sections
-   - Half sections
-   - Offset sections
-   - Revolved sections
+## Edge classification
 
-## Programmatic Generation
+1. Visible edges: edges between a visible face and another face (or edge on convex hull).
+2. Hidden edges: edges not directly visible from the chosen view (backface or occluded). Compute via depth test or by checking triangle normals and z-order.
+3. Center lines: for circular/arc features, compute center line primitives separately.
 
-### View Generation
-1. Calculate optimal view arrangement
-2. Determine necessary additional views
-3. Apply projection rules
-4. Generate section cuts as needed
+Algorithm notes:
+- Use face normal sign in view space for basic visibility (backface culling).
+- For occlusion between non-adjacent geometry (e.g., an internal cavity), use a 2D depth buffer / painter's algorithm on projected primitives (triangles) for robust hidden-line detection.
 
-### Dimensioning Algorithm
-1. Identify critical features
-2. Calculate dimension placement
-3. Avoid overlapping
-4. Group related dimensions
+## Dimensioning algorithm (heuristic)
 
-### Line Generation
-1. Calculate visible edges
-2. Determine hidden lines
-3. Generate center lines
-4. Apply line styles
+1. Feature detection: detect primitives and important features (extents, holes, radii, centerlines).
+2. Prioritize dimensions: overall bounding box dimensions (height/width/depth) first, then hole positions, then radii/diameters.
+3. Placement rules:
+   - Place outside the object when possible.
+   - Keep a minimum margin (e.g., 5 mm) from visible geometry.
+   - Avoid overlapping text and dimension lines by simple collision checks; if conflict, move dimension to alternate side or create a dedicated detail view.
 
-## Technical Implementation
+Pseudocode snippet (linear dimensions):
 
-### SVG Generation
-1. Define viewports for each projection
-2. Generate path data for lines
-3. Create text elements for dimensions
-4. Apply styles and patterns
+```
+bbox = computeBoundingBox(projectedVertices)
+placeDimension('width', bbox.left, bbox.right, y = bbox.top + margin)
+for each hole:
+  placePositionDimension(hole.center.x, nearestEdge, outside)
+```
 
-### PDF Export
-1. Convert SVG to PDF
-2. Maintain scale accuracy
-3. Include title block
-4. Add multiple pages if needed
+## Section generation
 
-### DXF Export
-1. Convert geometry to DXF entities
-2. Maintain layers for line types
-3. Include dimension entities
-4. Export title block
+- Heuristic: generate sections only if internal features are detected or requested.
+- Choose cutting plane to pass through feature centers (e.g., hole centers or large pockets).
+- For each section:
+  - Intersect geometry with cutting plane to produce contours
+  - Fill hatched areas for cut faces (45° hatch, spacing based on scale)
+
+## Line styles and weights
+
+- Visible lines: solid, stroke-width mapped to drawing scale (default 0.7 mm at 1:1)
+- Hidden lines: dashed (dash/gap scaled to drawing scale)
+- Center lines: chain, lighter weight
+- Section hatch: thin lines at 45° with spacing depending on scale
+
+## Title block
+
+- Standard fields: Drawing number, Part name, Scale, Units, Date, Author, Revision
+- Place at bottom-right of the page, with field widths sized for legibility at common paper sizes (A4, A3).
+
+Title block data shape:
+
+```ts
+interface TitleBlock { drawingNumber?: string; partName?: string; scale: string; units: string; date?: string; author?: string; }
+```
+
+## Export formats
+
+- SVG (primary): compose pages as scalable vector graphics. Keep one `viewBox` per page matching the physical mm page size (e.g., A4 in mm). Use groups/layers for line types (visible, hidden, center, hatch).
+- PDF: convert generated SVG to PDF while preserving scale. Ensure fonts are embedded or use simple sans-serif fallback.
+- DXF: create DXF entities with layers corresponding to line types (0=visible, 1=hidden, 2=center, 3=hatch). Dimension entities exported as native DXF dimensions where possible.
+
+## Implementation notes and libraries
+
+- Use Three.js for geometry handling and triangulated meshes.
+- For robust hidden-line removal and contour extraction, consider rasterizing projected triangles into a 2D depth buffer (pixel grid) or using exact planar boolean/contour clipping libraries.
+- For SVG generation: use a minimal templating step to convert paths into SVG `path` elements. Use transforms to keep mm units consistent: set `viewBox="0 0 <widthMm> <heightMm>"` and `width`/`height` in mm if exporting to PDF.
+
+## Tests / Fixtures
+
+- Provide small geometry fixtures for unit tests:
+  - Simple block with a centered hole
+  - L-shaped part
+  - Part with internal pocket requiring section
+- For each fixture, assert that produced SVG contains expected number of visible edges, hidden lines, and at least one dimension for each primary axis.
+
+## Checklist (progress)
+- [x] Drafted high-level requirements (ISO references)
+- [x] Created an initial draft file (`docs/specs/2d-drawing.md`)
+- [x] Added data shapes and projection math
+- [x] Added algorithms for edge classification and dimensioning
+- [ ] Implement rendering/export examples (SVG/PDF/DXF)
+- [ ] Add unit tests and fixtures
+
+## Next steps (implementation)
+1. Implement a small prototype that takes a Block+Hole fixture and outputs an SVG page.
+2. Add unit tests to validate edge counts and dimension placement.
+3. Iterate on dimension collision heuristics and section generation.

@@ -40,13 +40,16 @@ This document tracks detailed implementation progress and technical decisions fo
 - [ ] Export generation
 - [ ] Offline support configuration
 
-## 2D Drawing Engine (Not Started)
-- [ ] ISO standard compliance
-- [ ] Projection system
-- [ ] Dimensioning rules
-- [ ] Line types
-- [ ] Title block generation
-- [ ] Section view generation
+## 2D Drawing Engine (In Progress)
+- [x] ISO standard compliance (references added)
+- [x] Projection system documented (first-angle)
+- [x] Dimensioning rules (heuristics drafted)
+- [x] Line types (weights & patterns documented)
+- [x] Title block generation (template drafted)
+- [ ] Section view generation (algorithm drafted, needs prototyping)
+
+Files changed:
+- `docs/specs/2d-drawing.md` — detailed specification and checklist
 
 ## Testing (Not Started)
 - [ ] Unit test framework setup
