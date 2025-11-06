@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
     "composite": true,
-    "types": ["node"]
+    "types": ["node"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ESNext"]
   },
-  "include": ["env.d.ts", "vite.config.ts"]
+  "include": ["env.d.ts", "vite.config.ts", "tests/**/*"]
 }

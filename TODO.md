@@ -1,38 +1,26 @@
-# Project TODO
-
-This file mirrors the managed todo list and acts as the project's on-disk tracker. Keep this file updated as work progresses.
-
-## Overall Checklist
-
 # Todo List
 
-> Note: This is the main task tracking file. For detailed implementation progress, see:
-> - [Implementation Progress](docs/progress/PROGRESS.md)
-> - [Technical Specifications](docs/specs/)
-
 - [x] Draft app outline & feature suggestions
- - [x] Design core data model
-  - PartRecipe TypeScript types added (`src/types/part.ts`)
-  - JSON Schema added (`docs/schema/part-recipe.schema.json`)
-  - Migration helper from legacy BeginnerRecipe implemented (`src/storage/migrate.ts`)
-  - Runtime validation with Ajv available (`src/schema/validate.ts`)
- - [-] Specify 3D generator algorithms
-  - Basic cylinder holes working
-  - CSG boolean subtraction implemented (see App.tsx using @react-three/csg)
+  - Produce a detailed outline of the app's features, UI flows, data model, ISO-compliant 2D drawing approach, difficulty levels, timer/bookmark/export behavior, and a prioritized roadmap.
+- [x] Setup deployment pipeline
+  - Configure GitHub repository, setup Vercel integration, configure build process for static deployment.
+- [x] Design core data model
+  - Define JSON schema for generated parts (primitives, operations, parameters, units mm, seed, difficulty, name, function, timestamps).
+- [x] Specify 3D generator algorithms
+  - Describe algorithms and heuristics for random model generation per difficulty (primitives, Boolean ops, lofts, splines, internal features), and list libraries to use (Three.js, CSG).
+- [x] Implement CSG boolean holes
+  - Use @react-three/csg to apply subtraction operations so holes are true booleans on generated parts and render correctly in R3F.
 - [ ] Specify 2D drawing engine & ISO conventions
+  - Detail projection (ISO first-angle), standards to follow (ISO 128, 129, 5456, 7200), dimensioning rules, line types, title block, section-view rules and how to generate them programmatically.
 - [-] UI/UX and interactions
-  - OrbitControls implemented
-  - Basic Generate/Save UI working
-  - Need view presets, 2D viewer
- - [-] Persistence and export
-  - localStorage bookmarks working (temporary)
-  - Migration to IndexedDB planned; PDF/SVG export pending
-- [ ] Scoring, timer, and leaderboards
-- [x] MVP roadmap and tech stack
-  - React + Three.js + Vite implemented
-  - Successfully deployed to Vercel
-- [ ] Testing, validation, and documentation
-
-## Notes
-- The first item (high-level outline) was completed and is recorded in `README.md` and `docs/`.
-- Use the `manage_todo_list` tool (or update this file) whenever you change task statuses so the in-memory and on-disk trackers stay in sync.
+  - Define interactions: orbit, pan, zoom, view presets; 2D viewer with scale selection; start timer on 2D view; save/bookmark; export to PDF/DXF/STP; difficulty selector.
+- [-] Client-side persistence and export
+  - Implement bookmarking with IndexedDB, client-side PDF/SVG generation, and offline support.
+- [ ] Scoring and timer implementation
+  - Implement client-side timer, local records storage, prepare for optional cloud features later.
+- [-] MVP implementation
+  - Build static web app with React + Three.js + Vite, ensure it works fully client-side.
+- [ ] Testing and documentation
+  - Implement browser tests, document offline capabilities, create example models.
+- [x] Add `tsconfig.node.json` for project reference
+  - Create the node-specific tsconfig file so `tsconfig.json` project reference resolves (fix missing reference error).
