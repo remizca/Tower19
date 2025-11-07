@@ -35,6 +35,8 @@ type PartStrategy =
   | 'block-with-angled-holes'
   | 'block-with-linear-hole-pattern'
   | 'cylinder-with-circular-hole-pattern'
+  | 'block-with-chamfered-edges'
+  | 'block-with-edge-fillets'
 
 const STRATEGIES: PartStrategy[] = [
   'block-with-holes',
@@ -48,7 +50,9 @@ const STRATEGIES: PartStrategy[] = [
   'block-with-torus-cutout',
   'block-with-angled-holes',
   'block-with-linear-hole-pattern',
-  'cylinder-with-circular-hole-pattern'
+  'cylinder-with-circular-hole-pattern',
+  'block-with-chamfered-edges',
+  'block-with-edge-fillets'
 ]
 
 /**
@@ -96,6 +100,12 @@ export function generateBeginnerPartRecipe(seed = Date.now()): PartRecipe {
       break
     case 'cylinder-with-circular-hole-pattern':
       recipe = generateCylinderWithCircularHolePattern(seed, r)
+      break
+    case 'block-with-chamfered-edges':
+      recipe = generateBlockWithChamferedEdges(seed, r)
+      break
+    case 'block-with-edge-fillets':
+      recipe = generateBlockWithEdgeFillets(seed, r)
       break
     default:
       recipe = generateBlockWithHoles(seed, r)
@@ -845,6 +855,143 @@ function generateCylinderWithCircularHolePattern(seed: number, r: () => number):
     difficulty: 'Beginner',
     units: 'mm',
     bounding_mm: { x: radius * 2, y: radius * 2, z: height },
+    primitives,
+    operations,
+    createdAt: new Date().toISOString()
+  }
+}
+
+/**
+ * Strategy 13: Block with chamfered edges (approximated by subtracting rotated boxes)
+ * We emulate chamfers on selected top vertical edges by subtracting small boxes rotated 45°.
+ */
+function generateBlockWithChamferedEdges(seed: number, r: () => number): PartRecipe {
+  const width = Math.round(60 + r() * 90)
+  const depth = Math.round(50 + r() * 80)
+  const height = Math.round(25 + r() * 50)
+
+  const primitives: Primitive[] = [{
+    id: 'p0',
+    kind: 'box',
+    params: { width, depth, height },
+    transform: { position: { x: 0, y: 0, z: 0 } }
+  }]
+
+  const operations: Operation[] = []
+  let primId = 1
+  let opId = 1
+
+  // Decide how many edges to chamfer (2-4 among the four top vertical edges)
+  const edges = [
+    { x: -1, y: -1 },
+    { x: 1, y: -1 },
+    { x: 1, y: 1 },
+    { x: -1, y: 1 }
+  ]
+  const chamferCount = 2 + Math.floor(r() * 3) // 2-4
+  const selected = [...edges].sort(() => r() - 0.5).slice(0, chamferCount)
+  const chamferSize = Math.round(Math.min(width, depth, height) * 0.18)
+
+  for (const edge of selected) {
+    primitives.push({
+      id: `p${primId}`,
+      kind: 'box',
+      params: { width: chamferSize, depth: chamferSize, height: height * 0.6 },
+      transform: {
+        position: {
+          x: edge.x * (width / 2 - chamferSize / 2),
+          y: edge.y * (depth / 2 - chamferSize / 2),
+          z: height / 2 - chamferSize / 4
+        },
+        rotation: { x: 0, y: 0, z: 45 }
+      }
+    })
+    operations.push({
+      id: `op${opId}`,
+      op: 'subtract',
+      targetId: 'p0',
+      toolId: `p${primId}`
+    })
+    primId++
+    opId++
+  }
+
+  return {
+    id: String(seed),
+    seed,
+    name: 'Block with Chamfered Edges',
+    difficulty: 'Beginner',
+    units: 'mm',
+    bounding_mm: { x: width, y: depth, z: height },
+    primitives,
+    operations,
+    createdAt: new Date().toISOString()
+  }
+}
+
+/**
+ * Strategy 14: Block with edge fillets (approximated by subtracting cylinders)
+ * We approximate external vertical edge fillets by subtracting quarter-cylinder like cuts
+ * using cylinders rotated to bite into the edges.
+ */
+function generateBlockWithEdgeFillets(seed: number, r: () => number): PartRecipe {
+  const width = Math.round(70 + r() * 100)
+  const depth = Math.round(55 + r() * 90)
+  const height = Math.round(25 + r() * 55)
+
+  const primitives: Primitive[] = [{
+    id: 'p0',
+    kind: 'box',
+    params: { width, depth, height },
+    transform: { position: { x: 0, y: 0, z: 0 } }
+  }]
+
+  const operations: Operation[] = []
+  let primId = 1
+  let opId = 1
+
+  // Choose 2-4 edges to fillet
+  const edges = [
+    { x: -1, y: -1 },
+    { x: 1, y: -1 },
+    { x: 1, y: 1 },
+    { x: -1, y: 1 }
+  ]
+  const filletCount = 2 + Math.floor(r() * 3)
+  const selected = [...edges].sort(() => r() - 0.5).slice(0, filletCount)
+  const filletRadius = Math.round(Math.min(width, depth) * 0.12)
+
+  for (const edge of selected) {
+    // Cylinder oriented along Z, positioned so only a quarter removes material
+    primitives.push({
+      id: `p${primId}`,
+      kind: 'cylinder',
+      params: { radius: filletRadius, height: height * 1.4, axis: 'z' },
+      transform: {
+        position: {
+          x: edge.x * (width / 2 - filletRadius),
+          y: edge.y * (depth / 2 - filletRadius),
+          z: 0
+        }
+      }
+    })
+    operations.push({
+      id: `op${opId}`,
+      op: 'subtract',
+      targetId: 'p0',
+      toolId: `p${primId}`
+    })
+    primId++
+    opId++
+  }
+
+  return {
+    id: String(seed),
+    seed,
+    name: 'Block with Edge Fillets',
+    difficulty: 'Beginner',
+    units: 'mm',
+    bounding_mm: { x: width, y: depth, z: height },
     primitives,
     operations,
     createdAt: new Date().toISOString()

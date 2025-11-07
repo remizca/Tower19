@@ -19,9 +19,9 @@ Current Status
 - ✅ Local bookmarking with localStorage
 - ✅ **Deployed to Vercel and working in production**
 - ✅ CSG boolean operations (subtraction and union) working with @react-three/csg
-- ✅ Procedural generator creates 12 varied part types using multiple strategies
+- ✅ Procedural generator creates 14 varied part types using multiple strategies
   - Box, cylinder, sphere, cone (frustum), and torus primitives supported
-  - Feature strategies: Spherical pockets, countersinks, torus cutouts, angled holes, linear/circular patterns
+  - Feature strategies: Spherical pockets, countersinks, torus cutouts, angled holes, linear/circular patterns, chamfers, edge fillets
   - Structural strategies: L-bracket, T-bracket, Cylinder-cutouts, Stacked blocks, Corner bracket, Block-with-holes
   - Full transform support: position, rotation (Euler angles), and scale
 - ✅ Build optimizations: manual chunk splitting, reduced bundle size
@@ -45,7 +45,7 @@ Next steps (prioritized)
 1. **[HIGH PRIORITY]** Implement robust edge visibility for 2D renderer
    - Use depth-buffer rasterization or ray-casting for occlusion detection
    - Test with all primitive types and varied shapes
-2. Create intermediate difficulty generator (5-8 primitives, more complex patterns, fillets)
+2. Create intermediate difficulty generator (5-8 primitives, more complex patterns)
 3. Migrate bookmarking/storage from localStorage to IndexedDB
 4. Migrate bookmarking/storage from localStorage to IndexedDB
 5. Add timer functionality and local records storage

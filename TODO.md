@@ -37,7 +37,7 @@
   - ✅ Added 'Block with Angled Holes' strategy demonstrating rotation transforms
 - [x] Implement feature generators
   - ✅ Patterns: linear array (3-5 holes along axis) and circular pattern (4-8 holes around cylinder)
-  - [ ] Fillets and chamfers
+  - ✅ Fillets and chamfers (added beginner strategies: Block with Chamfered Edges, Block with Edge Fillets)
   - [ ] Ribs and webs
 - [ ] Create intermediate difficulty generator
   - 5-8 primitives per part
