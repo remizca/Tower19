@@ -24,9 +24,10 @@
   - ✅ T-shapes (`tests/fixtures/t-bracket.ts`)
   - ✅ Cylinder with cutouts (`tests/fixtures/cylinder-cutout.ts`)
   - ✅ Block with holes (`tests/fixtures/block-hole.ts`)
-- [ ] Add more primitive types to generators
-  - Implement sphere, cone, torus generation
-  - Add transformation support (rotation, scale for angled features)
+- [x] Add more primitive types to generators
+  - Implemented sphere, cone (frustum), and torus primitives in generator
+  - Updated 3D renderer to support subtraction/union with these primitives
+  - [Next] Add transformation support (rotation, scale for angled features)
 - [ ] Implement feature generators
   - Patterns (linear, circular)
   - Fillets and chamfers

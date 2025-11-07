@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added (Nov 7, 2025)
+- **More Primitives**: Added sphere, cone (frustum), and torus primitive types
+  - Generator includes new strategies: Block with Spherical Pockets, Block with Countersinks, Block with Torus Cutout
+  - 3D renderer updated to support subtraction/union with these primitives
 - **Generator Variety**: Expanded beginner generator to create 6 different part types instead of just blocks with holes
   - New part types: L-Bracket, T-Bracket, Cylinder-with-cutouts, Stacked-blocks, Corner-bracket
   - Each part uses 2-6 primitives with varied boolean operations (union, subtract)

@@ -29,6 +29,9 @@ type PartStrategy =
   | 'cylinder-with-cutouts'
   | 'stacked-blocks'
   | 'corner-bracket'
+  | 'block-with-spherical-pockets'
+  | 'block-with-countersinks'
+  | 'block-with-torus-cutout'
 
 const STRATEGIES: PartStrategy[] = [
   'block-with-holes',
@@ -36,7 +39,10 @@ const STRATEGIES: PartStrategy[] = [
   't-bracket',
   'cylinder-with-cutouts',
   'stacked-blocks',
-  'corner-bracket'
+  'corner-bracket',
+  'block-with-spherical-pockets',
+  'block-with-countersinks',
+  'block-with-torus-cutout'
 ]
 
 /**
@@ -66,6 +72,15 @@ export function generateBeginnerPartRecipe(seed = Date.now()): PartRecipe {
       break
     case 'corner-bracket':
       recipe = generateCornerBracket(seed, r)
+      break
+    case 'block-with-spherical-pockets':
+      recipe = generateBlockWithSphericalPockets(seed, r)
+      break
+    case 'block-with-countersinks':
+      recipe = generateBlockWithCountersinks(seed, r)
+      break
+    case 'block-with-torus-cutout':
+      recipe = generateBlockWithTorusCutout(seed, r)
       break
     default:
       recipe = generateBlockWithHoles(seed, r)
@@ -488,6 +503,144 @@ function generateCornerBracket(seed: number, r: () => number): PartRecipe {
     difficulty: 'Beginner',
     units: 'mm',
     bounding_mm: { x: size, y: size, z: size },
+    primitives,
+    operations,
+    createdAt: new Date().toISOString()
+  }
+}
+
+/**
+ * Strategy 7: Block with spherical pockets (sphere subtraction)
+ */
+function generateBlockWithSphericalPockets(seed: number, r: () => number): PartRecipe {
+  const width = Math.round(60 + r() * 100)
+  const depth = Math.round(40 + r() * 80)
+  const height = Math.round(25 + r() * 40)
+
+  const primitives: Primitive[] = [
+    {
+      id: 'p0',
+      kind: 'box',
+      params: { width, depth, height },
+      transform: { position: { x: 0, y: 0, z: 0 } }
+    }
+  ]
+
+  const operations: Operation[] = []
+  const pocketCount = 1 + Math.floor(r() * 3)
+  for (let i = 0; i < pocketCount; i++) {
+    const radius = Math.round(6 + r() * Math.min(width, depth) * 0.15)
+    const px = Math.round((r() - 0.5) * width * 0.6)
+    const py = Math.round((r() - 0.5) * depth * 0.6)
+    // Place sphere so that only the top half cuts into the block
+    const pz = Math.round(height * 0.25 + r() * height * 0.2)
+    const pid = `p${i + 1}`
+    primitives.push({
+      id: pid,
+      kind: 'sphere',
+      params: { radius },
+      transform: { position: { x: px, y: py, z: pz } }
+    })
+    operations.push({ id: `op${i + 1}`, op: 'subtract', targetId: 'p0', toolId: pid })
+  }
+
+  return {
+    id: String(seed),
+    seed,
+    name: 'Block with Spherical Pockets',
+    difficulty: 'Beginner',
+    units: 'mm',
+    bounding_mm: { x: width, y: depth, z: height },
+    primitives,
+    operations,
+    createdAt: new Date().toISOString()
+  }
+}
+
+/**
+ * Strategy 8: Block with countersinks (cylinder + cone/frustum subtraction)
+ */
+function generateBlockWithCountersinks(seed: number, r: () => number): PartRecipe {
+  const width = Math.round(70 + r() * 100)
+  const depth = Math.round(40 + r() * 60)
+  const height = Math.round(20 + r() * 35)
+
+  const primitives: Primitive[] = [
+    { id: 'p0', kind: 'box', params: { width, depth, height }, transform: { position: { x: 0, y: 0, z: 0 } } }
+  ]
+  const operations: Operation[] = []
+
+  const holePairs = 2 + Math.floor(r() * 2) // 2-3 countersunk holes
+  for (let i = 0; i < holePairs; i++) {
+    const baseR = Math.round(3 + r() * 5)
+    const csR = Math.round(baseR * (1.8 + r() * 1.2))
+    const csDepth = Math.round(4 + r() * 6)
+    const x = Math.round((i - (holePairs - 1) / 2) * (width * 0.3))
+    const y = Math.round((r() - 0.5) * depth * 0.5)
+
+    // Through hole (cylinder)
+    primitives.push({
+      id: `p${primitives.length}`,
+      kind: 'cylinder',
+      params: { radius: baseR, height: height * 3, axis: 'z' },
+      transform: { position: { x, y, z: 0 } }
+    })
+    operations.push({ id: `op${operations.length}`, op: 'subtract', targetId: 'p0', toolId: `p${primitives.length - 1}` })
+
+    // Countersink (cone/frustum), placed at top surface
+    primitives.push({
+      id: `p${primitives.length}`,
+      kind: 'cone',
+      params: { radiusTop: baseR, radiusBottom: csR, height: csDepth, axis: 'z' },
+      transform: { position: { x, y, z: height / 2 - csDepth / 2 } }
+    })
+    operations.push({ id: `op${operations.length}`, op: 'subtract', targetId: 'p0', toolId: `p${primitives.length - 1}` })
+  }
+
+  return {
+    id: String(seed),
+    seed,
+    name: 'Block with Countersinks',
+    difficulty: 'Beginner',
+    units: 'mm',
+    bounding_mm: { x: width, y: depth, z: height },
+    primitives,
+    operations,
+    createdAt: new Date().toISOString()
+  }
+}
+
+/**
+ * Strategy 9: Block with torus cutout (donut groove)
+ */
+function generateBlockWithTorusCutout(seed: number, r: () => number): PartRecipe {
+  const width = Math.round(80 + r() * 120)
+  const depth = Math.round(50 + r() * 90)
+  const height = Math.round(25 + r() * 45)
+
+  const primitives: Primitive[] = [
+    { id: 'p0', kind: 'box', params: { width, depth, height }, transform: { position: { x: 0, y: 0, z: 0 } } }
+  ]
+  const operations: Operation[] = []
+
+  const majorRadius = Math.round(Math.min(width, depth) * (0.25 + r() * 0.15))
+  const tubeRadius = Math.round(4 + r() * Math.min(width, depth) * 0.07)
+
+  primitives.push({
+    id: 'p1',
+    kind: 'torus',
+    params: { majorRadius, tubeRadius, axis: 'z' },
+    transform: { position: { x: 0, y: 0, z: 0 } }
+  })
+  operations.push({ id: 'op1', op: 'subtract', targetId: 'p0', toolId: 'p1' })
+
+  return {
+    id: String(seed),
+    seed,
+    name: 'Block with Torus Cutout',
+    difficulty: 'Beginner',
+    units: 'mm',
+    bounding_mm: { x: width, y: depth, z: height },
     primitives,
     operations,
     createdAt: new Date().toISOString()

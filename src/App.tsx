@@ -5,7 +5,7 @@ import { generateBeginnerPartRecipe } from './generators/beginner'
 import type PartRecipe from './types/part'
 import { validatePartRecipe } from './schema/validate'
 import migrateLegacyBeginnerToPartRecipe from './storage/migrate'
-import { Geometry, Base, Subtraction } from '@react-three/csg'
+import { Geometry, Base, Subtraction, Addition } from '@react-three/csg'
 
 function Controls() {
   const { camera, gl } = useThree()
@@ -22,45 +22,216 @@ function Controls() {
   return null
 }
 
+function axisRotation(axis: 'x' | 'y' | 'z' | undefined): [number, number, number] {
+  if (axis === 'x') return [0, 0, Math.PI / 2]
+  if (axis === 'y') return [Math.PI / 2, 0, 0]
+  return [0, 0, 0]
+}
+
+function toVec3mm(vec?: { x: number; y: number; z: number }): [number, number, number] {
+  if (!vec) return [0, 0, 0]
+  return [vec.x / 10, vec.y / 10, vec.z / 10]
+}
+
 function ModelRenderer({ recipe }: { recipe: PartRecipe | null }) {
   if (!recipe) return null
 
-  // Find a base primitive (box) or fallback to the first primitive
+  // Find a base primitive (prefer a box, otherwise first primitive)
   const base = recipe.primitives.find((p) => p.kind === 'box') || recipe.primitives[0]
   if (!base) return null
 
-  // Compute base box dims
-  const boxParams: any = base.params
-  const width = (boxParams.width || 100) / 10
-  const depth = (boxParams.depth || 50) / 10
-  const height = (boxParams.height || 25) / 10
-
-  // For each subtract operation, find its tool primitive
+  // For operations
   const subtractOps = recipe.operations.filter((op) => op.op === 'subtract')
+  const unionOps = recipe.operations.filter((op) => op.op === 'union')
 
   return (
     <group position={[0, 0, 0]}>
       <mesh>
         <Geometry>
           <Base>
-            <boxGeometry args={[width, depth, height]} />
-            <meshStandardMaterial color="#8888cc" metalness={0.2} roughness={0.6} />
+            {base.kind === 'box' && (
+              <>
+                {(() => {
+                  const p: any = base.params
+                  const width = (p.width || 100) / 10
+                  const depth = (p.depth || 50) / 10
+                  const height = (p.height || 25) / 10
+                  const pos = toVec3mm(base.transform?.position)
+                  return (
+                    <group position={pos}>
+                      <boxGeometry args={[width, depth, height]} />
+                      <meshStandardMaterial color="#8888cc" metalness={0.2} roughness={0.6} />
+                    </group>
+                  )
+                })()}
+              </>
+            )}
+            {base.kind === 'cylinder' && (
+              <>
+                {(() => {
+                  const p: any = base.params
+                  const r = (p.radius || 20) / 10
+                  const h = (p.height || 50) / 10
+                  const rot = axisRotation(p.axis)
+                  const pos = toVec3mm(base.transform?.position)
+                  return (
+                    <group position={pos} rotation={rot as any}>
+                      <cylinderGeometry args={[r, r, h, 32]} />
+                      <meshStandardMaterial color="#8888cc" metalness={0.2} roughness={0.6} />
+                    </group>
+                  )
+                })()}
+              </>
+            )}
+            {base.kind === 'sphere' && (
+              <>
+                {(() => {
+                  const p: any = base.params
+                  const r = (p.radius || 20) / 10
+                  const pos = toVec3mm(base.transform?.position)
+                  return (
+                    <group position={pos}>
+                      <sphereGeometry args={[r, 32, 16]} />
+                      <meshStandardMaterial color="#8888cc" metalness={0.2} roughness={0.6} />
+                    </group>
+                  )
+                })()}
+              </>
+            )}
+            {base.kind === 'cone' && (
+              <>
+                {(() => {
+                  const p: any = base.params
+                  const rt = (p.radiusTop || 0) / 10
+                  const rb = (p.radiusBottom || 20) / 10
+                  const h = (p.height || 50) / 10
+                  const rot = axisRotation(p.axis)
+                  const pos = toVec3mm(base.transform?.position)
+                  return (
+                    <group position={pos} rotation={rot as any}>
+                      <cylinderGeometry args={[rt, rb, h, 32]} />
+                      <meshStandardMaterial color="#8888cc" metalness={0.2} roughness={0.6} />
+                    </group>
+                  )
+                })()}
+              </>
+            )}
+            {base.kind === 'torus' && (
+              <>
+                {(() => {
+                  const p: any = base.params
+                  const R = (p.majorRadius || 40) / 10
+                  const r = (p.tubeRadius || 8) / 10
+                  const rot = axisRotation(p.axis)
+                  const pos = toVec3mm(base.transform?.position)
+                  return (
+                    <group position={pos} rotation={rot as any}>
+                      <torusGeometry args={[R, r, 24, 48]} />
+                      <meshStandardMaterial color="#8888cc" metalness={0.2} roughness={0.6} />
+                    </group>
+                  )
+                })()}
+              </>
+            )}
           </Base>
+
+          {unionOps.map((op) => {
+            const tool = recipe.primitives.find((p) => p.id === op.toolId)
+            if (!tool) return null
+            const pos = toVec3mm(tool.transform?.position)
+            if (tool.kind === 'box') {
+              const p: any = tool.params
+              return (
+                <Addition key={op.id} position={pos as any}>
+                  <boxGeometry args={[(p.width || 20) / 10, (p.depth || 20) / 10, (p.height || 20) / 10]} />
+                  <meshStandardMaterial color="#8888cc" />
+                </Addition>
+              )
+            }
+            if (tool.kind === 'cylinder') {
+              const p: any = tool.params
+              const rot = axisRotation(p.axis)
+              return (
+                <Addition key={op.id} position={pos as any} rotation={rot as any}>
+                  <cylinderGeometry args={[(p.radius || 10) / 10, (p.radius || 10) / 10, (p.height || 20) / 10, 32]} />
+                  <meshStandardMaterial color="#8888cc" />
+                </Addition>
+              )
+            }
+            if (tool.kind === 'sphere') {
+              const p: any = tool.params
+              return (
+                <Addition key={op.id} position={pos as any}>
+                  <sphereGeometry args={[(p.radius || 10) / 10, 32, 16]} />
+                  <meshStandardMaterial color="#8888cc" />
+                </Addition>
+              )
+            }
+            if (tool.kind === 'cone') {
+              const p: any = tool.params
+              const rot = axisRotation(p.axis)
+              return (
+                <Addition key={op.id} position={pos as any} rotation={rot as any}>
+                  <cylinderGeometry args={[(p.radiusTop || 0) / 10, (p.radiusBottom || 10) / 10, (p.height || 20) / 10, 32]} />
+                  <meshStandardMaterial color="#8888cc" />
+                </Addition>
+              )
+            }
+            if (tool.kind === 'torus') {
+              const p: any = tool.params
+              const rot = axisRotation(p.axis)
+              return (
+                <Addition key={op.id} position={pos as any} rotation={rot as any}>
+                  <torusGeometry args={[(p.majorRadius || 20) / 10, (p.tubeRadius || 5) / 10, 24, 48]} />
+                  <meshStandardMaterial color="#8888cc" />
+                </Addition>
+              )
+            }
+            return null
+          })}
 
           {subtractOps.map((op) => {
             const tool = recipe.primitives.find((p) => p.id === op.toolId)
             if (!tool) return null
 
+            const pos = toVec3mm(tool.transform?.position)
             if (tool.kind === 'cylinder') {
-              const params: any = tool.params
-              const axis = params.axis || 'z'
-              const r = (params.radius || 5) / 10
-              const h = (params.height || Math.max(recipe.bounding_mm.x, recipe.bounding_mm.y, recipe.bounding_mm.z) * 2) / 10
-              const pos = tool.transform?.position ? [tool.transform.position.x / 10, tool.transform.position.y / 10, tool.transform.position.z / 10] : [0, 0, 0]
-              const rot = axis === 'x' ? [0, 0, Math.PI / 2] : axis === 'y' ? [Math.PI / 2, 0, 0] : [0, 0, 0]
+              const p: any = tool.params
+              const r = (p.radius || 5) / 10
+              const h = (p.height || Math.max(recipe.bounding_mm.x, recipe.bounding_mm.y, recipe.bounding_mm.z) * 2) / 10
+              const rot = axisRotation(p.axis)
               return (
                 <Subtraction key={op.id} position={pos as any} rotation={rot as any}>
                   <cylinderGeometry args={[r, r, h, 32]} />
+                  <meshStandardMaterial color="#333" />
+                </Subtraction>
+              )
+            }
+            if (tool.kind === 'sphere') {
+              const p: any = tool.params
+              return (
+                <Subtraction key={op.id} position={pos as any}>
+                  <sphereGeometry args={[(p.radius || 5) / 10, 32, 16]} />
+                  <meshStandardMaterial color="#333" />
+                </Subtraction>
+              )
+            }
+            if (tool.kind === 'cone') {
+              const p: any = tool.params
+              const rot = axisRotation(p.axis)
+              return (
+                <Subtraction key={op.id} position={pos as any} rotation={rot as any}>
+                  <cylinderGeometry args={[(p.radiusTop || 0) / 10, (p.radiusBottom || 8) / 10, (p.height || 20) / 10, 32]} />
+                  <meshStandardMaterial color="#333" />
+                </Subtraction>
+              )
+            }
+            if (tool.kind === 'torus') {
+              const p: any = tool.params
+              const rot = axisRotation(p.axis)
+              return (
+                <Subtraction key={op.id} position={pos as any} rotation={rot as any}>
+                  <torusGeometry args={[(p.majorRadius || 20) / 10, (p.tubeRadius || 5) / 10, 24, 48]} />
                   <meshStandardMaterial color="#333" />
                 </Subtraction>
               )

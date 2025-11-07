@@ -27,9 +27,13 @@ export type Transform = {
 export type BoxParams = { width: number; depth: number; height: number }
 export type CylinderParams = { radius: number; height: number; axis?: 'x' | 'y' | 'z' }
 export type SphereParams = { radius: number }
-export type PrimitiveParams = BoxParams | CylinderParams | SphereParams | Record<string, unknown>
+// Frustum/cone (generalized with top/bottom radii)
+export type ConeParams = { radiusTop: number; radiusBottom: number; height: number; axis?: 'x' | 'y' | 'z' }
+// Torus (donut): majorRadius is from center to tube center; tubeRadius is radius of tube
+export type TorusParams = { majorRadius: number; tubeRadius: number; axis?: 'x' | 'y' | 'z' }
+export type PrimitiveParams = BoxParams | CylinderParams | SphereParams | ConeParams | TorusParams | Record<string, unknown>
 
-export type PrimitiveKind = 'box' | 'cylinder' | 'sphere' | 'custom'
+export type PrimitiveKind = 'box' | 'cylinder' | 'sphere' | 'cone' | 'torus' | 'custom'
 
 export type Primitive = {
   id: string
