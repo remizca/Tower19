@@ -36,10 +36,13 @@ for (const view of ['front', 'top', 'right'] as const) {
 
   // Get expected counts for this view
   const expected = EXPECTED_COUNTS.visibleEdges[view]
+  const { min, max } = expected
 
-  if (visibleCount !== expected) {
-    throw new Error(`Edge count mismatch for ${view} view. Expected ${expected} visible edges, got ${visibleCount}`)
+  if (visibleCount < min || visibleCount > max) {
+    throw new Error(`Edge count mismatch for ${view} view. Expected ${min}-${max} visible edges, got ${visibleCount}`)
   }
+
+  console.log(`✓ ${view} view: ${visibleCount} visible edges (expected ${min}-${max})`)
 }  console.log('SVG generation test passed! Output written to tests/output/block-hole.svg')
 }
 

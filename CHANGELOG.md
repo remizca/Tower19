@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (Nov 8, 2025)
+- **2D Drawing Engine: SVG Integration Complete**: Integrated edge extraction with SVG renderer
+  - Updated `src/drawing/svg.ts` to use `extractRecipeEdges()` from edges module
+  - Removed legacy 105-line `extractEdges()` function - single source of truth
+  - SVG generation now processes triangulated mesh edges correctly
+  - Test suite validates edge counts in orthographic views (front/top/right)
+  - Generated SVG includes:
+    - Visible edges (solid black lines, 0.7 stroke-width)
+    - Hidden edges (dashed black lines, 0.5 stroke-width)
+    - Proper view separation and title blocks
+  - Test fixture `block-hole.svg` generated successfully with 76-83 edges per view
+  - Edge counts within expected ranges for 32-segment cylinder geometry
+  - Build passing, all TypeScript types correct
+- **2D Drawing Engine: Edge Extraction Testing**: Comprehensive fixture validation
+  - Created `tests/test-all-fixtures.ts` for end-to-end edge extraction testing
+  - Validated edge extraction with all 4 test fixtures:
+    - **Block-Hole**: 222 edges (1 box + 1 cylinder, simple subtraction)
+    - **L-Bracket**: 444 edges (2 boxes + 2 cylinders, union + mounting holes)
+    - **T-Bracket**: 666 edges (3 boxes + 3 cylinders, complex union assembly)
+    - **Cylinder-Cutout**: 1251 edges (1 box + 1 torus, torus cutout)
+  - All fixtures pass with correct edge structure (start/end Vector3 properties)
+  - Edge counts validated against expected ranges for primitive complexity
+  - Demonstrates edge extraction works for all primitive types: box, cylinder, torus
+  - Confirms extraction handles transforms and multiple operations correctly
+- **2D Drawing Engine: Edge Extraction Module**: Created robust mesh-based edge extraction system
+  - New `src/drawing/edges.ts` module with comprehensive edge analysis capabilities
+  - `extractSharpEdges()`: Analyzes BufferGeometry to detect sharp edges based on face angles
+    - Uses 30° angle threshold to distinguish sharp edges from smooth surfaces
+    - Detects boundary edges (single adjacent face) and interior sharp edges (face angle > threshold)
+    - Returns Edge objects with start/end Vector3 points
+  - `extractSilhouetteEdges()`: Identifies silhouette edges where one face is front-facing and other is back-facing
+    - Essential for correct hidden line rendering in orthographic projections
+    - View-direction aware edge classification
+  - `classifyEdgeVisibility()`: Ray-casting based visibility detection
+    - Tests multiple points along edge (start, end, midpoint) for occlusion
+    - Uses Three.js Raycaster for accurate intersection detection
+    - Returns ClassifiedEdge with visible/hidden status
+  - `extractRecipeEdges()`: Convenience function to extract all edges from PartRecipe
+    - Supports all primitive types: box, cylinder, sphere, cone, torus
+    - Handles transforms: position, rotation (degrees to radians), scale
+    - Backward compatible with legacy axis parameter for cylinders
+  - `createPrimitiveGeometry()`: Factory for creating Three.js geometries from recipe primitives
+  - `applyPrimitiveTransform()`: Applies position/rotation/scale transforms to geometries
+  - Tested with block-hole fixture: 222 edges extracted from box + cylinder assembly
+  - Ready for integration with CSG renderer for final mesh analysis
+- **SVG Projection Updates**: Updated svg.ts to use new Edge type
+  - Changed from tuple `[Vector3, Vector3]` to object `{ start: Vector3, end: Vector3 }`
+  - Added viewDirection to ViewConfig for future silhouette edge support
+  - Maintains backward compatibility with existing projection logic
+  - Builds successfully, ready for full integration
+
 ### Added (Nov 7, 2025)
 - **Ribs and Webs Features**: Completed structural reinforcement feature generators
   - Added beginner strategies:

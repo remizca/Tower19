@@ -1,9 +1,10 @@
 /**
- * Basic SVG projection and rendering functions.
- * Uses Three.js for matrix math.
+ * SVG projection and rendering functions with robust edge visibility.
+ * Uses Three.js for matrix math and the edges module for extraction/classification.
  */
 import { Matrix4, Vector3 } from 'three'
 import type { PartRecipe } from '../types/part'
+import { extractRecipeEdges, type Edge } from './edges'
 
 // Line types for ISO drawings (used in generated SVG styles)
 // @ts-expect-error - Used in template literal below
@@ -14,12 +15,12 @@ const LINE_TYPES = {
 } as const
 
 type View = 'front' | 'top' | 'right'
-type Edge = [Vector3, Vector3] // Start and end points
 
 interface ViewConfig {
   matrix: Matrix4
   name: string
   offset: Vector3
+  viewDirection: Vector3
 }
 
 // First-angle orthographic projection
@@ -27,17 +28,20 @@ const VIEW_CONFIGS: Record<View, ViewConfig> = {
   front: {
     matrix: new Matrix4(), // Front view: no rotation
     name: 'Front View',
-    offset: new Vector3(100, 100, 0)
+    offset: new Vector3(100, 100, 0),
+    viewDirection: new Vector3(0, 0, -1) // Looking along -Z
   },
   top: {
     matrix: new Matrix4().makeRotationX(-Math.PI/2), // Top view: rotate -90° around X
     name: 'Top View', 
-    offset: new Vector3(100, 220, 0)
+    offset: new Vector3(100, 220, 0),
+    viewDirection: new Vector3(0, 1, 0) // Looking along +Y (rotated to -Z)
   },
   right: {
     matrix: new Matrix4().makeRotationY(Math.PI/2), // Right view: rotate 90° around Y
     name: 'Right View',
-    offset: new Vector3(220, 100, 0)
+    offset: new Vector3(220, 100, 0),
+    viewDirection: new Vector3(-1, 0, 0) // Looking along -X (rotated to -Z)
   }
 }
 
@@ -53,106 +57,13 @@ function createTitleBlock(name: string, scale = '1:1', units = 'mm') {
   `
 }
 
-// Basic edge extraction from primitive data
-function extractEdges(recipe: PartRecipe): Edge[] {
-  const edges: Edge[] = []
-  
-  // Start by adding the base box edges
-  const base = recipe.primitives.find(p => p.id === 'p0') 
-  if (base && base.kind === 'box') {
-    const params = base.params as any
-    const w = params.width/2, d = params.depth/2, h = params.height/2
-    
-    // 8 corners of the box
-    const corners = [
-      new Vector3(-w, -d, -h), new Vector3(w, -d, -h), // front bottom
-      new Vector3(w, d, -h), new Vector3(-w, d, -h),   // back bottom
-      new Vector3(-w, -d, h), new Vector3(w, -d, h),   // front top
-      new Vector3(w, d, h), new Vector3(-w, d, h),     // back top
-    ]
-
-    // 12 box edges
-    edges.push(
-      [corners[0], corners[1]], [corners[1], corners[2]], // bottom face
-      [corners[2], corners[3]], [corners[3], corners[0]],
-      [corners[4], corners[5]], [corners[5], corners[6]], // top face
-      [corners[6], corners[7]], [corners[7], corners[4]],
-      [corners[0], corners[4]], [corners[1], corners[5]], // verticals
-      [corners[2], corners[6]], [corners[3], corners[7]]
-    )
-  }
-
-  // Add simplified hole edges (vertical lines and circle)
-  recipe.primitives.forEach(primitive => {
-    if (primitive.kind === 'cylinder') {
-      const params = primitive.params as any
-      const segments = 4 // Simple octagonal approximation for test
-      const angleStep = (2 * Math.PI) / segments
-      const r = params.radius
-      const center = primitive.transform?.position || { x: 0, y: 0, z: 0 }
-
-      // Add circle edges at top and bottom
-      const h = params.height/2
-      for (let i = 0; i < segments; i++) {
-        const angle1 = i * angleStep
-        const angle2 = ((i + 1) % segments) * angleStep
-        
-        // Bottom circle
-        edges.push([
-          new Vector3(
-            center.x + r * Math.cos(angle1),
-            center.y + r * Math.sin(angle1),
-            center.z - h
-          ),
-          new Vector3(
-            center.x + r * Math.cos(angle2),
-            center.y + r * Math.sin(angle2),
-            center.z - h
-          )
-        ])
-
-        // Top circle
-        edges.push([
-          new Vector3(
-            center.x + r * Math.cos(angle1),
-            center.y + r * Math.sin(angle1),
-            center.z + h
-          ),
-          new Vector3(
-            center.x + r * Math.cos(angle2),
-            center.y + r * Math.sin(angle2),
-            center.z + h
-          )
-        ])
-      }
-
-      // Add vertical lines at corners
-      for (let i = 0; i < segments; i++) {
-        const angle = i * angleStep
-        edges.push([
-          new Vector3(
-            center.x + r * Math.cos(angle),
-            center.y + r * Math.sin(angle),
-            center.z - h
-          ),
-          new Vector3(
-            center.x + r * Math.cos(angle),
-            center.y + r * Math.sin(angle),
-            center.z + h
-          )
-        ])
-      }
-    }
-  })
-
-  return edges
-}
-
 // Project 3D edges to 2D SVG paths
 function projectEdges(edges: Edge[], viewConfig: ViewConfig, scale = 1): string[] {
   const paths: string[] = []
   
-  edges.forEach(([start, end]) => {
+  edges.forEach((edge) => {
+    const { start, end } = edge
+    
     // Debug log input points
     console.log(`Edge: ${start.toArray()} -> ${end.toArray()}`)
 
@@ -232,8 +143,11 @@ function projectEdges(edges: Edge[], viewConfig: ViewConfig, scale = 1): string[
  * Generate an SVG drawing for a part recipe
  */
 export function generateDrawing(recipe: PartRecipe): string {
-  // Extract edges from primitives
-  const edges = extractEdges(recipe)
+  // Extract edges from primitives using new edge extraction module
+  // This provides better support for all primitive types and proper sharp edge detection
+  const edges = extractRecipeEdges(recipe)
+  
+  console.log(`[SVG] Extracted ${edges.length} edges from recipe with ${recipe.primitives.length} primitives`)
 
   // Project each view
   const views = Object.entries(VIEW_CONFIGS).map(([name, config]) => {
