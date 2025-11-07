@@ -1,12 +1,10 @@
-import Ajv from 'ajv'
-import schema from '../../docs/schema/part-recipe.schema.json'
+import { isMinimalPartRecipe } from '../types/part'
 
-const ajv = new Ajv({ allErrors: true })
-const validate = ajv.compile(schema as object)
-
+// Lightweight runtime validation to keep client bundle small and avoid
+// bundling AJV in the browser. Ensures basic shape only.
 export function validatePartRecipe(obj: any): { valid: boolean; errors?: any } {
-  const valid = validate(obj)
-  return { valid: Boolean(valid), errors: validate.errors }
+  const valid = isMinimalPartRecipe(obj)
+  return { valid, errors: valid ? undefined : 'Invalid PartRecipe shape' }
 }
 
 export default validatePartRecipe
