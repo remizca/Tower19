@@ -33,6 +33,8 @@ type PartStrategy =
   | 'block-with-countersinks'
   | 'block-with-torus-cutout'
   | 'block-with-angled-holes'
+  | 'block-with-linear-hole-pattern'
+  | 'cylinder-with-circular-hole-pattern'
 
 const STRATEGIES: PartStrategy[] = [
   'block-with-holes',
@@ -44,7 +46,9 @@ const STRATEGIES: PartStrategy[] = [
   'block-with-spherical-pockets',
   'block-with-countersinks',
   'block-with-torus-cutout',
-  'block-with-angled-holes'
+  'block-with-angled-holes',
+  'block-with-linear-hole-pattern',
+  'cylinder-with-circular-hole-pattern'
 ]
 
 /**
@@ -86,6 +90,12 @@ export function generateBeginnerPartRecipe(seed = Date.now()): PartRecipe {
       break
     case 'block-with-angled-holes':
       recipe = generateBlockWithAngledHoles(seed, r)
+      break
+    case 'block-with-linear-hole-pattern':
+      recipe = generateBlockWithLinearHolePattern(seed, r)
+      break
+    case 'cylinder-with-circular-hole-pattern':
+      recipe = generateCylinderWithCircularHolePattern(seed, r)
       break
     default:
       recipe = generateBlockWithHoles(seed, r)
@@ -711,6 +721,130 @@ function generateBlockWithAngledHoles(seed: number, r: () => number): PartRecipe
     difficulty: 'Beginner',
     units: 'mm',
     bounding_mm: { x: width, y: depth, z: height },
+    primitives,
+    operations,
+    createdAt: new Date().toISOString()
+  }
+}
+
+/**
+ * Strategy 11: Block with linear hole pattern (demonstrates position transforms)
+ */
+function generateBlockWithLinearHolePattern(seed: number, r: () => number): PartRecipe {
+  const width = Math.round(80 + r() * 100)
+  const depth = Math.round(40 + r() * 60)
+  const height = Math.round(20 + r() * 40)
+  
+  const primitives: Primitive[] = [{
+    id: 'p0',
+    kind: 'box',
+    params: { width, depth, height },
+    transform: { position: { x: 0, y: 0, z: 0 } }
+  }]
+  
+  const operations: Operation[] = []
+  
+  // Linear pattern: 3-5 holes along X axis
+  const holeCount = 3 + Math.floor(r() * 3)
+  const radius = Math.round(4 + r() * 6)
+  const spacing = width / (holeCount + 1)
+  
+  for (let i = 0; i < holeCount; i++) {
+    const xPos = -width / 2 + spacing * (i + 1)
+    const yOffset = Math.round((r() - 0.5) * depth * 0.3) // slight Y variation
+    
+    primitives.push({
+      id: `p${i + 1}`,
+      kind: 'cylinder',
+      params: { radius, height: height * 3, axis: 'z' },
+      transform: {
+        position: {
+          x: xPos,
+          y: yOffset,
+          z: 0
+        }
+      }
+    })
+    
+    operations.push({
+      id: `op${i + 1}`,
+      op: 'subtract',
+      targetId: 'p0',
+      toolId: `p${i + 1}`
+    })
+  }
+  
+  return {
+    id: String(seed),
+    seed,
+    name: 'Block with Linear Hole Pattern',
+    difficulty: 'Beginner',
+    units: 'mm',
+    bounding_mm: { x: width, y: depth, z: height },
+    primitives,
+    operations,
+    createdAt: new Date().toISOString()
+  }
+}
+
+/**
+ * Strategy 12: Cylinder with circular hole pattern
+ */
+function generateCylinderWithCircularHolePattern(seed: number, r: () => number): PartRecipe {
+  const radius = Math.round(30 + r() * 30)
+  const height = Math.round(30 + r() * 50)
+  
+  const primitives: Primitive[] = [{
+    id: 'p0',
+    kind: 'cylinder',
+    params: { radius, height, axis: 'z' },
+    transform: { position: { x: 0, y: 0, z: 0 } }
+  }]
+  
+  const operations: Operation[] = []
+  
+  // Circular pattern: 4-8 holes around the cylinder
+  const holeCount = 4 + Math.floor(r() * 5)
+  const holeRadius = Math.round(3 + r() * 5)
+  const patternRadius = radius * 0.65 // holes positioned at 65% of cylinder radius
+  const angleStep = 360 / holeCount
+  
+  for (let i = 0; i < holeCount; i++) {
+    const angle = angleStep * i
+    const angleRad = (angle * Math.PI) / 180
+    
+    // Calculate position on circle
+    const xPos = patternRadius * Math.cos(angleRad)
+    const yPos = patternRadius * Math.sin(angleRad)
+    
+    primitives.push({
+      id: `p${i + 1}`,
+      kind: 'cylinder',
+      params: { radius: holeRadius, height: height * 2, axis: 'z' },
+      transform: {
+        position: {
+          x: Math.round(xPos),
+          y: Math.round(yPos),
+          z: 0
+        }
+      }
+    })
+    
+    operations.push({
+      id: `op${i + 1}`,
+      op: 'subtract',
+      targetId: 'p0',
+      toolId: `p${i + 1}`
+    })
+  }
+  
+  return {
+    id: String(seed),
+    seed,
+    name: 'Cylinder with Circular Hole Pattern',
+    difficulty: 'Beginner',
+    units: 'mm',
+    bounding_mm: { x: radius * 2, y: radius * 2, z: height },
     primitives,
     operations,
     createdAt: new Date().toISOString()

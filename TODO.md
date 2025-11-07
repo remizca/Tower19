@@ -35,10 +35,10 @@
   - ✅ Applied transforms for operation tools (position + axis-based rotation) in CSG renderer
   - ✅ Full rotation (rx, ry, rz) and scale support implemented in recipes and renderer
   - ✅ Added 'Block with Angled Holes' strategy demonstrating rotation transforms
-- [ ] Implement feature generators
-  - Patterns (linear, circular)
-  - Fillets and chamfers
-  - Ribs and webs
+- [x] Implement feature generators
+  - ✅ Patterns: linear array (3-5 holes along axis) and circular pattern (4-8 holes around cylinder)
+  - [ ] Fillets and chamfers
+  - [ ] Ribs and webs
 - [ ] Create intermediate difficulty generator
   - 5-8 primitives per part
   - More complex boolean combinations

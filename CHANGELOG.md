@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added (Nov 7, 2025)
+- **Pattern Generators**: Implemented linear and circular hole pattern strategies
+  - 'Block with Linear Hole Pattern': 3-5 holes evenly spaced along X axis with slight Y variation
+  - 'Cylinder with Circular Hole Pattern': 4-8 holes arranged in circular pattern around cylinder axis
+  - Both patterns use transform.position for precise hole placement
+  - Now 12 total generator strategies (up from 10)
 - **Full Transform Support**: Implemented complete rotation (x, y, z Euler angles in degrees) and scale (x, y, z) support
   - `computeTransform()` helper in App.tsx handles position/rotation/scale from transform objects
   - Rotation values in recipes are in degrees, converted to radians for Three.js
