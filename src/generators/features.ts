@@ -1,6 +1,6 @@
 /**
  * Reusable feature generation helpers
- * Provides common CAD features (chamfers, fillets) for use across all difficulty levels
+ * Provides common CAD features (chamfers, fillets, ribs, webs, patterns) for use across all difficulty levels
  */
 
 import type { Primitive, Operation } from '../types/part'
@@ -271,4 +271,214 @@ export const EDGE_CONFIGS = {
     { x: 1, y: -1 },
     { x: 1, y: 1 }
   ]
+}
+
+/**
+ * Generate rib features (thin vertical walls for structural reinforcement)
+ * Ribs are typically perpendicular to a base surface, connecting two parallel surfaces
+ * @param ribCount - Number of ribs to generate
+ * @param ribThickness - Thickness of each rib in mm
+ * @param ribHeight - Height of ribs in mm
+ * @param ribLength - Length of ribs in mm
+ * @param spacing - Distance between ribs in mm
+ * @param orientation - 'x' (ribs along X axis) or 'y' (ribs along Y axis)
+ * @param basePosition - Position of base plane { x, y, z } in mm
+ * @param startPrimId - Starting primitive ID counter
+ * @param startOpId - Starting operation ID counter
+ * @param targetId - ID of the primitive to union with
+ * @returns Object containing primitives and operations to add
+ */
+export function generateRibFeatures(
+  ribCount: number,
+  ribThickness: number,
+  ribHeight: number,
+  ribLength: number,
+  spacing: number,
+  orientation: 'x' | 'y',
+  basePosition: { x: number; y: number; z: number },
+  startPrimId: number,
+  startOpId: number,
+  targetId: string
+): { primitives: Primitive[]; operations: Operation[] } {
+  const primitives: Primitive[] = []
+  const operations: Operation[] = []
+  
+  let primId = startPrimId
+  let opId = startOpId
+  
+  for (let i = 0; i < ribCount; i++) {
+    const offset = -(ribCount - 1) * spacing / 2 + i * spacing
+    
+    let position: { x: number; y: number; z: number }
+    let params: { width: number; depth: number; height: number }
+    
+    if (orientation === 'x') {
+      // Ribs perpendicular to X axis (thin in Y direction)
+      position = {
+        x: basePosition.x,
+        y: basePosition.y + offset,
+        z: basePosition.z + ribHeight / 2
+      }
+      params = {
+        width: ribLength,
+        depth: ribThickness,
+        height: ribHeight
+      }
+    } else {
+      // Ribs perpendicular to Y axis (thin in X direction)
+      position = {
+        x: basePosition.x + offset,
+        y: basePosition.y,
+        z: basePosition.z + ribHeight / 2
+      }
+      params = {
+        width: ribThickness,
+        depth: ribLength,
+        height: ribHeight
+      }
+    }
+    
+    primitives.push({
+      id: `p${primId}`,
+      kind: 'box',
+      params,
+      transform: { position }
+    })
+    operations.push({
+      id: `op${opId}`,
+      op: 'union',
+      targetId,
+      toolId: `p${primId}`
+    })
+    primId++
+    opId++
+  }
+  
+  return { primitives, operations }
+}
+
+/**
+ * Generate web features (thin plates connecting structural elements)
+ * Webs are typically diagonal or vertical supports connecting two non-parallel surfaces
+ * @param webCount - Number of webs to generate
+ * @param webThickness - Thickness of each web in mm
+ * @param webWidth - Width of web in mm
+ * @param webHeight - Height of web in mm
+ * @param positions - Array of web center positions { x, y, z } in mm
+ * @param rotation - Rotation angles for webs (degrees)
+ * @param startPrimId - Starting primitive ID counter
+ * @param startOpId - Starting operation ID counter
+ * @param targetId - ID of the primitive to union with
+ * @returns Object containing primitives and operations to add
+ */
+export function generateWebFeatures(
+  webCount: number,
+  webThickness: number,
+  webWidth: number,
+  webHeight: number,
+  positions: Array<{ x: number; y: number; z: number }>,
+  rotation: { x: number; y: number; z: number },
+  startPrimId: number,
+  startOpId: number,
+  targetId: string
+): { primitives: Primitive[]; operations: Operation[] } {
+  const primitives: Primitive[] = []
+  const operations: Operation[] = []
+  
+  let primId = startPrimId
+  let opId = startOpId
+  
+  for (let i = 0; i < Math.min(webCount, positions.length); i++) {
+    primitives.push({
+      id: `p${primId}`,
+      kind: 'box',
+      params: {
+        width: webWidth,
+        depth: webThickness,
+        height: webHeight
+      },
+      transform: {
+        position: positions[i],
+        rotation
+      }
+    })
+    operations.push({
+      id: `op${opId}`,
+      op: 'union',
+      targetId,
+      toolId: `p${primId}`
+    })
+    primId++
+    opId++
+  }
+  
+  return { primitives, operations }
+}
+
+/**
+ * Generate radial rib features (ribs radiating from a center point)
+ * Useful for circular bases, flanges, or cylindrical structures
+ * @param ribCount - Number of radial ribs
+ * @param ribThickness - Thickness of each rib in mm
+ * @param ribHeight - Height of ribs in mm
+ * @param ribLength - Radial length of ribs in mm
+ * @param centerPosition - Center position { x, y, z } in mm
+ * @param startPrimId - Starting primitive ID counter
+ * @param startOpId - Starting operation ID counter
+ * @param targetId - ID of the primitive to union with
+ * @returns Object containing primitives and operations to add
+ */
+export function generateRadialRibFeatures(
+  ribCount: number,
+  ribThickness: number,
+  ribHeight: number,
+  ribLength: number,
+  centerPosition: { x: number; y: number; z: number },
+  startPrimId: number,
+  startOpId: number,
+  targetId: string
+): { primitives: Primitive[]; operations: Operation[] } {
+  const primitives: Primitive[] = []
+  const operations: Operation[] = []
+  
+  let primId = startPrimId
+  let opId = startOpId
+  const angleStep = 360 / ribCount
+  
+  for (let i = 0; i < ribCount; i++) {
+    const angle = angleStep * i
+    const angleRad = (angle * Math.PI) / 180
+    
+    // Position rib at half its length from center
+    const xOffset = Math.round((ribLength / 2) * Math.cos(angleRad))
+    const yOffset = Math.round((ribLength / 2) * Math.sin(angleRad))
+    
+    primitives.push({
+      id: `p${primId}`,
+      kind: 'box',
+      params: {
+        width: ribLength,
+        depth: ribThickness,
+        height: ribHeight
+      },
+      transform: {
+        position: {
+          x: centerPosition.x + xOffset,
+          y: centerPosition.y + yOffset,
+          z: centerPosition.z + ribHeight / 2
+        },
+        rotation: { x: 0, y: 0, z: angle }
+      }
+    })
+    operations.push({
+      id: `op${opId}`,
+      op: 'union',
+      targetId,
+      toolId: `p${primId}`
+    })
+    primId++
+    opId++
+  }
+  
+  return { primitives, operations }
 }

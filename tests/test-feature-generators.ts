@@ -1,7 +1,7 @@
 import { generateBeginnerPartRecipe } from '../src/generators/beginner'
 
-// Simple smoke test ensuring new feature strategies (chamfers & fillets) appear across seeds
-const seeds = Array.from({ length: 80 }, () => Math.floor(Math.random() * 1_000_000))
+// Simple smoke test ensuring all feature strategies appear across seeds
+const seeds = Array.from({ length: 100 }, () => Math.floor(Math.random() * 1_000_000))
 
 const seen = new Set<string>()
 for (const seed of seeds) {
@@ -9,7 +9,12 @@ for (const seed of seeds) {
   seen.add(recipe.name)
 }
 
-const required = ['Block with Chamfered Edges', 'Block with Edge Fillets']
+const required = [
+  'Block with Chamfered Edges',
+  'Block with Edge Fillets',
+  'Block with Support Ribs',
+  'Bracket with Web Reinforcement'
+]
 let missing: string[] = []
 for (const name of required) {
   if (!seen.has(name)) missing.push(name)
@@ -20,5 +25,6 @@ if (missing.length) {
   console.error('Seen strategies:', Array.from(seen).sort())
   process.exit(1)
 } else {
-  console.log('Feature generator test passed. Strategies observed:', required)
+  console.log('Feature generator test passed. All strategies observed:', required)
+  console.log('Total unique beginner strategies:', seen.size)
 }

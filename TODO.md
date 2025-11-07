@@ -39,7 +39,8 @@
   - ✅ Patterns: linear array (3-5 holes along axis) and circular pattern (4-8 holes around cylinder)
   - ✅ Fillets and chamfers (added beginner strategies: Block with Chamfered Edges, Block with Edge Fillets)
   - ✅ Created shared features.ts module with reusable helpers for chamfers, fillets, linear/circular patterns
-  - [ ] Ribs and webs
+  - ✅ Ribs and webs (added beginner strategies: Block with Support Ribs, Bracket with Web Reinforcement)
+  - ✅ Extended features.ts with generateRibFeatures(), generateWebFeatures(), generateRadialRibFeatures()
 - [x] Create intermediate difficulty generator
   - ✅ 5-8 primitives per part
   - ✅ More complex boolean combinations (unions + subtractions)

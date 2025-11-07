@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added (Nov 7, 2025)
+- **Ribs and Webs Features**: Completed structural reinforcement feature generators
+  - Added beginner strategies:
+    - 'Block with Support Ribs': Flat base with 2-4 parallel ribs for structural support
+    - 'Bracket with Web Reinforcement': L-bracket with 1-2 diagonal webs connecting legs
+  - Extended features.ts with three new helpers:
+    - `generateRibFeatures()`: Parallel ribs perpendicular to base surface
+    - `generateWebFeatures()`: Thin plates connecting structural elements with configurable rotation
+    - `generateRadialRibFeatures()`: Ribs radiating from center point for circular structures
+  - Now 16 total beginner strategies (up from 14)
+  - Completes all planned feature generators (patterns, chamfers, fillets, ribs, webs)
 - **Intermediate Difficulty Generator**: Implemented complete intermediate-level generator with 4 strategies
   - Multi-Feature Block: Combines linear patterns, pockets, and corner chamfers (5-8 primitives)
   - Patterned Bracket: L-bracket with circular pattern on vertical face and linear pattern in base (6-9 primitives)

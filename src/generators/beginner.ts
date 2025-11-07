@@ -37,6 +37,8 @@ type PartStrategy =
   | 'cylinder-with-circular-hole-pattern'
   | 'block-with-chamfered-edges'
   | 'block-with-edge-fillets'
+  | 'block-with-support-ribs'
+  | 'bracket-with-web-reinforcement'
 
 const STRATEGIES: PartStrategy[] = [
   'block-with-holes',
@@ -52,7 +54,9 @@ const STRATEGIES: PartStrategy[] = [
   'block-with-linear-hole-pattern',
   'cylinder-with-circular-hole-pattern',
   'block-with-chamfered-edges',
-  'block-with-edge-fillets'
+  'block-with-edge-fillets',
+  'block-with-support-ribs',
+  'bracket-with-web-reinforcement'
 ]
 
 /**
@@ -107,13 +111,18 @@ export function generateBeginnerPartRecipe(seed = Date.now()): PartRecipe {
     case 'block-with-edge-fillets':
       recipe = generateBlockWithEdgeFillets(seed, r)
       break
+    case 'block-with-support-ribs':
+      recipe = generateBlockWithSupportRibs(seed, r)
+      break
+    case 'bracket-with-web-reinforcement':
+      recipe = generateBracketWithWebReinforcement(seed, r)
+      break
     default:
       recipe = generateBlockWithHoles(seed, r)
   }
   
   return recipe
 }
-
 /**
  * Strategy 1: Block with cylindrical holes (original)
  */
@@ -992,6 +1001,256 @@ function generateBlockWithEdgeFillets(seed: number, r: () => number): PartRecipe
     difficulty: 'Beginner',
     units: 'mm',
     bounding_mm: { x: width, y: depth, z: height },
+    primitives,
+    operations,
+    createdAt: new Date().toISOString()
+  }
+}
+
+/**
+ * Strategy 15: Block with support ribs (demonstrates rib reinforcement)
+ * Creates a flat base with parallel ribs for structural support
+ */
+function generateBlockWithSupportRibs(seed: number, r: () => number): PartRecipe {
+  const baseWidth = Math.round(80 + r() * 100)
+  const baseDepth = Math.round(60 + r() * 80)
+  const baseHeight = Math.round(12 + r() * 18)
+  
+  const primitives: Primitive[] = [{
+    id: 'p0',
+    kind: 'box',
+    params: { width: baseWidth, depth: baseDepth, height: baseHeight },
+    transform: { position: { x: 0, y: 0, z: 0 } }
+  }]
+  
+  const operations: Operation[] = []
+  let primId = 1
+  let opId = 1
+  
+  // Add parallel ribs (2-4 ribs)
+  const ribCount = 2 + Math.floor(r() * 3)
+  const ribThickness = Math.round(baseHeight * 0.4)
+  const ribHeight = Math.round(baseHeight * (1.2 + r() * 0.8))
+  const ribLength = baseDepth * 0.8
+  const spacing = baseWidth / (ribCount + 1)
+  const orientation = r() > 0.5 ? 'y' : 'x'
+  
+  for (let i = 0; i < ribCount; i++) {
+    const offset = -baseWidth / 2 + spacing * (i + 1)
+    
+    let position: { x: number; y: number; z: number }
+    let params: { width: number; depth: number; height: number }
+    
+    if (orientation === 'x') {
+      position = {
+        x: 0,
+        y: offset,
+        z: baseHeight / 2 + ribHeight / 2
+      }
+      params = {
+        width: ribLength,
+        depth: ribThickness,
+        height: ribHeight
+      }
+    } else {
+      position = {
+        x: offset,
+        y: 0,
+        z: baseHeight / 2 + ribHeight / 2
+      }
+      params = {
+        width: ribThickness,
+        depth: ribLength,
+        height: ribHeight
+      }
+    }
+    
+    primitives.push({
+      id: `p${primId}`,
+      kind: 'box',
+      params,
+      transform: { position }
+    })
+    operations.push({
+      id: `op${opId}`,
+      op: 'union',
+      targetId: 'p0',
+      toolId: `p${primId}`
+    })
+    primId++
+    opId++
+  }
+  
+  // Add mounting holes in base
+  const holeCount = 2 + Math.floor(r() * 2)
+  const holeRadius = Math.round(4 + r() * 5)
+  
+  for (let i = 0; i < holeCount; i++) {
+    const xPos = Math.round((r() - 0.5) * baseWidth * 0.7)
+    const yPos = Math.round((r() - 0.5) * baseDepth * 0.7)
+    
+    primitives.push({
+      id: `p${primId}`,
+      kind: 'cylinder',
+      params: { radius: holeRadius, height: baseHeight * 3, axis: 'z' },
+      transform: {
+        position: { x: xPos, y: yPos, z: 0 }
+      }
+    })
+    operations.push({
+      id: `op${opId}`,
+      op: 'subtract',
+      targetId: 'p0',
+      toolId: `p${primId}`
+    })
+    primId++
+    opId++
+  }
+  
+  const maxZ = baseHeight / 2 + ribHeight
+  
+  return {
+    id: String(seed),
+    seed,
+    name: 'Block with Support Ribs',
+    difficulty: 'Beginner',
+    units: 'mm',
+    bounding_mm: { x: baseWidth, y: baseDepth, z: maxZ * 2 },
+    primitives,
+    operations,
+    createdAt: new Date().toISOString()
+  }
+}
+
+/**
+ * Strategy 16: Bracket with web reinforcement (demonstrates diagonal web supports)
+ * Creates an L-bracket with diagonal web connecting the two legs
+ */
+function generateBracketWithWebReinforcement(seed: number, r: () => number): PartRecipe {
+  const baseWidth = Math.round(60 + r() * 80)
+  const baseDepth = Math.round(50 + r() * 70)
+  const baseHeight = Math.round(15 + r() * 20)
+  
+  const vertWidth = baseWidth
+  const vertDepth = baseHeight
+  const vertHeight = Math.round(50 + r() * 70)
+  
+  const primitives: Primitive[] = [
+    {
+      id: 'p0',
+      kind: 'box',
+      params: { width: baseWidth, depth: baseDepth, height: baseHeight },
+      transform: { position: { x: 0, y: baseDepth / 2, z: 0 } }
+    },
+    {
+      id: 'p1',
+      kind: 'box',
+      params: { width: vertWidth, depth: vertDepth, height: vertHeight },
+      transform: { position: { x: 0, y: 0, z: vertHeight / 2 + baseHeight / 2 } }
+    }
+  ]
+  
+  const operations: Operation[] = [{
+    id: 'op1',
+    op: 'union',
+    targetId: 'p0',
+    toolId: 'p1'
+  }]
+  
+  let primId = 2
+  let opId = 2
+  
+  // Add diagonal web(s) connecting base and vertical
+  const webCount = 1 + Math.floor(r() * 2) // 1-2 webs
+  const webThickness = Math.round(baseHeight * 0.6)
+  const webWidth = Math.round(Math.min(baseWidth, vertHeight) * 0.4)
+  
+  // Calculate web dimensions and angle
+  const webHeight = Math.sqrt(baseDepth * baseDepth + vertHeight * vertHeight) * 0.6
+  const webAngle = Math.atan2(vertHeight, baseDepth) * (180 / Math.PI)
+  
+  for (let i = 0; i < webCount; i++) {
+    const xOffset = (i - (webCount - 1) / 2) * (baseWidth * 0.4)
+    
+    primitives.push({
+      id: `p${primId}`,
+      kind: 'box',
+      params: {
+        width: webWidth,
+        depth: webThickness,
+        height: webHeight
+      },
+      transform: {
+        position: {
+          x: xOffset,
+          y: baseDepth / 4,
+          z: vertHeight / 3
+        },
+        rotation: { x: webAngle, y: 0, z: 0 }
+      }
+    })
+    operations.push({
+      id: `op${opId}`,
+      op: 'union',
+      targetId: 'p0',
+      toolId: `p${primId}`
+    })
+    primId++
+    opId++
+  }
+  
+  // Add mounting holes
+  const holeRadius = Math.round(4 + r() * 6)
+  
+  // Hole in base
+  primitives.push({
+    id: `p${primId}`,
+    kind: 'cylinder',
+    params: { radius: holeRadius, height: baseHeight * 3, axis: 'z' },
+    transform: {
+      position: {
+        x: Math.round((r() - 0.5) * baseWidth * 0.5),
+        y: baseDepth * 0.65,
+        z: 0
+      }
+    }
+  })
+  operations.push({
+    id: `op${opId}`,
+    op: 'subtract',
+    targetId: 'p0',
+    toolId: `p${primId}`
+  })
+  primId++
+  opId++
+  
+  // Hole in vertical
+  primitives.push({
+    id: `p${primId}`,
+    kind: 'cylinder',
+    params: { radius: holeRadius, height: vertDepth * 3, axis: 'y' },
+    transform: {
+      position: {
+        x: Math.round((r() - 0.5) * vertWidth * 0.5),
+        y: 0,
+        z: vertHeight * 0.7 + baseHeight / 2
+      }
+    }
+  })
+  operations.push({
+    id: `op${opId}`,
+    op: 'subtract',
+    targetId: 'p0',
+    toolId: `p${primId}`
+  })
+  
+  return {
+    id: String(seed),
+    seed,
+    name: 'Bracket with Web Reinforcement',
+    difficulty: 'Beginner',
+    units: 'mm',
+    bounding_mm: { x: baseWidth, y: baseDepth, z: vertHeight + baseHeight },
     primitives,
     operations,
     createdAt: new Date().toISOString()
