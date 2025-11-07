@@ -111,10 +111,14 @@ function ModelRenderer({ recipe }: { recipe: PartRecipe | null }) {
           {unionOps.map((op) => {
             const tool = recipe.primitives.find((p) => p.id === op.toolId)
             if (!tool) return null
+            const pos = tool.transform?.position ? [tool.transform.position.x / 10, tool.transform.position.y / 10, tool.transform.position.z / 10] as [number,number,number] : undefined
+            const axis = (tool as any).params?.axis || 'z'
+            const rot: [number,number,number] | undefined = axis === 'x' ? [0,0,Math.PI/2] : axis === 'y' ? [Math.PI/2,0,0] : undefined
+
             if (tool.kind === 'box') {
               const p: any = tool.params
               return (
-                <Addition key={op.id}>
+                <Addition key={op.id} position={pos as any} rotation={rot as any}>
                   <boxGeometry args={[(p.width || 20) / 10, (p.depth || 20) / 10, (p.height || 20) / 10]} />
                   <meshStandardMaterial color="#8888cc" />
                 </Addition>
@@ -123,7 +127,7 @@ function ModelRenderer({ recipe }: { recipe: PartRecipe | null }) {
             if (tool.kind === 'cylinder') {
               const p: any = tool.params
               return (
-                <Addition key={op.id}>
+                <Addition key={op.id} position={pos as any} rotation={rot as any}>
                   <cylinderGeometry args={[(p.radius || 10) / 10, (p.radius || 10) / 10, (p.height || 20) / 10, 32]} />
                   <meshStandardMaterial color="#8888cc" />
                 </Addition>
@@ -132,7 +136,7 @@ function ModelRenderer({ recipe }: { recipe: PartRecipe | null }) {
             if (tool.kind === 'sphere') {
               const p: any = tool.params
               return (
-                <Addition key={op.id}>
+                <Addition key={op.id} position={pos as any} rotation={rot as any}>
                   <sphereGeometry args={[(p.radius || 10) / 10, 32, 16]} />
                   <meshStandardMaterial color="#8888cc" />
                 </Addition>
@@ -141,7 +145,7 @@ function ModelRenderer({ recipe }: { recipe: PartRecipe | null }) {
             if (tool.kind === 'cone') {
               const p: any = tool.params
               return (
-                <Addition key={op.id}>
+                <Addition key={op.id} position={pos as any} rotation={rot as any}>
                   <cylinderGeometry args={[(p.radiusTop || 0) / 10, (p.radiusBottom || 10) / 10, (p.height || 20) / 10, 32]} />
                   <meshStandardMaterial color="#8888cc" />
                 </Addition>
@@ -150,7 +154,7 @@ function ModelRenderer({ recipe }: { recipe: PartRecipe | null }) {
             if (tool.kind === 'torus') {
               const p: any = tool.params
               return (
-                <Addition key={op.id}>
+                <Addition key={op.id} position={pos as any} rotation={rot as any}>
                   <torusGeometry args={[(p.majorRadius || 20) / 10, (p.tubeRadius || 5) / 10, 24, 48]} />
                   <meshStandardMaterial color="#8888cc" />
                 </Addition>
@@ -163,12 +167,16 @@ function ModelRenderer({ recipe }: { recipe: PartRecipe | null }) {
             const tool = recipe.primitives.find((p) => p.id === op.toolId)
             if (!tool) return null
 
+            const pos = tool.transform?.position ? [tool.transform.position.x / 10, tool.transform.position.y / 10, tool.transform.position.z / 10] as [number,number,number] : undefined
+            const axis = (tool as any).params?.axis || 'z'
+            const rot: [number,number,number] | undefined = axis === 'x' ? [0,0,Math.PI/2] : axis === 'y' ? [Math.PI/2,0,0] : undefined
+
             if (tool.kind === 'cylinder') {
               const p: any = tool.params
               const r = (p.radius || 5) / 10
               const h = (p.height || Math.max(recipe.bounding_mm.x, recipe.bounding_mm.y, recipe.bounding_mm.z) * 2) / 10
               return (
-                <Subtraction key={op.id}>
+                <Subtraction key={op.id} position={pos as any} rotation={rot as any}>
                   <cylinderGeometry args={[r, r, h, 32]} />
                   <meshStandardMaterial color="#333" />
                 </Subtraction>
@@ -177,7 +185,7 @@ function ModelRenderer({ recipe }: { recipe: PartRecipe | null }) {
             if (tool.kind === 'sphere') {
               const p: any = tool.params
               return (
-                <Subtraction key={op.id}>
+                <Subtraction key={op.id} position={pos as any} rotation={rot as any}>
                   <sphereGeometry args={[(p.radius || 5) / 10, 32, 16]} />
                   <meshStandardMaterial color="#333" />
                 </Subtraction>
@@ -186,7 +194,7 @@ function ModelRenderer({ recipe }: { recipe: PartRecipe | null }) {
             if (tool.kind === 'cone') {
               const p: any = tool.params
               return (
-                <Subtraction key={op.id}>
+                <Subtraction key={op.id} position={pos as any} rotation={rot as any}>
                   <cylinderGeometry args={[(p.radiusTop || 0) / 10, (p.radiusBottom || 8) / 10, (p.height || 20) / 10, 32]} />
                   <meshStandardMaterial color="#333" />
                 </Subtraction>
@@ -195,7 +203,7 @@ function ModelRenderer({ recipe }: { recipe: PartRecipe | null }) {
             if (tool.kind === 'torus') {
               const p: any = tool.params
               return (
-                <Subtraction key={op.id}>
+                <Subtraction key={op.id} position={pos as any} rotation={rot as any}>
                   <torusGeometry args={[(p.majorRadius || 20) / 10, (p.tubeRadius || 5) / 10, 24, 48]} />
                   <meshStandardMaterial color="#333" />
                 </Subtraction>

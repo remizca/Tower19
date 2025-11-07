@@ -5,6 +5,8 @@ This folder contains all project documentation organized by category:
 ## Directory Structure
 
 - `/docs` - Root documentation folder
+  - `PROGRAMMING_STANDARDS.md` - TypeScript/React/Three.js coding standards for this repo
+  - `PROJECT_STRUCTURE.md` - Repository layout and file organization guide
   - `/generators` - Generator algorithms and specifications
     - `algorithms.md` - Core 3D generator algorithms and heuristics
   - `/progress` - Implementation tracking

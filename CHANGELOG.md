@@ -44,6 +44,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Removed Ajv from client bundle to avoid import resolution issues
   - Uses `isMinimalPartRecipe` for runtime validation
   - Significantly reduces bundle size (~115 KB saved)
+- **Renderer**: Applied transforms to CSG brushes
+  - `Addition`/`Subtraction` now read `tool.transform.position` (in mm) and apply dm scaling
+  - Axis-based rotation supported via `params.axis` ('x'|'y'|'z')
+  - Preserves CSG requirement of direct geometry+material children (no extra groups)
 - Refactored `src/generators/beginner.ts` with strategy pattern
   - Each part type has dedicated generation function
   - Improved code organization and maintainability

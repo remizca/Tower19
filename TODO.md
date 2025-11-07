@@ -32,7 +32,8 @@
 - [x] Add more primitive types to generators
   - ✅ Implemented sphere, cone (frustum), and torus primitives in generator
   - ✅ Updated 3D renderer to support subtraction/union with these primitives
-  - [Next] Add transformation support (rotation, scale for angled features) - currently primitives render at origin
+  - ✅ Applied transforms for operation tools (position + axis-based rotation) in CSG renderer
+  - [Next] Full rotation (rx, ry, rz) and scale support in recipes and renderer
 - [ ] Implement feature generators
   - Patterns (linear, circular)
   - Fillets and chamfers

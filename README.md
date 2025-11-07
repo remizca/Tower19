@@ -33,17 +33,17 @@ Recent Progress (Nov 7, 2025)
 - ✅ Expanded beginner generator from 6 to 9 strategies with new primitive types
 - ✅ Build optimizations: replaced Ajv with lightweight validator, manual chunk splitting
 - ✅ Created test fixtures and variety validation tests
+- ✅ Re-enabled transforms for CSG operation tools (position + axis-aligned rotation)
 
 Known Issues
 - 2D SVG renderer edge visibility incomplete (needs depth-buffer or ray-casting)
-- Primitive transforms (position, rotation) not yet applied in CSG renderer (all primitives render at origin)
 - Need to add intermediate and expert difficulty generators
 
 Next steps (prioritized)
 1. **[HIGH PRIORITY]** Implement robust edge visibility for 2D renderer
    - Use depth-buffer rasterization or ray-casting for occlusion detection
    - Test with all primitive types and varied shapes
-2. Add transformation support (position, rotation, scale) to generators and renderer
+2. Extend transformation support (full Euler rotation + scale) in recipes and renderer
 3. Create intermediate difficulty generator (5-8 primitives, patterns, fillets)
 4. Migrate bookmarking/storage from localStorage to IndexedDB
 5. Add timer functionality and local records storage
