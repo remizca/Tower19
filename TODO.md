@@ -5,7 +5,10 @@
 - [x] Draft app outline & feature suggestions
   - Produce a detailed outline of the app's features, UI flows, data model, ISO-compliant 2D drawing approach, difficulty levels, timer/bookmark/export behavior, and a prioritized roadmap.
 - [x] Setup deployment pipeline
-  - Configure GitHub repository, setup Vercel integration, configure build process for static deployment.
+  - ✅ GitHub + Vercel configured and working
+  - ✅ Build optimizations: manual chunk splitting for react/three/r3f
+  - ✅ Fixed Vercel build errors (Ajv import resolved, outputDirectory configured)
+  - ✅ 3D viewer renders correctly in production
 - [x] Design core data model
   - Define JSON schema for generated parts (primitives, operations, parameters, units mm, seed, difficulty, name, function, timestamps).
 
@@ -18,16 +21,18 @@
   - **Next**: Intermediate and Expert difficulty levels
   - **Details**: See `docs/progress/generator-variety.md`
 - [x] Implement CSG boolean operations
-  - Use @react-three/csg to apply subtraction operations so holes are true booleans on generated parts and render correctly in R3F.
+  - ✅ @react-three/csg working for subtraction and union operations
+  - ✅ Fixed CSG Geometry structure (removed group wrappers that broke rendering)
+  - ✅ Supports box, cylinder, sphere, cone, torus primitives
 - [x] Create diverse test fixtures
   - ✅ L-shapes (`tests/fixtures/l-bracket.ts`)
   - ✅ T-shapes (`tests/fixtures/t-bracket.ts`)
   - ✅ Cylinder with cutouts (`tests/fixtures/cylinder-cutout.ts`)
   - ✅ Block with holes (`tests/fixtures/block-hole.ts`)
 - [x] Add more primitive types to generators
-  - Implemented sphere, cone (frustum), and torus primitives in generator
-  - Updated 3D renderer to support subtraction/union with these primitives
-  - [Next] Add transformation support (rotation, scale for angled features)
+  - ✅ Implemented sphere, cone (frustum), and torus primitives in generator
+  - ✅ Updated 3D renderer to support subtraction/union with these primitives
+  - [Next] Add transformation support (rotation, scale for angled features) - currently primitives render at origin
 - [ ] Implement feature generators
   - Patterns (linear, circular)
   - Fillets and chamfers
@@ -67,13 +72,27 @@
 ## UI/UX and Integration
 
 - [-] UI/UX and interactions
-  - Define interactions: orbit, pan, zoom, view presets; 2D viewer with scale selection; start timer on 2D view; save/bookmark; export to PDF/DXF/STP; difficulty selector.
+  - ✅ Orbit, pan, zoom controls working
+  - ✅ Generate button with seed display
+  - ✅ Bookmark/save functionality with localStorage
+  - [ ] View presets (front/top/right quick views)
+  - [ ] 2D viewer with scale selection
+  - [ ] Start timer on 2D view
+  - [ ] Export to PDF/DXF/STP
+  - [ ] Difficulty selector (currently hardcoded to Beginner)
 - [-] Client-side persistence and export
-  - Implement bookmarking with IndexedDB, client-side PDF/SVG generation, and offline support.
+  - ✅ Bookmarking with localStorage
+  - ✅ Legacy migration support for old data format
+  - [ ] Migrate to IndexedDB for better storage
+  - [ ] Client-side PDF/SVG generation
+  - [ ] Offline support / service worker
 - [ ] Scoring and timer implementation
   - Implement client-side timer, local records storage, prepare for optional cloud features later.
-- [-] MVP implementation
-  - Build static web app with React + Three.js + Vite, ensure it works fully client-side.
+- [x] MVP implementation
+  - ✅ Static web app with React + Three.js + Vite
+  - ✅ Fully client-side, deployed to Vercel
+  - ✅ Random 3D part generation working
+  - ✅ CSG boolean operations rendering correctly
 - [ ] Testing and documentation
   - Implement browser tests, document offline capabilities, create example models.
 

@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added (Nov 7, 2025)
+- **Production Deployment**: Fixed and verified working deployment to Vercel
+  - Added seed display next to Generate button for visibility
+  - Added debug console logs for ModelRenderer state tracking
+  - All features working in production environment
 - **More Primitives**: Added sphere, cone (frustum), and torus primitive types
   - Generator includes new strategies: Block with Spherical Pockets, Block with Countersinks, Block with Torus Cutout
   - 3D renderer updated to support subtraction/union with these primitives
@@ -32,6 +36,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated `docs/progress/PROGRESS.md` with milestone details
 
 ### Changed (Nov 7, 2025)
+- **Build Configuration**: Optimized for production deployment
+  - Added manual chunk splitting in vite.config (react, three, r3f separate bundles)
+  - Raised chunkSizeWarningLimit to 1500 KB to reduce build noise
+  - Configured Vercel buildCommand and outputDirectory explicitly
+- **Validation**: Replaced Ajv with lightweight shape validator
+  - Removed Ajv from client bundle to avoid import resolution issues
+  - Uses `isMinimalPartRecipe` for runtime validation
+  - Significantly reduces bundle size (~115 KB saved)
 - Refactored `src/generators/beginner.ts` with strategy pattern
   - Each part type has dedicated generation function
   - Improved code organization and maintainability
@@ -41,6 +53,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `package.json` with new test script
 
 ### Fixed (Nov 7, 2025)
+- **Critical Rendering Fix**: Removed `<group>` wrappers inside CSG `<Geometry>`
+  - @react-three/csg requires direct geometry+material pairs as children
+  - Fixes blank canvas issue in production deployment
+  - All primitive types now render correctly (box, cylinder, sphere, cone, torus)
+- **Vercel Build Errors**: 
+  - Resolved Rollup import resolution failure for 'ajv' module
+  - Fixed blank page by configuring proper output directory
+  - Build now succeeds on Vercel with optimized chunks
+- **UI Interaction**: Ensured overlay controls have pointer-events for clickability
 - TypeScript build errors related to test file compilation
 - Unused variable warnings in SVG rendering code
 

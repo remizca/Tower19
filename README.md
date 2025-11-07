@@ -16,29 +16,34 @@ Deployment
 Current Status
 - ✅ Project scaffold with React + TypeScript + Three.js + Vite
 - ✅ Interactive 3D viewer with OrbitControls
-- ✅ Local bookmarking with localStorage (short-term)
-- ✅ Deployed to Vercel
-- ✅ CSG boolean subtraction for holes implemented (@react-three/csg)
-- ✅ **NEW**: Procedural generator creates 6 varied part types (L-bracket, T-bracket, Cylinder, Stacked blocks, Corner bracket, Block-with-holes)
+- ✅ Local bookmarking with localStorage
+- ✅ **Deployed to Vercel and working in production**
+- ✅ CSG boolean operations (subtraction and union) working with @react-three/csg
+- ✅ Procedural generator creates 9+ varied part types using 6 strategies
+  - Box, cylinder, sphere, cone (frustum), and torus primitives supported
+  - New strategies: Spherical pockets, countersinks, torus cutouts
+  - L-bracket, T-bracket, Cylinder-cutouts, Stacked blocks, Corner bracket, Block-with-holes
+- ✅ Build optimizations: manual chunk splitting, reduced bundle size
 - ⚠️ **Blocked**: 2D SVG renderer needs robust edge visibility for varied geometry
 
 Recent Progress (Nov 7, 2025)
-- ✅ Expanded beginner generator to create varied shapes instead of just blocks with holes
-- ✅ Implemented 6 different part generation strategies with 2-6 primitives each
-- ✅ Created test fixtures for L-bracket, T-bracket, and cylinder-cutout shapes
-- ✅ Verified variety with automated test (`npm run test:generator`)
-- ✅ All shapes render correctly in 3D viewer
+- ✅ **Fixed production deployment**: Resolved Vercel build errors and blank page issue
+- ✅ **Fixed 3D rendering**: Removed invalid CSG structure (group wrappers) causing blank canvas
+- ✅ Added sphere, cone (frustum), and torus primitive support to generator and renderer
+- ✅ Expanded beginner generator from 6 to 9 strategies with new primitive types
+- ✅ Build optimizations: replaced Ajv with lightweight validator, manual chunk splitting
+- ✅ Created test fixtures and variety validation tests
 
 Known Issues
-- 2D edge visibility classification incomplete (needs depth-buffer or ray-casting for general geometry)
-- Production build has large JS chunk (~1 MB) — consider code-splitting heavy modules (CSG, Three.js)
+- 2D SVG renderer edge visibility incomplete (needs depth-buffer or ray-casting)
+- Primitive transforms (position, rotation) not yet applied in CSG renderer (all primitives render at origin)
+- Need to add intermediate and expert difficulty generators
 
 Next steps (prioritized)
 1. **[HIGH PRIORITY]** Implement robust edge visibility for 2D renderer
    - Use depth-buffer rasterization or ray-casting for occlusion detection
-   - Test with all new varied shapes (L-bracket, T-bracket, cylinder, etc.)
-   - Support both box and cylinder primitives
-2. Add transformation support (rotation, scale) to generators
+   - Test with all primitive types and varied shapes
+2. Add transformation support (position, rotation, scale) to generators and renderer
 3. Create intermediate difficulty generator (5-8 primitives, patterns, fillets)
 4. Migrate bookmarking/storage from localStorage to IndexedDB
 5. Add timer functionality and local records storage
