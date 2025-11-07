@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added (Nov 7, 2025)
+- **Full Transform Support**: Implemented complete rotation (x, y, z Euler angles in degrees) and scale (x, y, z) support
+  - `computeTransform()` helper in App.tsx handles position/rotation/scale from transform objects
+  - Rotation values in recipes are in degrees, converted to radians for Three.js
+  - Scale support for non-uniform scaling of primitives
+  - Backward compatible with axis-based rotation fallback
+  - New generator strategy: 'Block with Angled Holes' demonstrates rotation transforms (15-45° angles)
 - **Production Deployment**: Fixed and verified working deployment to Vercel
   - Added seed display next to Generate button for visibility
   - Added debug console logs for ModelRenderer state tracking

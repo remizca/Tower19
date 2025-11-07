@@ -33,7 +33,8 @@
   - ✅ Implemented sphere, cone (frustum), and torus primitives in generator
   - ✅ Updated 3D renderer to support subtraction/union with these primitives
   - ✅ Applied transforms for operation tools (position + axis-based rotation) in CSG renderer
-  - [Next] Full rotation (rx, ry, rz) and scale support in recipes and renderer
+  - ✅ Full rotation (rx, ry, rz) and scale support implemented in recipes and renderer
+  - ✅ Added 'Block with Angled Holes' strategy demonstrating rotation transforms
 - [ ] Implement feature generators
   - Patterns (linear, circular)
   - Fillets and chamfers

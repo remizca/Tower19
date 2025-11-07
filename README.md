@@ -19,10 +19,11 @@ Current Status
 - ✅ Local bookmarking with localStorage
 - ✅ **Deployed to Vercel and working in production**
 - ✅ CSG boolean operations (subtraction and union) working with @react-three/csg
-- ✅ Procedural generator creates 9+ varied part types using 6 strategies
+- ✅ Procedural generator creates 10 varied part types using multiple strategies
   - Box, cylinder, sphere, cone (frustum), and torus primitives supported
-  - New strategies: Spherical pockets, countersinks, torus cutouts
+  - New strategies: Spherical pockets, countersinks, torus cutouts, angled holes
   - L-bracket, T-bracket, Cylinder-cutouts, Stacked blocks, Corner bracket, Block-with-holes
+  - Full transform support: position, rotation (Euler angles), and scale
 - ✅ Build optimizations: manual chunk splitting, reduced bundle size
 - ⚠️ **Blocked**: 2D SVG renderer needs robust edge visibility for varied geometry
 
@@ -30,10 +31,10 @@ Recent Progress (Nov 7, 2025)
 - ✅ **Fixed production deployment**: Resolved Vercel build errors and blank page issue
 - ✅ **Fixed 3D rendering**: Removed invalid CSG structure (group wrappers) causing blank canvas
 - ✅ Added sphere, cone (frustum), and torus primitive support to generator and renderer
-- ✅ Expanded beginner generator from 6 to 9 strategies with new primitive types
+- ✅ Expanded beginner generator from 6 to 10 strategies with new primitive types
 - ✅ Build optimizations: replaced Ajv with lightweight validator, manual chunk splitting
 - ✅ Created test fixtures and variety validation tests
-- ✅ Re-enabled transforms for CSG operation tools (position + axis-aligned rotation)
+- ✅ **Full transform support**: Implemented rotation (Euler angles) and scale in renderer and generator
 
 Known Issues
 - 2D SVG renderer edge visibility incomplete (needs depth-buffer or ray-casting)
@@ -43,7 +44,7 @@ Next steps (prioritized)
 1. **[HIGH PRIORITY]** Implement robust edge visibility for 2D renderer
    - Use depth-buffer rasterization or ray-casting for occlusion detection
    - Test with all primitive types and varied shapes
-2. Extend transformation support (full Euler rotation + scale) in recipes and renderer
+2. Add pattern generators (linear and circular hole arrays)
 3. Create intermediate difficulty generator (5-8 primitives, patterns, fillets)
 4. Migrate bookmarking/storage from localStorage to IndexedDB
 5. Add timer functionality and local records storage
