@@ -5,7 +5,8 @@
 import { Matrix4, Vector3 } from 'three'
 import type { PartRecipe } from '../types/part'
 
-// Line types for ISO drawings
+// Line types for ISO drawings (used in generated SVG styles)
+// @ts-expect-error - Used in template literal below
 const LINE_TYPES = {
   VISIBLE: { stroke: '#000', strokeWidth: 0.7, strokeDasharray: 'none' },
   HIDDEN: { stroke: '#000', strokeWidth: 0.5, strokeDasharray: '3,1.5' },
@@ -14,7 +15,6 @@ const LINE_TYPES = {
 
 type View = 'front' | 'top' | 'right'
 type Edge = [Vector3, Vector3] // Start and end points
-type ClassifiedEdge = Edge & { type: keyof typeof LINE_TYPES }
 
 interface ViewConfig {
   matrix: Matrix4

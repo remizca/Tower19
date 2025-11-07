@@ -15,20 +15,34 @@ Deployment
 
 Current Status
 - ✅ Project scaffold with React + TypeScript + Three.js + Vite
-- ✅ Basic beginner generator (blocks with cylinder holes)
 - ✅ Interactive 3D viewer with OrbitControls
 - ✅ Local bookmarking with localStorage (short-term)
 - ✅ Deployed to Vercel
 - ✅ CSG boolean subtraction for holes implemented (@react-three/csg)
+- ✅ **NEW**: Procedural generator creates 6 varied part types (L-bracket, T-bracket, Cylinder, Stacked blocks, Corner bracket, Block-with-holes)
+- ⚠️ **Blocked**: 2D SVG renderer needs robust edge visibility for varied geometry
 
-Notes from the recent test run
-- Production build completed successfully. There is a large JS chunk (~1 MB) flagged by Rollup — we should consider code-splitting heavy modules (CSG, Three.js) to reduce initial bundle size.
+Recent Progress (Nov 7, 2025)
+- ✅ Expanded beginner generator to create varied shapes instead of just blocks with holes
+- ✅ Implemented 6 different part generation strategies with 2-6 primitives each
+- ✅ Created test fixtures for L-bracket, T-bracket, and cylinder-cutout shapes
+- ✅ Verified variety with automated test (`npm run test:generator`)
+- ✅ All shapes render correctly in 3D viewer
+
+Known Issues
+- 2D edge visibility classification incomplete (needs depth-buffer or ray-casting for general geometry)
+- Production build has large JS chunk (~1 MB) — consider code-splitting heavy modules (CSG, Three.js)
 
 Next steps (prioritized)
-1. Migrate bookmarking/storage from localStorage to IndexedDB and provide a migration path for existing bookmarks
-2. Implement 2D SVG drawing generator (ISO-compliant orthographic views, dimensioning, title block)
-3. Add timer functionality and local records storage (start when viewing 2D drawing)
-4. Add CI (GitHub Actions) that runs `npm run build` on PRs
-5. Add tests, documentation and small example models
+1. **[HIGH PRIORITY]** Implement robust edge visibility for 2D renderer
+   - Use depth-buffer rasterization or ray-casting for occlusion detection
+   - Test with all new varied shapes (L-bracket, T-bracket, cylinder, etc.)
+   - Support both box and cylinder primitives
+2. Add transformation support (rotation, scale) to generators
+3. Create intermediate difficulty generator (5-8 primitives, patterns, fillets)
+4. Migrate bookmarking/storage from localStorage to IndexedDB
+5. Add timer functionality and local records storage
+6. Add CI (GitHub Actions) that runs `npm run build` on PRs
+7. Add comprehensive tests and example models
 
 See `TODO.md` and `docs/` for project tracking and technical notes.

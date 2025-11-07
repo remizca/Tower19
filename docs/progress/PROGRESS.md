@@ -15,6 +15,12 @@ This document tracks detailed implementation progress and technical decisions fo
 - [x] Listed required Three.js + CSG libraries
 - [x] Defined primitive generation approach
 - [x] Specified boolean operation rules
+- [x] **NEW (Nov 7, 2025)**: Implemented varied part generation strategies
+  - 6 different part types for beginner level
+  - Deterministic variety using seed-based RNG
+  - Test fixtures created for L-bracket, T-bracket, cylinder-cutout
+  - Verification test confirms variety (`npm run test:generator`)
+  - Details: `docs/progress/generator-variety.md`
 
 ## CSG Implementation ✓
 - [x] Integrated @react-three/csg library
@@ -53,14 +59,21 @@ A centralized, actionable checklist for the 2D drawing engine lives here. Subtas
 Detailed sub-tasks (tree):
 
 1. Prototype & renderer
-   - [~] 2D-15: Prototype Block+Hole SVG renderer (minimal projection + hidden-line) — in-progress
+   - [~] 2D-15: Prototype Block+Hole SVG renderer (minimal projection + hidden-line) — **PAUSED**
      - goal: output single-page SVG for Block+Hole fixture
      - acceptance: SVG contains expected visible/hidden edge counts and a title block
+     - **blocker**: Edge visibility classification needs robust algorithm for varied geometry
+     - **decision**: Paused to expand generator variety first; now unblocked with varied shapes available
 
 2. Tests & fixtures
-   - [ ] 2D-16: Add unit test fixtures (Block+Hole, L-shape, internal pocket)
+   - [x] 2D-16: Add unit test fixtures (Block+Hole, L-shape, internal pocket)
      - goal: provide deterministic geometry fixtures and test assertions
-     - acceptance: tests assert visible edge counts and at least one axis dimension
+     - **status**: ✅ Complete - Created fixtures for:
+       - `tests/fixtures/block-hole.ts` - Simple block with holes
+       - `tests/fixtures/l-bracket.ts` - L-shaped bracket
+       - `tests/fixtures/t-bracket.ts` - T-shaped bracket
+       - `tests/fixtures/cylinder-cutout.ts` - Cylinder with box cutouts
+     - **next**: Use these fixtures to test 2D renderer with varied geometry
 
 3. Export & examples
    - [ ] 2D-17: Implement rendering/export examples (SVG → PDF, DXF) for prototype
