@@ -32,6 +32,7 @@ type PartStrategy =
   | 'block-with-spherical-pockets'
   | 'block-with-countersinks'
   | 'block-with-torus-cutout'
+  | 'block-with-angled-holes'
 
 const STRATEGIES: PartStrategy[] = [
   'block-with-holes',
@@ -42,7 +43,8 @@ const STRATEGIES: PartStrategy[] = [
   'corner-bracket',
   'block-with-spherical-pockets',
   'block-with-countersinks',
-  'block-with-torus-cutout'
+  'block-with-torus-cutout',
+  'block-with-angled-holes'
 ]
 
 /**
@@ -81,6 +83,9 @@ export function generateBeginnerPartRecipe(seed = Date.now()): PartRecipe {
       break
     case 'block-with-torus-cutout':
       recipe = generateBlockWithTorusCutout(seed, r)
+      break
+    case 'block-with-angled-holes':
+      recipe = generateBlockWithAngledHoles(seed, r)
       break
     default:
       recipe = generateBlockWithHoles(seed, r)
@@ -638,6 +643,71 @@ function generateBlockWithTorusCutout(seed: number, r: () => number): PartRecipe
     id: String(seed),
     seed,
     name: 'Block with Torus Cutout',
+    difficulty: 'Beginner',
+    units: 'mm',
+    bounding_mm: { x: width, y: depth, z: height },
+    primitives,
+    operations,
+    createdAt: new Date().toISOString()
+  }
+}
+
+/**
+ * Strategy 10: Block with angled holes (demonstrates rotation transforms)
+ */
+function generateBlockWithAngledHoles(seed: number, r: () => number): PartRecipe {
+  const width = Math.round(60 + r() * 80)
+  const depth = Math.round(50 + r() * 70)
+  const height = Math.round(30 + r() * 50)
+  
+  const primitives: Primitive[] = [{
+    id: 'p0',
+    kind: 'box',
+    params: { width, depth, height },
+    transform: { position: { x: 0, y: 0, z: 0 } }
+  }]
+  
+  const operations: Operation[] = []
+  const holeCount = 2 + Math.floor(r() * 2) // 2-3 angled holes
+  
+  for (let i = 0; i < holeCount; i++) {
+    const radius = Math.round(4 + r() * 8)
+    const holeLength = Math.max(width, depth, height) * 2
+    
+    // Create holes at various angles (15-45 degrees)
+    const angleX = (15 + r() * 30) * (r() > 0.5 ? 1 : -1)
+    const angleY = (15 + r() * 30) * (r() > 0.5 ? 1 : -1)
+    
+    primitives.push({
+      id: `p${i + 1}`,
+      kind: 'cylinder',
+      params: { radius, height: holeLength, axis: 'z' },
+      transform: {
+        position: {
+          x: Math.round((r() - 0.5) * width * 0.5),
+          y: Math.round((r() - 0.5) * depth * 0.5),
+          z: 0
+        },
+        rotation: {
+          x: angleX,
+          y: angleY,
+          z: 0
+        }
+      }
+    })
+    
+    operations.push({
+      id: `op${i + 1}`,
+      op: 'subtract',
+      targetId: 'p0',
+      toolId: `p${i + 1}`
+    })
+  }
+  
+  return {
+    id: String(seed),
+    seed,
+    name: 'Block with Angled Holes',
     difficulty: 'Beginner',
     units: 'mm',
     bounding_mm: { x: width, y: depth, z: height },
