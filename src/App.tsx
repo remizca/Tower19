@@ -247,7 +247,8 @@ function ModelRenderer({ recipe }: { recipe: PartRecipe | null }) {
 }
 
 function App() {
-  const [recipe, setRecipe] = useState<PartRecipe | null>(() => generateBeginnerPartRecipe(Date.now()))
+  const [seed, setSeed] = useState<number>(() => Date.now())
+  const [recipe, setRecipe] = useState<PartRecipe | null>(() => generateBeginnerPartRecipe(seed))
   const [bookmarks, setBookmarks] = useState<PartRecipe[]>(() => {
     try {
       const raw = localStorage.getItem('tower19:bookmarks')
@@ -274,7 +275,18 @@ function App() {
     }
   })
 
-  const generate = () => setRecipe(generateBeginnerPartRecipe(Date.now()))
+  const generate = () => {
+    const nextSeed = Date.now()
+    try {
+      const next = generateBeginnerPartRecipe(nextSeed)
+      setSeed(nextSeed)
+      setRecipe(next)
+      // Debug marker for deployed builds
+      console.log('[generate] seed', nextSeed, 'name', next.name)
+    } catch (err) {
+      console.error('[generate] failed', err)
+    }
+  }
 
   const saveBookmark = () => {
     if (!recipe) return
@@ -285,12 +297,13 @@ function App() {
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
-      <div style={{ position: 'absolute', zIndex: 10, left: 12, top: 12, display: 'flex', gap: 8 }}>
+      <div style={{ position: 'absolute', zIndex: 10, left: 12, top: 12, display: 'flex', gap: 8, pointerEvents: 'auto' }}>
         <button onClick={generate}>Generate</button>
         <select defaultValue="Beginner" style={{ padding: '4px 8px' }} disabled>
           <option>Beginner</option>
         </select>
         <button onClick={saveBookmark}>Save / Bookmark</button>
+        <span style={{ alignSelf: 'center', opacity: 0.7 }}>seed: {seed}</span>
       </div>
       <Canvas>
         <ambientLight intensity={0.6} />
@@ -299,7 +312,7 @@ function App() {
         <Controls />
       </Canvas>
 
-      <div style={{ position: 'absolute', right: 12, top: 12, zIndex: 10, background: 'rgba(255,255,255,0.06)', padding: 8, borderRadius: 6, color: '#fff' }}>
+      <div style={{ position: 'absolute', right: 12, top: 12, zIndex: 10, background: 'rgba(255,255,255,0.06)', padding: 8, borderRadius: 6, color: '#fff', pointerEvents: 'auto' }}>
         <div style={{ fontWeight: 600, marginBottom: 6 }}>Bookmarks</div>
         {bookmarks.length === 0 && <div style={{ opacity: 0.7 }}>No bookmarks yet</div>}
         <ul style={{ listStyle: 'none', margin: 0, padding: 0, maxHeight: 300, overflow: 'auto' }}>
