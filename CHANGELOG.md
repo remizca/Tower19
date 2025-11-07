@@ -8,17 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added (Nov 7, 2025)
-- **Pattern Generators**: Implemented linear and circular hole pattern strategies
-  - 'Block with Linear Hole Pattern': 3-5 holes evenly spaced along X axis with slight Y variation
-  - 'Cylinder with Circular Hole Pattern': 4-8 holes arranged in circular pattern around cylinder axis
-  - Both patterns use transform.position for precise hole placement
-  - Now 14 total generator strategies (up from 12)
-  
+- **Intermediate Difficulty Generator**: Implemented complete intermediate-level generator with 4 strategies
+  - Multi-Feature Block: Combines linear patterns, pockets, and corner chamfers (5-8 primitives)
+  - Patterned Bracket: L-bracket with circular pattern on vertical face and linear pattern in base (6-9 primitives)
+  - Complex Cylinder Assembly: Cylinder with flanges, bolt patterns, and central bore (8-15 primitives)
+  - Symmetric Mounting Plate: Block with symmetric corner holes, circular center pattern, and side slots (11-14 primitives)
+  - All strategies use 5-8+ primitives with mixed union/subtract operations
+  - Integrated with UI via difficulty selector dropdown
+- **Shared Features Module**: Created `src/generators/features.ts` with reusable helpers
+  - `generateChamferFeatures()`: Parameterized chamfer generation using rotated box subtraction
+  - `generateFilletFeatures()`: Parameterized fillet generation using cylinder subtraction
+  - `generateLinearPattern()`: Generic linear array pattern with optional perpendicular variation
+  - `generateCircularPattern()`: Generic circular pattern with configurable axis and angle offset
+  - `EDGE_CONFIGS`: Standard edge configurations (all corners, front/back, left/right)
+  - Enables consistent feature generation across all difficulty levels
 - **Feature Generators**: Fillets and Chamfers
   - Added beginner strategies:
     - 'Block with Chamfered Edges' (45° edge cuts using rotated box subtraction)
     - 'Block with Edge Fillets' (rounded external edges using cylinder subtraction)
   - Approximations use existing primitives and boolean operations, consistent with CSG constraints
+- **Pattern Generators**: Implemented linear and circular hole pattern strategies
+  - 'Block with Linear Hole Pattern': 3-5 holes evenly spaced along X axis with slight Y variation
+  - 'Cylinder with Circular Hole Pattern': 4-8 holes arranged in circular pattern around cylinder axis
+  - Both patterns use transform.position for precise hole placement
+  - Now 14 total beginner strategies (up from 12)
 - **Full Transform Support**: Implemented complete rotation (x, y, z Euler angles in degrees) and scale (x, y, z) support
   - `computeTransform()` helper in App.tsx handles position/rotation/scale from transform objects
   - Rotation values in recipes are in degrees, converted to radians for Three.js

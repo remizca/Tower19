@@ -38,11 +38,14 @@
 - [x] Implement feature generators
   - ✅ Patterns: linear array (3-5 holes along axis) and circular pattern (4-8 holes around cylinder)
   - ✅ Fillets and chamfers (added beginner strategies: Block with Chamfered Edges, Block with Edge Fillets)
+  - ✅ Created shared features.ts module with reusable helpers for chamfers, fillets, linear/circular patterns
   - [ ] Ribs and webs
-- [ ] Create intermediate difficulty generator
-  - 5-8 primitives per part
-  - More complex boolean combinations
-  - Patterns and symmetry
+- [x] Create intermediate difficulty generator
+  - ✅ 5-8 primitives per part
+  - ✅ More complex boolean combinations (unions + subtractions)
+  - ✅ Patterns and symmetry (circular, linear, mirror)
+  - ✅ 4 strategies: Multi-Feature Block, Patterned Bracket, Complex Cylinder Assembly, Symmetric Mounting Plate
+  - ✅ Wired to UI with difficulty selector dropdown
 
 ## 2D Drawing Engine (Priority: Medium)
 
@@ -77,11 +80,11 @@
   - ✅ Orbit, pan, zoom controls working
   - ✅ Generate button with seed display
   - ✅ Bookmark/save functionality with localStorage
+  - ✅ Difficulty selector (Beginner / Intermediate)
   - [ ] View presets (front/top/right quick views)
   - [ ] 2D viewer with scale selection
   - [ ] Start timer on 2D view
   - [ ] Export to PDF/DXF/STP
-  - [ ] Difficulty selector (currently hardcoded to Beginner)
 - [-] Client-side persistence and export
   - ✅ Bookmarking with localStorage
   - ✅ Legacy migration support for old data format

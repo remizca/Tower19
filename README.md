@@ -19,19 +19,27 @@ Current Status
 - ✅ Local bookmarking with localStorage
 - ✅ **Deployed to Vercel and working in production**
 - ✅ CSG boolean operations (subtraction and union) working with @react-three/csg
-- ✅ Procedural generator creates 14 varied part types using multiple strategies
+- ✅ **Procedural generators for Beginner and Intermediate difficulty**
+  - **Beginner**: 14 strategies (2-6 primitives, basic features and patterns)
+  - **Intermediate**: 4 strategies (5-15 primitives, complex assemblies, symmetric features)
   - Box, cylinder, sphere, cone (frustum), and torus primitives supported
   - Feature strategies: Spherical pockets, countersinks, torus cutouts, angled holes, linear/circular patterns, chamfers, edge fillets
   - Structural strategies: L-bracket, T-bracket, Cylinder-cutouts, Stacked blocks, Corner bracket, Block-with-holes
   - Full transform support: position, rotation (Euler angles), and scale
+  - Shared features module for reusable chamfer/fillet/pattern helpers
+- ✅ **UI difficulty selector** for switching between Beginner and Intermediate
 - ✅ Build optimizations: manual chunk splitting, reduced bundle size
 - ⚠️ **Blocked**: 2D SVG renderer needs robust edge visibility for varied geometry
 
 Recent Progress (Nov 7, 2025)
+- ✅ **Intermediate difficulty generator implemented**: 4 complex strategies with 5-15 primitives each
+- ✅ **Shared features module**: Reusable helpers for chamfers, fillets, linear/circular patterns
+- ✅ **UI difficulty selector**: Dropdown allows switching between Beginner and Intermediate
+- ✅ **Feature generators**: Added chamfers and fillets to beginner strategies
 - ✅ **Fixed production deployment**: Resolved Vercel build errors and blank page issue
 - ✅ **Fixed 3D rendering**: Removed invalid CSG structure (group wrappers) causing blank canvas
 - ✅ Added sphere, cone (frustum), and torus primitive support to generator and renderer
-- ✅ Expanded beginner generator from 6 to 12 strategies with new primitive types and patterns
+- ✅ Expanded beginner generator from 6 to 14 strategies with new primitive types and patterns
 - ✅ Build optimizations: replaced Ajv with lightweight validator, manual chunk splitting
 - ✅ Created test fixtures and variety validation tests
 - ✅ **Full transform support**: Implemented rotation (Euler angles) and scale in renderer and generator
@@ -39,17 +47,16 @@ Recent Progress (Nov 7, 2025)
 
 Known Issues
 - 2D SVG renderer edge visibility incomplete (needs depth-buffer or ray-casting)
-- Need to add intermediate and expert difficulty generators
+- Expert difficulty generator not yet implemented
 
 Next steps (prioritized)
 1. **[HIGH PRIORITY]** Implement robust edge visibility for 2D renderer
    - Use depth-buffer rasterization or ray-casting for occlusion detection
    - Test with all primitive types and varied shapes
-2. Create intermediate difficulty generator (5-8 primitives, more complex patterns)
+2. Create expert difficulty generator (8-12+ primitives, advanced features, ribs/webs)
 3. Migrate bookmarking/storage from localStorage to IndexedDB
-4. Migrate bookmarking/storage from localStorage to IndexedDB
-5. Add timer functionality and local records storage
-6. Add CI (GitHub Actions) that runs `npm run build` on PRs
-7. Add comprehensive tests and example models
+4. Add timer functionality and local records storage
+5. Add CI (GitHub Actions) that runs `npm run build` on PRs
+6. Add comprehensive tests and example models
 
 See `TODO.md` and `docs/` for project tracking and technical notes.

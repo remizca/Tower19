@@ -2,8 +2,9 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { OrbitControls as ThreeOrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { useEffect, useRef, useState } from 'react'
 import { generateBeginnerPartRecipe } from './generators/beginner'
+import { generateIntermediatePartRecipe } from './generators/intermediate'
 import type PartRecipe from './types/part'
-import type { Transform } from './types/part'
+import type { Transform, Difficulty } from './types/part'
 import { validatePartRecipe } from './schema/validate'
 import migrateLegacyBeginnerToPartRecipe from './storage/migrate'
 import { Geometry, Base, Subtraction, Addition } from '@react-three/csg'
@@ -255,6 +256,7 @@ function ModelRenderer({ recipe }: { recipe: PartRecipe | null }) {
 }
 
 function App() {
+  const [difficulty, setDifficulty] = useState<Difficulty>('Beginner')
   const [seed, setSeed] = useState<number>(() => Date.now())
   const [recipe, setRecipe] = useState<PartRecipe | null>(() => generateBeginnerPartRecipe(seed))
   const [bookmarks, setBookmarks] = useState<PartRecipe[]>(() => {
@@ -286,13 +288,36 @@ function App() {
   const generate = () => {
     const nextSeed = Date.now()
     try {
-      const next = generateBeginnerPartRecipe(nextSeed)
+      let next: PartRecipe
+      if (difficulty === 'Intermediate') {
+        next = generateIntermediatePartRecipe(nextSeed)
+      } else {
+        next = generateBeginnerPartRecipe(nextSeed)
+      }
       setSeed(nextSeed)
       setRecipe(next)
       // Debug marker for deployed builds
-      console.log('[generate] seed', nextSeed, 'name', next.name)
+      console.log('[generate] seed', nextSeed, 'difficulty', difficulty, 'name', next.name)
     } catch (err) {
       console.error('[generate] failed', err)
+    }
+  }
+
+  const handleDifficultyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newDifficulty = e.target.value as Difficulty
+    setDifficulty(newDifficulty)
+    // Regenerate with current seed using new difficulty
+    try {
+      let next: PartRecipe
+      if (newDifficulty === 'Intermediate') {
+        next = generateIntermediatePartRecipe(seed)
+      } else {
+        next = generateBeginnerPartRecipe(seed)
+      }
+      setRecipe(next)
+      console.log('[difficulty change]', newDifficulty, 'seed', seed, 'name', next.name)
+    } catch (err) {
+      console.error('[difficulty change] failed', err)
     }
   }
 
@@ -307,8 +332,9 @@ function App() {
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
       <div style={{ position: 'absolute', zIndex: 10, left: 12, top: 12, display: 'flex', gap: 8, pointerEvents: 'auto' }}>
         <button onClick={generate}>Generate</button>
-        <select defaultValue="Beginner" style={{ padding: '4px 8px' }} disabled>
+        <select value={difficulty} onChange={handleDifficultyChange} style={{ padding: '4px 8px' }}>
           <option>Beginner</option>
+          <option>Intermediate</option>
         </select>
         <button onClick={saveBookmark}>Save / Bookmark</button>
         <span style={{ alignSelf: 'center', opacity: 0.7 }}>seed: {seed}</span>
