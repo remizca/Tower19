@@ -2,6 +2,8 @@
   "github": {
     "silent": true
   },
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [

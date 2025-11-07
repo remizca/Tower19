@@ -8,6 +8,16 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    chunkSizeWarningLimit: 1500,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          three: ['three'],
+          r3f: ['@react-three/fiber', '@react-three/csg']
+        }
+      }
+    }
   },
   server: {
     port: 3000,
