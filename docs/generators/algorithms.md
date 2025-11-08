@@ -98,10 +98,15 @@ Expert
 - For each hole: add `Primitive {kind: 'cylinder'}` and `Operation {op: 'subtract', targetId: baseId, toolId: cylinderId}`.
 - For additive features: add `Primitive` then `Operation {op: 'union', targetId: baseOrLast, toolId: primId}`.
 
-## Testing checklist
-- Unit tests: deterministic outputs for a set of fixed seeds (particle snapshots in `tests/fixtures`).
-- Property-based tests: verify invariants (no negative sizes, minimum wall thickness, valid JSON Schema) across randomized seeds.
-- Integration: visual smoke tests rendering small set of seeds and snapshotting canvases or GLTF exports.
+## Testing Strategy
+
+> **Note**: Detailed testing checklist has been moved to a dedicated document for better organization.
+
+See **[Generator Testing Checklist](../roadmaps/generator-testing.md)** for:
+- Unit tests: Deterministic outputs for fixed seeds
+- Property-based tests: Verify invariants across randomized seeds
+- Integration tests: Visual smoke tests and snapshot testing
+- Test fixtures and coverage goals
 
 ---
 

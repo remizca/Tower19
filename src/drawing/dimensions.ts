@@ -11,7 +11,6 @@
  */
 
 import type { PartRecipe } from '../types/part'
-import type { Vector2 } from 'three'
 
 // ============================================================================
 // Type Definitions
@@ -312,6 +311,9 @@ function generateFeatureDimensions(
   // Find cylindrical features (holes, bosses)
   for (const primitive of recipe.primitives) {
     if (primitive.kind === 'cylinder') {
+      // Type-safe access to cylinder params
+      if (!('radius' in primitive.params)) continue
+      
       const radius = primitive.params.radius as number
       const position = primitive.transform?.position || { x: 0, y: 0, z: 0 }
       
@@ -319,7 +321,7 @@ function generateFeatureDimensions(
       if (radius * 2 < config.minDimensionValue) continue
       
       // Determine which view shows the cylinder as a circle
-      const axis = (primitive.params.axis as string) || 'y'
+      const axis = ('axis' in primitive.params ? primitive.params.axis as string : null) || 'y'
       
       // Create diameter dimension
       if (axis === 'z') {

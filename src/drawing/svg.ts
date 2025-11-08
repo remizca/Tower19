@@ -7,14 +7,7 @@ import type { PartRecipe } from '../types/part'
 import { extractRecipeEdges, type Edge } from './edges'
 import { generateDimensions, DEFAULT_DIMENSION_CONFIG } from './dimensions'
 import { renderDimensions } from './dimensionsSVG'
-
-// Line types for ISO drawings (used in generated SVG styles)
-// @ts-expect-error - Used in template literal below
-const LINE_TYPES = {
-  VISIBLE: { stroke: '#000', strokeWidth: 0.7, strokeDasharray: 'none' },
-  HIDDEN: { stroke: '#000', strokeWidth: 0.5, strokeDasharray: '3,1.5' },
-  CENTER: { stroke: '#000', strokeWidth: 0.25, strokeDasharray: '6,2' }
-} as const
+import { getEdgeLineType, generateAllLineStylesCSS } from './lineTypes'
 
 type View = 'front' | 'top' | 'right'
 
@@ -135,7 +128,10 @@ function projectEdges(edges: Edge[], viewConfig: ViewConfig, scale = 1): string[
     }
 
     console.log(`  Adding ${type} edge: (${x1},${y1}) -> (${x2},${y2})`)
-    paths.push(`<path d="M ${x1} ${y1} L ${x2} ${y2}" class="${type}" />`)
+    
+    // Map visibility to ISO line type
+    const lineType = getEdgeLineType(type === 'visible')
+    paths.push(`<path d="M ${x1} ${y1} L ${x2} ${y2}" class="${lineType}" />`)
   })
 
   return paths
@@ -170,14 +166,14 @@ export function generateDrawing(recipe: PartRecipe): string {
   })
 
   // Compose final SVG with style block for line types
+  // Using ISO 128-24 compliant line styles (scale 2.0 = 2 SVG units per mm)
+  const lineStylesCSS = generateAllLineStylesCSS(2.0)
+  
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
       <defs>
         <style>
-          path { fill: none; }
-          .visible { stroke: black; stroke-width: 0.7; }
-          .hidden { stroke: black; stroke-width: 0.5; stroke-dasharray: 3,1.5; }
-          .center { stroke: black; stroke-width: 0.25; stroke-dasharray: 6,2; }
+${lineStylesCSS}
         </style>
       </defs>
       

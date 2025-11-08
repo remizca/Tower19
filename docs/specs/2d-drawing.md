@@ -130,12 +130,25 @@ interface TitleBlock { drawingNumber?: string; partName?: string; scale: string;
 
 ## Tests / Fixtures
 
-- Provide small geometry fixtures for unit tests (defined in `docs/progress/PROGRESS.md`):
-  - Simple block with a centered hole
-  - L-shaped part
-  - Part with internal pocket requiring section
+- Provide small geometry fixtures for unit tests:
+  - Simple block with a centered hole ✅ (Created: `tests/fixtures/block-hole.ts`)
+  - L-shaped part ✅ (Created: `tests/fixtures/l-bracket.ts`)
+  - T-shaped bracket ✅ (Created: `tests/fixtures/t-bracket.ts`)
+  - Cylinder with cutouts ✅ (Created: `tests/fixtures/cylinder-cutout.ts`)
 - For each fixture, assert that produced SVG contains expected number of visible edges, hidden lines, and at least one dimension for each primary axis.
 
-> Progress tracking and actionable next steps for implementation have been centralized in `docs/progress/PROGRESS.md`.
-> Please consult that file for the detailed tree-style checklist, prototyping tasks, tests, and export work.
+## Implementation Progress
+
+> **Note**: Implementation progress and roadmap have been moved to dedicated documents for better organization.
+
+**Current Status**:
+- ✅ **Phase 1 Complete**: Edge extraction, orthographic projection, visible/hidden lines
+- ✅ **Phase 2 Complete**: Dimensioning system with ISO-compliant formatting
+- 🔄 **Phase 3 In Progress**: Line weights, center lines, scale selection
+
+**Related Documents**:
+- **[2D Drawing Engine Roadmap](../roadmaps/2d-drawing-engine.md)** - Phased implementation plan
+- **[Progress Tracking](../progress/PROGRESS.md)** - Detailed implementation notes
+- **[ISO Drawing Standards](iso-drawing-standards.md)** - Complete technical specification
+
 

@@ -545,41 +545,21 @@ function selectOptimalScale(
 
 ## 8. Implementation Roadmap
 
-### Phase 1: ✅ COMPLETE
-- [x] Basic SVG generation
-- [x] Orthographic projection
-- [x] Edge extraction
-- [x] Visible/hidden lines
-- [x] Simple title block
+> **Note**: Detailed implementation roadmap has been moved to a dedicated document for better organization and tracking.
 
-### Phase 2: Dimensions (NEXT)
-- [ ] Linear dimension generation
-- [ ] Radial dimension generation (R, Ø)
-- [ ] Dimension placement algorithm
-- [ ] Collision detection
-- [ ] Text formatting
+See **[2D Drawing Engine Roadmap](../roadmaps/2d-drawing-engine.md)** for:
+- ✅ Phase 1: Basic Projection & Rendering (COMPLETE)
+- ✅ Phase 2: Dimensioning System (COMPLETE)
+- 🔄 Phase 3: Enhanced Drawing (IN PROGRESS)
+- 📋 Phase 4: Section Views (PLANNED)
+- 🔮 Phase 5: Advanced Features (FUTURE)
 
-### Phase 3: Enhanced Drawing
-- [ ] Proper line weights (thick/thin)
-- [ ] Center lines for holes
-- [ ] Projection symbol in title block
-- [ ] Scale selection algorithm
-- [ ] View arrangement optimization
+**Quick Status**:
+- **Phase 1** ✅: Edge extraction, orthographic projection, visible/hidden lines
+- **Phase 2** ✅: Linear and radial dimensions, automatic placement, ISO formatting
+- **Phase 3** 🔄: Line weights, center lines, scale selection, collision detection
 
-### Phase 4: Section Views
-- [ ] Cutting plane definition
-- [ ] Geometry slicing
-- [ ] Hatch pattern generation
-- [ ] Section view projection
-- [ ] Multi-section support
-
-### Phase 5: Advanced Features
-- [ ] Detail views (enlarged)
-- [ ] Break lines for long parts
-- [ ] Auxiliary views
-- [ ] Notes and symbols
-- [ ] Material specification
-- [ ] Surface finish symbols
+For detailed task lists, success criteria, and implementation notes, consult the roadmap document.
 
 ## 9. References
 

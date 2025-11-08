@@ -32,7 +32,8 @@ const viewRegex = (name: string) => new RegExp(`class="view ${name}"[^>]*>([\\s\
 
 for (const view of ['front', 'top', 'right'] as const) {
   const match = svg.match(viewRegex(view))?.[1]
-  const visibleCount = (match?.match(/class="visible"/g) || []).length
+  // Updated to use new ISO line type class names (visible-edge instead of visible)
+  const visibleCount = (match?.match(/class="visible-edge"/g) || []).length
 
   // Get expected counts for this view
   const expected = EXPECTED_COUNTS.visibleEdges[view]
