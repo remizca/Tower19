@@ -175,6 +175,10 @@
 <path d="M 90 200 L 90.19214725494385 200" class="hidden-edge" />
 <path d="M 100 200 L 100 100" class="hidden-edge" />
 <path d="M 100 100 L 100 200" class="hidden-edge" />
+        <g class="center-lines" transform="translate(100, 100)">
+          <path d="M -20.00 0.00 L 20.00 0.00" class="center-line" />
+    <path d="M 0.00 20.00 L 0.00 -20.00" class="center-line" />
+        </g>
         <g class="dimensions" data-view="front">
 <g class="linear-dimension" data-id="bbox-width-front">
 <line x1="-100" y1="-29" x2="-100" y2="-47" class="extension-line" stroke="black" stroke-width="0.35" />
@@ -284,6 +288,9 @@
 <path d="M 100 220 L 98.04909682273865 210.19214725494385" class="visible-edge" />
 <path d="M 100 210 L 100 220" class="hidden-edge" />
 <path d="M 100 220 L 100 210" class="hidden-edge" />
+        <g class="center-lines" transform="translate(100, 220)">
+          <path d="M 0.00 210.00 L 0.00 -210.00" class="center-line" />
+        </g>
         <g class="dimensions" data-view="top">
 <g class="linear-dimension" data-id="bbox-width-top">
 <line x1="-100" y1="-54" x2="-100" y2="-72" class="extension-line" stroke="black" stroke-width="0.35" />
@@ -406,6 +413,9 @@
 <path d="M 210 200 L 210.76120471954346 200" class="visible-edge" />
 <path d="M 230 200 L 220 100" class="hidden-edge" />
 <path d="M 220 100 L 230 200" class="hidden-edge" />
+        <g class="center-lines" transform="translate(220, 100)">
+          <path d="M 0.00 210.00 L 0.00 -210.00" class="center-line" />
+        </g>
         <g class="dimensions" data-view="right">
 <g class="linear-dimension" data-id="bbox-depth-right">
 <line x1="-50" y1="-29" x2="-50" y2="-47" class="extension-line" stroke="black" stroke-width="0.35" />

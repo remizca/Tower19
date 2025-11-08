@@ -91,9 +91,13 @@ Detailed sub-tasks (tree):
      - **status**: ✅ Created `src/drawing/lineTypes.ts` with comprehensive ISO 128-24 line type system
      - **implemented**: LineType enum, LINE_STYLES mapping, CSS generation, all line types defined
      - **line types**: visible-edge (0.7mm), hidden-edge (0.35mm dashed), dimension (0.35mm), center-line (0.35mm chain), etc.
-   - [ ] 2D-21: Center lines for cylindrical features
+   - [x] 2D-21: Center lines for cylindrical features (✅ Complete - Nov 8, 2025)
      - goal: Crossed chain lines showing axes of cylinders, cones
      - acceptance: Center lines render with proper dasharray (8,2,2,2) pattern
+     - **status**: ✅ Created `src/drawing/centerLines.ts` (400+ lines) with full center line system
+     - **implemented**: extractCenterLines(), extractCylinderCenterLines(), extractConeCenterLines(), renderCenterLines()
+     - **features**: Cross lines for end-on views, axis lines for side views, extends 5mm beyond features, min 10mm diameter threshold
+     - **tested**: block-hole fixture shows crossed center lines in front view, axis lines in top/right views
    - [ ] 2D-22: Scale selection algorithm
      - goal: Automatically select standard scale (1:1, 1:2, 2:1, etc.) to fit drawing on page
      - acceptance: Drawing fits within A4/A3 margins with appropriate scale

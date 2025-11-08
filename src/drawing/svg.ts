@@ -8,6 +8,7 @@ import { extractRecipeEdges, type Edge } from './edges'
 import { generateDimensions, DEFAULT_DIMENSION_CONFIG } from './dimensions'
 import { renderDimensions } from './dimensionsSVG'
 import { getEdgeLineType, generateAllLineStylesCSS } from './lineTypes'
+import { extractCenterLines, renderCenterLines, DEFAULT_CENTER_LINE_CONFIG } from './centerLines'
 
 type View = 'front' | 'top' | 'right'
 
@@ -155,11 +156,20 @@ export function generateDrawing(recipe: PartRecipe): string {
   const views = Object.entries(VIEW_CONFIGS).map(([name, config]) => {
     const paths = projectEdges(edges, config)
     const dimensionSVG = renderDimensions(dimensions, name as 'front' | 'top' | 'right', 2.0)
+    
+    // Extract and render center lines for cylindrical features
+    const centerLines = extractCenterLines(recipe, name as 'front' | 'top' | 'right', DEFAULT_CENTER_LINE_CONFIG)
+    const centerLineSVG = renderCenterLines(centerLines, 2.0)
+    console.log(`[SVG] Generated ${centerLines.length} center lines for ${name} view`)
+    
     return `
       <g class="view ${name}">
         <text x="${config.offset.x}" y="${config.offset.y - 10}" 
               font-family="sans-serif" font-size="8" text-anchor="middle">${config.name}</text>
         ${paths.join('\n')}
+        <g class="center-lines" transform="translate(${config.offset.x}, ${config.offset.y})">
+          ${centerLineSVG}
+        </g>
         ${dimensionSVG}
       </g>
     `

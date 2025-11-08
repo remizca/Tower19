@@ -75,7 +75,13 @@ Recent Progress (Nov 8, 2025)
   - Thin lines (0.35mm) for dimensions, hidden edges, center lines
   - 11 line types: visible-edge, hidden-edge, dimension, extension, leader, hatching, center-line, pitch-circle, phantom, cutting-plane
   - Proper dasharray patterns for hidden (3,1.5) and chain lines (8,2,2,2)
-- ⚠️ **Next**: Phase 3.2 - Center lines for cylindrical features
+- ✅ **Phase 3.2 Complete - Center Lines**: Automatic center line generation for cylindrical features
+  - Crossed center lines for cylinders viewed end-on (circular profile)
+  - Axis center lines for cylinders viewed from side (rectangular profile)
+  - Chain line pattern (8,2,2,2 dasharray) per ISO 128-24
+  - Extends 5mm beyond feature boundaries, 10mm diameter minimum threshold
+  - Supports cylinders and cones with any axis orientation (x, y, z)
+- ⚠️ **Next**: Phase 3.3 - Scale selection algorithm
 
 Recent Progress (Nov 7, 2025)
 - ✅ **Ribs and webs features**: Complete structural reinforcement generators (ribs, webs, radial ribs)
