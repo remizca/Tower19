@@ -8,6 +8,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added (Nov 8, 2025)
+- **2D Drawing Engine: ISO-Compliant Dimensioning System (Phase 2)**: Automatic dimension generation per ISO 129-1
+  - Created `src/drawing/dimensions.ts` (600+ lines) - Core dimensioning logic
+    - Type system: `Dimension`, `LinearDimension`, `RadialDimension`, `AngularDimension` interfaces
+    - `DEFAULT_DIMENSION_CONFIG` with ISO-compliant spacing (8mm offset, 6mm between dims)
+    - `generateDimensions()`: Main API for automatic dimension creation
+    - `generateBoundingBoxDimensions()`: Creates 6 overall dimensions (width/height/depth per view)
+    - `generateFeatureDimensions()`: Detects cylinders, creates diameter dimensions with Ø prefix
+    - `formatDimensionValue()`: ISO text formatting (no trailing zeros, minimal decimals)
+    - Priority system for collision resolution (100=bounding box, 80=features)
+  - Created `src/drawing/dimensionsSVG.ts` (350+ lines) - SVG rendering module
+    - `renderDimensions()`: Main rendering API, filters by view
+    - Component renderers: extension lines (with gaps), arrowheads (3mm×1mm filled polygons), dimension text (Arial 3.5mm)
+    - `renderLinearDimension()`: Complete linear dimensions with proper offsets
+    - `renderRadialDimension()`: Leader lines at 45°, center marks (crossed chain lines), R/Ø prefixes
+    - All styling per ISO 128-24 (thin lines 0.35mm, black, filled arrowheads)
+  - Integrated with SVG generator (`src/drawing/svg.ts`)
+    - Dimensions render above edges, scaled 2:1 for clarity
+    - Console logging for dimension count per drawing
+  - Test validation: `npm run test:svg` generates `block-hole.svg` with 7 dimensions
+    - 6 bounding box dimensions (2 per view: width/height in front, width/depth in top, depth/height in right)
+    - 1 cylinder diameter dimension (Ø20 in top view with center mark)
+  - Separation of concerns: logic (dimensions.ts) vs rendering (dimensionsSVG.ts)
 - **2D Drawing Engine: ISO Standards Specification**: Comprehensive technical reference for engineering drawings
   - Created `docs/specs/iso-drawing-standards.md` (500+ lines)
   - **Projection systems**: ISO first-angle (default) and third-angle projection per ISO 5456-2

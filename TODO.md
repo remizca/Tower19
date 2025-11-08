@@ -83,10 +83,37 @@
     - Ray-casting visibility in projectEdges() (requires mesh access)
     - CSG mesh integration for accurate post-boolean edge visibility
     - Edge simplification/consolidation for cleaner drawings
-- [ ] Add dimensions and annotations
-  - Automatic dimension placement
-  - Collision detection and resolution
-  - Support for different dimension types (linear, radial, angular)
+- [x] Add dimensions and annotations (PHASE 2 COMPLETE)
+  - **Status**: ✅ ISO-compliant dimensioning system implemented
+  - **Progress**:
+    - ✅ Created `src/drawing/dimensions.ts` (600+ lines) - core logic module
+    - ✅ Type system: Dimension, LinearDimension, RadialDimension, AngularDimension
+    - ✅ Automatic dimension placement per ISO 129-1 (8mm offset, 6mm spacing)
+    - ✅ Bounding box dimensions: 6 total (width/height/depth across 3 views)
+    - ✅ Feature dimensions: Cylinder diameters with Ø prefix and center marks
+    - ✅ Created `src/drawing/dimensionsSVG.ts` (350+ lines) - rendering module
+    - ✅ Extension lines with gaps (2mm) and overhangs (3mm)
+    - ✅ Arrowheads: Filled polygons (3mm×1mm, 3:1 ratio per ISO)
+    - ✅ Dimension text: Arial 3.5mm, no trailing zeros, minimal decimals
+    - ✅ Radial dimensions: Leader lines at 45°, crossed chain-line center marks
+    - ✅ All styling per ISO 128-24 (thin lines 0.35mm, black)
+    - ✅ Integrated with SVG generator (dimensions render above edges)
+    - ✅ Test validation: 7 dimensions in block-hole.svg (6 bbox + 1 cylinder Ø20)
+  - **Current Capabilities**:
+    - Linear dimensions (horizontal/vertical) with extension lines
+    - Radial dimensions (diameter for cylinders) with center marks
+    - Automatic text formatting (no trailing zeros: "100" not "100.0")
+    - Priority-based system for future collision resolution
+  - **Known Limitations**:
+    - Basic placement (no collision detection yet)
+    - Only detects cylindrical features (no holes, slots, or complex features)
+    - Angular dimensions not yet implemented
+  - **Deferred Enhancements**:
+    - Collision detection and resolution (priority-based algorithm stubbed)
+    - Angular dimensions for chamfers and bevels
+    - Hole callouts (counterbores, countersinks)
+    - Feature detection: slots, pockets, bosses
+    - Dimension stacking for multiple parallel dimensions
 - [ ] Section view generation
   - Section plane selection
   - Contour extraction

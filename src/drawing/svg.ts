@@ -5,6 +5,8 @@
 import { Matrix4, Vector3 } from 'three'
 import type { PartRecipe } from '../types/part'
 import { extractRecipeEdges, type Edge } from './edges'
+import { generateDimensions, DEFAULT_DIMENSION_CONFIG } from './dimensions'
+import { renderDimensions } from './dimensionsSVG'
 
 // Line types for ISO drawings (used in generated SVG styles)
 // @ts-expect-error - Used in template literal below
@@ -149,14 +151,20 @@ export function generateDrawing(recipe: PartRecipe): string {
   
   console.log(`[SVG] Extracted ${edges.length} edges from recipe with ${recipe.primitives.length} primitives`)
 
+  // Generate dimensions using ISO 129-1 compliant system
+  const dimensions = generateDimensions(recipe, DEFAULT_DIMENSION_CONFIG)
+  console.log(`[SVG] Generated ${dimensions.length} dimensions`)
+
   // Project each view
   const views = Object.entries(VIEW_CONFIGS).map(([name, config]) => {
     const paths = projectEdges(edges, config)
+    const dimensionSVG = renderDimensions(dimensions, name as 'front' | 'top' | 'right', 2.0)
     return `
       <g class="view ${name}">
         <text x="${config.offset.x}" y="${config.offset.y - 10}" 
               font-family="sans-serif" font-size="8" text-anchor="middle">${config.name}</text>
         ${paths.join('\n')}
+        ${dimensionSVG}
       </g>
     `
   })
