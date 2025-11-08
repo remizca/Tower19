@@ -1,0 +1,448 @@
+
+    <svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+      <defs>
+        <style>
+  .visible-edge {
+    fill: none;
+    stroke: #000;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+  }
+
+  .cutting-plane {
+    fill: none;
+    stroke: #000;
+    stroke-width: 1.4;
+    stroke-linecap: butt;
+  }
+
+  .dimension {
+    fill: none;
+    stroke: #000;
+    stroke-width: 0.7;
+    stroke-linecap: butt;
+  }
+
+  .extension {
+    fill: none;
+    stroke: #000;
+    stroke-width: 0.7;
+    stroke-linecap: butt;
+  }
+
+  .leader {
+    fill: none;
+    stroke: #000;
+    stroke-width: 0.7;
+    stroke-linecap: butt;
+  }
+
+  .hatching {
+    fill: none;
+    stroke: #000;
+    stroke-width: 0.7;
+    stroke-linecap: butt;
+  }
+
+  .hidden-edge {
+    fill: none;
+    stroke: #000;
+    stroke-width: 0.7;
+    stroke-linecap: butt;
+    stroke-dasharray: 6,3;
+  }
+
+  .center-line {
+    fill: none;
+    stroke: #000;
+    stroke-width: 0.7;
+    stroke-linecap: butt;
+    stroke-dasharray: 16,4,4,4;
+  }
+
+  .pitch-circle {
+    fill: none;
+    stroke: #000;
+    stroke-width: 0.7;
+    stroke-linecap: butt;
+    stroke-dasharray: 16,4,4,4;
+  }
+
+  .phantom {
+    fill: none;
+    stroke: #000;
+    stroke-width: 0.7;
+    stroke-linecap: butt;
+    stroke-dasharray: 16,4,4,4,4,4;
+    opacity: 0.5;
+  }
+
+        </style>
+      </defs>
+      
+      
+      <g class="view front">
+        <text x="210" y="150" 
+              font-family="sans-serif" font-size="8" text-anchor="middle">Front View</text>
+        <path d="M 310 110 L 310 210" class="visible-edge" />
+<path d="M 310 210 L 110 110" class="visible-edge" />
+<path d="M 110 110 L 310 210" class="visible-edge" />
+<path d="M 110 210 L 110 110" class="visible-edge" />
+<path d="M 110 110 L 110 210" class="visible-edge" />
+<path d="M 310 110 L 110 110" class="visible-edge" />
+<path d="M 310 210 L 110 210" class="visible-edge" />
+<path d="M 310 210 L 110 110" class="visible-edge" />
+<path d="M 310 110 L 310 210" class="visible-edge" />
+<path d="M 310 210 L 310 110" class="visible-edge" />
+<path d="M 310 110 L 110 210" class="visible-edge" />
+<path d="M 110 110 L 310 210" class="visible-edge" />
+<path d="M 310 210 L 110 210" class="visible-edge" />
+<path d="M 110 210 L 110 110" class="visible-edge" />
+<path d="M 308.0785274505615 -340 L 310 -340" class="hidden-edge" />
+<path d="M 310 -340 L 302.38795280456543 -340" class="hidden-edge" />
+<path d="M 308.0785274505615 -340 L 302.38795280456543 -340" class="visible-edge" />
+<path d="M 302.38795280456543 -340 L 293.14696311950684 -340" class="visible-edge" />
+<path d="M 293.14696311950684 -340 L 308.0785274505615 -340" class="visible-edge" />
+<path d="M 280.71067810058594 -340 L 265.55702209472656 -340" class="visible-edge" />
+<path d="M 265.55702209472656 -340 L 248.26834440231323 -340" class="visible-edge" />
+<path d="M 248.26834440231323 -340 L 280.71067810058594 -340" class="visible-edge" />
+<path d="M 229.50903177261353 -340 L 210 -340" class="visible-edge" />
+<path d="M 210 -340 L 190.49096822738647 -340" class="visible-edge" />
+<path d="M 190.49096822738647 -340 L 229.50903177261353 -340" class="visible-edge" />
+<path d="M 171.73165559768677 -340 L 154.44297790527344 -340" class="visible-edge" />
+<path d="M 154.44297790527344 -340 L 139.28932189941406 -340" class="visible-edge" />
+<path d="M 139.28932189941406 -340 L 171.73165559768677 -340" class="visible-edge" />
+<path d="M 126.85303688049316 -340 L 117.61204719543457 -340" class="visible-edge" />
+<path d="M 117.61204719543457 -340 L 111.92147254943848 -340" class="visible-edge" />
+<path d="M 111.92147254943848 -340 L 126.85303688049316 -340" class="visible-edge" />
+<path d="M 110 -340 L 111.92147254943848 -340" class="hidden-edge" />
+<path d="M 117.61204719543457 -340 L 110 -340" class="hidden-edge" />
+<path d="M 308.0785274505615 660 L 310 660" class="hidden-edge" />
+<path d="M 310 660 L 302.38795280456543 660" class="hidden-edge" />
+<path d="M 308.0785274505615 660 L 302.38795280456543 660" class="visible-edge" />
+<path d="M 302.38795280456543 660 L 293.14696311950684 660" class="visible-edge" />
+<path d="M 293.14696311950684 660 L 308.0785274505615 660" class="visible-edge" />
+<path d="M 280.71067810058594 660 L 265.55702209472656 660" class="visible-edge" />
+<path d="M 265.55702209472656 660 L 248.26834440231323 660" class="visible-edge" />
+<path d="M 248.26834440231323 660 L 280.71067810058594 660" class="visible-edge" />
+<path d="M 229.50903177261353 660 L 210 660" class="visible-edge" />
+<path d="M 210 660 L 190.49096822738647 660" class="visible-edge" />
+<path d="M 190.49096822738647 660 L 229.50903177261353 660" class="visible-edge" />
+<path d="M 171.73165559768677 660 L 154.44297790527344 660" class="visible-edge" />
+<path d="M 154.44297790527344 660 L 139.28932189941406 660" class="visible-edge" />
+<path d="M 139.28932189941406 660 L 171.73165559768677 660" class="visible-edge" />
+<path d="M 126.85303688049316 660 L 117.61204719543457 660" class="visible-edge" />
+<path d="M 117.61204719543457 660 L 111.92147254943848 660" class="visible-edge" />
+<path d="M 111.92147254943848 660 L 126.85303688049316 660" class="visible-edge" />
+<path d="M 110 660 L 111.92147254943848 660" class="hidden-edge" />
+<path d="M 117.61204719543457 660 L 110 660" class="hidden-edge" />
+<path d="M 308.0785274505615 -340 L 310 -340" class="hidden-edge" />
+<path d="M 310 -340 L 308.0785274505615 -340" class="visible-edge" />
+<path d="M 302.38795280456543 -340 L 293.14696311950684 -340" class="visible-edge" />
+<path d="M 293.14696311950684 -340 L 280.71067810058594 -340" class="visible-edge" />
+<path d="M 280.71067810058594 -340 L 302.38795280456543 -340" class="visible-edge" />
+<path d="M 265.55702209472656 -340 L 248.26834440231323 -340" class="visible-edge" />
+<path d="M 248.26834440231323 -340 L 229.50903177261353 -340" class="visible-edge" />
+<path d="M 229.50903177261353 -340 L 265.55702209472656 -340" class="visible-edge" />
+<path d="M 210 -340 L 190.49096822738647 -340" class="visible-edge" />
+<path d="M 190.49096822738647 -340 L 171.73165559768677 -340" class="visible-edge" />
+<path d="M 171.73165559768677 -340 L 210 -340" class="visible-edge" />
+<path d="M 154.44297790527344 -340 L 139.28932189941406 -340" class="visible-edge" />
+<path d="M 139.28932189941406 -340 L 126.85303688049316 -340" class="visible-edge" />
+<path d="M 126.85303688049316 -340 L 154.44297790527344 -340" class="visible-edge" />
+<path d="M 117.61204719543457 -340 L 111.92147254943848 -340" class="visible-edge" />
+<path d="M 111.92147254943848 -340 L 110 -340" class="visible-edge" />
+<path d="M 110 -340 L 117.61204719543457 -340" class="visible-edge" />
+<path d="M 209.99999999999997 -340 L 210 660" class="hidden-edge" />
+<path d="M 210 660 L 190.49096822738647 -340" class="hidden-edge" />
+<path d="M 229.50903177261353 660 L 210 660" class="hidden-edge" />
+<path d="M 310 660 L 308.0785274505615 660" class="visible-edge" />
+<path d="M 308.0785274505615 660 L 302.38795280456543 660" class="visible-edge" />
+<path d="M 302.38795280456543 660 L 310 660" class="visible-edge" />
+<path d="M 293.14696311950684 660 L 280.71067810058594 660" class="visible-edge" />
+<path d="M 280.71067810058594 660 L 265.55702209472656 660" class="visible-edge" />
+<path d="M 265.55702209472656 660 L 293.14696311950684 660" class="visible-edge" />
+<path d="M 248.26834440231323 660 L 229.50903177261353 660" class="visible-edge" />
+<path d="M 229.50903177261353 660 L 210 660" class="visible-edge" />
+<path d="M 210 660 L 248.26834440231323 660" class="visible-edge" />
+<path d="M 190.49096822738647 660 L 171.73165559768677 660" class="visible-edge" />
+<path d="M 171.73165559768677 660 L 154.44297790527344 660" class="visible-edge" />
+<path d="M 154.44297790527344 660 L 190.49096822738647 660" class="visible-edge" />
+<path d="M 139.28932189941406 660 L 126.85303688049316 660" class="visible-edge" />
+<path d="M 126.85303688049316 660 L 117.61204719543457 660" class="visible-edge" />
+<path d="M 117.61204719543457 660 L 139.28932189941406 660" class="visible-edge" />
+<path d="M 111.92147254943848 660 L 110 660" class="visible-edge" />
+<path d="M 110 660 L 111.92147254943848 660" class="hidden-edge" />
+<path d="M 209.99999999999997 660 L 210 160" class="hidden-edge" />
+<path d="M 210 160 L 209.99999999999997 660" class="hidden-edge" />
+        <g class="center-lines" transform="translate(210, 160)">
+          <path d="M -100.00 0.00 L 100.00 0.00" class="center-line" />
+    <path d="M 0.00 100.00 L 0.00 -100.00" class="center-line" />
+        </g>
+        <g class="dimensions" data-view="front">
+<g class="linear-dimension" data-id="bbox-width-front">
+<line x1="-100" y1="-70" x2="-100" y2="-160" class="extension-line" stroke="black" stroke-width="0.35" />
+<line x1="100" y1="-70" x2="100" y2="-160" class="extension-line" stroke="black" stroke-width="0.35" />
+<line x1="-100" y1="-130" x2="100" y2="-130" class="dimension-line" stroke="black" stroke-width="0.35" />
+<polygon points="-100,-130 -130,-125 -130,-135" class="arrowhead" fill="black" />
+<polygon points="100,-130 130,-135 130,-125" class="arrowhead" fill="black" />
+<text x="0" y="-130" class="dimension-text" font-family="Arial, sans-serif" font-size="35" text-anchor="middle" dominant-baseline="middle" fill="black">20</text>
+</g>
+<g class="linear-dimension" data-id="bbox-height-front">
+<line x1="120" y1="-50" x2="210" y2="-50" class="extension-line" stroke="black" stroke-width="0.35" />
+<line x1="120" y1="50" x2="210" y2="50" class="extension-line" stroke="black" stroke-width="0.35" />
+<line x1="180" y1="-50" x2="180" y2="50" class="dimension-line" stroke="black" stroke-width="0.35" />
+<polygon points="180,-50 175,-80 185,-80" class="arrowhead" fill="black" />
+<polygon points="180,50 185,80 175,80" class="arrowhead" fill="black" />
+<text x="180" y="0" class="dimension-text" font-family="Arial, sans-serif" font-size="35" text-anchor="middle" dominant-baseline="middle" fill="black" transform="rotate(-90 180 0)">10</text>
+</g>
+</g>
+      </g>
+    
+
+      <g class="view top">
+        <text x="210" y="430" 
+              font-family="sans-serif" font-size="8" text-anchor="middle">Top View</text>
+        <path d="M 310 390 L 310 490" class="visible-edge" />
+<path d="M 310 490 L 310 390" class="visible-edge" />
+<path d="M 310 490 L 110 490" class="visible-edge" />
+<path d="M 110 490 L 110 390" class="visible-edge" />
+<path d="M 110 390 L 310 490" class="visible-edge" />
+<path d="M 110 390 L 110 490" class="visible-edge" />
+<path d="M 310 490 L 110 390" class="visible-edge" />
+<path d="M 110 390 L 310 390" class="visible-edge" />
+<path d="M 310 390 L 310 490" class="visible-edge" />
+<path d="M 310 490 L 110 390" class="visible-edge" />
+<path d="M 110 390 L 310 390" class="visible-edge" />
+<path d="M 310 390 L 310 490" class="visible-edge" />
+<path d="M 310 390 L 310 490" class="visible-edge" />
+<path d="M 310 490 L 110 390" class="visible-edge" />
+<path d="M 110 490 L 310 490" class="visible-edge" />
+<path d="M 210 340 L 229.50903177261353 341.9214725494385" class="visible-edge" />
+<path d="M 229.50903177261353 341.9214725494385 L 248.26834440231323 347.61204719543457" class="visible-edge" />
+<path d="M 248.26834440231323 347.61204719543457 L 210 340" class="visible-edge" />
+<path d="M 265.55702209472656 356.85303688049316 L 280.71067810058594 369.28932189941406" class="visible-edge" />
+<path d="M 280.71067810058594 369.28932189941406 L 293.14696311950684 384.44297790527344" class="visible-edge" />
+<path d="M 293.14696311950684 384.44297790527344 L 265.55702209472656 356.85303688049316" class="visible-edge" />
+<path d="M 302.38795280456543 401.73165559768677 L 308.0785274505615 420.4909682273864" class="visible-edge" />
+<path d="M 308.0785274505615 420.4909682273864 L 310 439.99999999999994" class="visible-edge" />
+<path d="M 310 439.99999999999994 L 302.38795280456543 401.73165559768677" class="visible-edge" />
+<path d="M 308.0785274505615 459.50903177261347 L 302.38795280456543 478.26834440231323" class="visible-edge" />
+<path d="M 302.38795280456543 478.26834440231323 L 293.14696311950684 495.55702209472656" class="visible-edge" />
+<path d="M 293.14696311950684 495.55702209472656 L 308.0785274505615 459.50903177261347" class="visible-edge" />
+<path d="M 280.71067810058594 510.71067810058594 L 265.55702209472656 523.1469631195068" class="visible-edge" />
+<path d="M 265.55702209472656 523.1469631195068 L 248.26834440231323 532.3879528045654" class="visible-edge" />
+<path d="M 248.26834440231323 532.3879528045654 L 280.71067810058594 510.71067810058594" class="visible-edge" />
+<path d="M 229.50903177261353 538.0785274505615 L 210 540" class="visible-edge" />
+<path d="M 210 540 L 190.49096822738647 538.0785274505615" class="visible-edge" />
+<path d="M 190.49096822738647 538.0785274505615 L 229.50903177261353 538.0785274505615" class="visible-edge" />
+<path d="M 171.73165559768677 532.3879528045654 L 154.44297790527344 523.1469631195068" class="visible-edge" />
+<path d="M 154.44297790527344 523.1469631195068 L 139.28932189941406 510.71067810058594" class="visible-edge" />
+<path d="M 139.28932189941406 510.71067810058594 L 171.73165559768677 532.3879528045654" class="visible-edge" />
+<path d="M 126.85303688049316 495.55702209472656 L 117.61204719543457 478.26834440231323" class="visible-edge" />
+<path d="M 117.61204719543457 478.26834440231323 L 111.92147254943848 459.50903177261347" class="visible-edge" />
+<path d="M 111.92147254943848 459.50903177261347 L 126.85303688049316 495.55702209472656" class="visible-edge" />
+<path d="M 110 440 L 111.92147254943848 420.4909682273864" class="visible-edge" />
+<path d="M 111.92147254943848 420.4909682273864 L 117.61204719543457 401.73165559768677" class="visible-edge" />
+<path d="M 117.61204719543457 401.73165559768677 L 110 440" class="visible-edge" />
+<path d="M 126.85303688049316 384.44297790527344 L 139.28932189941406 369.28932189941406" class="visible-edge" />
+<path d="M 139.28932189941406 369.28932189941406 L 154.44297790527344 356.85303688049316" class="visible-edge" />
+<path d="M 154.44297790527344 356.85303688049316 L 126.85303688049316 384.44297790527344" class="visible-edge" />
+<path d="M 171.73165559768677 347.61204719543457 L 190.49096822738647 341.9214725494385" class="visible-edge" />
+<path d="M 190.49096822738647 341.9214725494385 L 209.99999999999997 340" class="visible-edge" />
+<path d="M 209.99999999999997 340 L 171.73165559768677 347.61204719543457" class="visible-edge" />
+<path d="M 210 439.99999999999994 L 210 340" class="visible-edge" />
+<path d="M 210 340 L 210 439.99999999999994" class="visible-edge" />
+<path d="M 229.50903177261353 341.9214725494385 L 248.26834440231323 347.61204719543457" class="visible-edge" />
+<path d="M 248.26834440231323 347.61204719543457 L 265.55702209472656 356.85303688049316" class="visible-edge" />
+<path d="M 265.55702209472656 356.85303688049316 L 229.50903177261353 341.9214725494385" class="visible-edge" />
+<path d="M 280.71067810058594 369.28932189941406 L 293.14696311950684 384.44297790527344" class="visible-edge" />
+<path d="M 293.14696311950684 384.44297790527344 L 302.38795280456543 401.73165559768677" class="visible-edge" />
+<path d="M 302.38795280456543 401.73165559768677 L 280.71067810058594 369.28932189941406" class="visible-edge" />
+<path d="M 308.0785274505615 420.4909682273864 L 310 439.99999999999994" class="visible-edge" />
+<path d="M 310 439.99999999999994 L 308.0785274505615 459.50903177261347" class="visible-edge" />
+<path d="M 308.0785274505615 459.50903177261347 L 308.0785274505615 420.4909682273864" class="visible-edge" />
+<path d="M 302.38795280456543 478.26834440231323 L 293.14696311950684 495.55702209472656" class="visible-edge" />
+<path d="M 293.14696311950684 495.55702209472656 L 280.71067810058594 510.71067810058594" class="visible-edge" />
+<path d="M 280.71067810058594 510.71067810058594 L 302.38795280456543 478.26834440231323" class="visible-edge" />
+<path d="M 265.55702209472656 523.1469631195068 L 248.26834440231323 532.3879528045654" class="visible-edge" />
+<path d="M 248.26834440231323 532.3879528045654 L 229.50903177261353 538.0785274505615" class="visible-edge" />
+<path d="M 229.50903177261353 538.0785274505615 L 265.55702209472656 523.1469631195068" class="visible-edge" />
+<path d="M 210 540 L 190.49096822738647 538.0785274505615" class="visible-edge" />
+<path d="M 190.49096822738647 538.0785274505615 L 171.73165559768677 532.3879528045654" class="visible-edge" />
+<path d="M 171.73165559768677 532.3879528045654 L 210 540" class="visible-edge" />
+<path d="M 154.44297790527344 523.1469631195068 L 139.28932189941406 510.71067810058594" class="visible-edge" />
+<path d="M 139.28932189941406 510.71067810058594 L 126.85303688049316 495.55702209472656" class="visible-edge" />
+<path d="M 126.85303688049316 495.55702209472656 L 154.44297790527344 523.1469631195068" class="visible-edge" />
+<path d="M 117.61204719543457 478.26834440231323 L 111.92147254943848 459.50903177261347" class="visible-edge" />
+<path d="M 111.92147254943848 459.50903177261347 L 110 440" class="visible-edge" />
+<path d="M 110 440 L 117.61204719543457 478.26834440231323" class="visible-edge" />
+<path d="M 111.92147254943848 420.4909682273864 L 117.61204719543457 401.73165559768677" class="visible-edge" />
+<path d="M 117.61204719543457 401.73165559768677 L 126.85303688049316 384.44297790527344" class="visible-edge" />
+<path d="M 126.85303688049316 384.44297790527344 L 111.92147254943848 420.4909682273864" class="visible-edge" />
+<path d="M 139.28932189941406 369.28932189941406 L 154.44297790527344 356.85303688049316" class="visible-edge" />
+<path d="M 154.44297790527344 356.85303688049316 L 171.73165559768677 347.61204719543457" class="visible-edge" />
+<path d="M 171.73165559768677 347.61204719543457 L 139.28932189941406 369.28932189941406" class="visible-edge" />
+<path d="M 190.49096822738647 341.9214725494385 L 209.99999999999997 340" class="visible-edge" />
+<path d="M 209.99999999999997 340 L 210 440.00000000000006" class="visible-edge" />
+<path d="M 210 440.00000000000006 L 190.49096822738647 341.9214725494385" class="visible-edge" />
+<path d="M 209.99999999999997 340 L 210 440" class="hidden-edge" />
+<path d="M 210 440 L 209.99999999999997 340" class="hidden-edge" />
+        <g class="center-lines" transform="translate(210, 440)">
+          <path d="M 0.00 550.00 L 0.00 -550.00" class="center-line" />
+        </g>
+        <g class="dimensions" data-view="top">
+<g class="linear-dimension" data-id="bbox-width-top">
+<line x1="-100" y1="-70" x2="-100" y2="-160" class="extension-line" stroke="black" stroke-width="0.35" />
+<line x1="100" y1="-70" x2="100" y2="-160" class="extension-line" stroke="black" stroke-width="0.35" />
+<line x1="-100" y1="-130" x2="100" y2="-130" class="dimension-line" stroke="black" stroke-width="0.35" />
+<polygon points="-100,-130 -130,-125 -130,-135" class="arrowhead" fill="black" />
+<polygon points="100,-130 130,-135 130,-125" class="arrowhead" fill="black" />
+<text x="0" y="-130" class="dimension-text" font-family="Arial, sans-serif" font-size="35" text-anchor="middle" dominant-baseline="middle" fill="black">20</text>
+</g>
+<g class="linear-dimension" data-id="bbox-depth-top">
+<line x1="120" y1="-50" x2="210" y2="-50" class="extension-line" stroke="black" stroke-width="0.35" />
+<line x1="120" y1="50" x2="210" y2="50" class="extension-line" stroke="black" stroke-width="0.35" />
+<line x1="180" y1="-50" x2="180" y2="50" class="dimension-line" stroke="black" stroke-width="0.35" />
+<polygon points="180,-50 175,-80 185,-80" class="arrowhead" fill="black" />
+<polygon points="180,50 185,80 175,80" class="arrowhead" fill="black" />
+<text x="180" y="0" class="dimension-text" font-family="Arial, sans-serif" font-size="35" text-anchor="middle" dominant-baseline="middle" fill="black" transform="rotate(-90 180 0)">10</text>
+</g>
+<g class="radial-dimension" data-id="cylinder-p1" data-subtype="diameter">
+<line x1="70.71067811865476" y1="70.71067811865474" x2="127.27922061357857" y2="127.27922061357856" class="leader-line" stroke="black" stroke-width="0.35" />
+<g class="center-mark"><line x1="-30" y1="0" x2="30" y2="0" stroke="black" stroke-width="0.35" stroke-dasharray="8,2,2,2" /><line x1="0" y1="-30" x2="0" y2="30" stroke="black" stroke-width="0.35" stroke-dasharray="8,2,2,2" /></g>
+<text x="127.27922061357857" y="127.27922061357856" class="dimension-text" font-family="Arial, sans-serif" font-size="35" text-anchor="middle" dominant-baseline="middle" fill="black">Ø20</text>
+</g>
+</g>
+      </g>
+    
+
+      <g class="view right">
+        <text x="590" y="150" 
+              font-family="sans-serif" font-size="8" text-anchor="middle">Right View</text>
+        <path d="M 640 110 L 540 110" class="visible-edge" />
+<path d="M 540 110 L 640 210" class="visible-edge" />
+<path d="M 640 210 L 640 110" class="visible-edge" />
+<path d="M 540 210 L 540 110" class="visible-edge" />
+<path d="M 640 110 L 540 210" class="visible-edge" />
+<path d="M 540 110 L 640 110" class="visible-edge" />
+<path d="M 640 110 L 540 110" class="visible-edge" />
+<path d="M 640 210 L 540 210" class="visible-edge" />
+<path d="M 540 210 L 640 110" class="visible-edge" />
+<path d="M 640 110 L 540 210" class="visible-edge" />
+<path d="M 640 210 L 540 110" class="visible-edge" />
+<path d="M 540 110 L 640 210" class="visible-edge" />
+<path d="M 540 110 L 540 210" class="visible-edge" />
+<path d="M 690 -340 L 688.0785274505615 -340" class="visible-edge" />
+<path d="M 688.0785274505615 -340 L 682.3879528045654 -340" class="visible-edge" />
+<path d="M 682.3879528045654 -340 L 690 -340" class="visible-edge" />
+<path d="M 673.1469631195068 -340 L 660.7106781005859 -340" class="visible-edge" />
+<path d="M 660.7106781005859 -340 L 645.5570220947266 -340" class="visible-edge" />
+<path d="M 645.5570220947266 -340 L 673.1469631195068 -340" class="visible-edge" />
+<path d="M 628.2683444023132 -340 L 609.5090317726135 -340" class="visible-edge" />
+<path d="M 609.5090317726135 -340 L 590 -340" class="visible-edge" />
+<path d="M 590 -340 L 628.2683444023132 -340" class="visible-edge" />
+<path d="M 570.4909682273865 -340 L 551.7316555976868 -340" class="visible-edge" />
+<path d="M 551.7316555976868 -340 L 534.4429779052734 -340" class="visible-edge" />
+<path d="M 534.4429779052734 -340 L 570.4909682273865 -340" class="visible-edge" />
+<path d="M 519.2893218994141 -340 L 506.85303688049316 -340" class="visible-edge" />
+<path d="M 506.85303688049316 -340 L 497.61204719543457 -340" class="visible-edge" />
+<path d="M 497.61204719543457 -340 L 519.2893218994141 -340" class="visible-edge" />
+<path d="M 491.9214725494385 -340 L 490 -340" class="visible-edge" />
+<path d="M 490 -340 L 491.9214725494385 -340" class="hidden-edge" />
+<path d="M 688.0785274505615 -340 L 690 -340" class="hidden-edge" />
+<path d="M 690 -340 L 682.3879528045654 -340" class="hidden-edge" />
+<path d="M 690 660 L 688.0785274505615 660" class="visible-edge" />
+<path d="M 688.0785274505615 660 L 682.3879528045654 660" class="visible-edge" />
+<path d="M 682.3879528045654 660 L 690 660" class="visible-edge" />
+<path d="M 673.1469631195068 660 L 660.7106781005859 660" class="visible-edge" />
+<path d="M 660.7106781005859 660 L 645.5570220947266 660" class="visible-edge" />
+<path d="M 645.5570220947266 660 L 673.1469631195068 660" class="visible-edge" />
+<path d="M 628.2683444023132 660 L 609.5090317726135 660" class="visible-edge" />
+<path d="M 609.5090317726135 660 L 590 660" class="visible-edge" />
+<path d="M 590 660 L 628.2683444023132 660" class="visible-edge" />
+<path d="M 570.4909682273865 660 L 551.7316555976868 660" class="visible-edge" />
+<path d="M 551.7316555976868 660 L 534.4429779052734 660" class="visible-edge" />
+<path d="M 534.4429779052734 660 L 570.4909682273865 660" class="visible-edge" />
+<path d="M 519.2893218994141 660 L 506.85303688049316 660" class="visible-edge" />
+<path d="M 506.85303688049316 660 L 497.61204719543457 660" class="visible-edge" />
+<path d="M 497.61204719543457 660 L 519.2893218994141 660" class="visible-edge" />
+<path d="M 491.9214725494385 660 L 490 660" class="visible-edge" />
+<path d="M 490 660 L 491.9214725494385 660" class="hidden-edge" />
+<path d="M 688.0785274505615 660 L 690 660" class="hidden-edge" />
+<path d="M 690 660 L 682.3879528045654 660" class="hidden-edge" />
+<path d="M 590 -340 L 690 -340" class="hidden-edge" />
+<path d="M 690 -340 L 590 -340" class="hidden-edge" />
+<path d="M 688.0785274505615 -340 L 682.3879528045654 -340" class="visible-edge" />
+<path d="M 682.3879528045654 -340 L 673.1469631195068 -340" class="visible-edge" />
+<path d="M 673.1469631195068 -340 L 688.0785274505615 -340" class="visible-edge" />
+<path d="M 660.7106781005859 -340 L 645.5570220947266 -340" class="visible-edge" />
+<path d="M 645.5570220947266 -340 L 628.2683444023132 -340" class="visible-edge" />
+<path d="M 628.2683444023132 -340 L 660.7106781005859 -340" class="visible-edge" />
+<path d="M 609.5090317726135 -340 L 590 -340" class="visible-edge" />
+<path d="M 590 -340 L 570.4909682273865 -340" class="visible-edge" />
+<path d="M 570.4909682273865 -340 L 609.5090317726135 -340" class="visible-edge" />
+<path d="M 551.7316555976868 -340 L 534.4429779052734 -340" class="visible-edge" />
+<path d="M 534.4429779052734 -340 L 519.2893218994141 -340" class="visible-edge" />
+<path d="M 519.2893218994141 -340 L 551.7316555976868 -340" class="visible-edge" />
+<path d="M 506.85303688049316 -340 L 497.61204719543457 -340" class="visible-edge" />
+<path d="M 497.61204719543457 -340 L 491.9214725494385 -340" class="visible-edge" />
+<path d="M 491.9214725494385 -340 L 506.85303688049316 -340" class="visible-edge" />
+<path d="M 490 -340 L 491.9214725494385 -340" class="hidden-edge" />
+<path d="M 497.61204719543457 -340 L 490 -340" class="hidden-edge" />
+<path d="M 688.0785274505615 -340 L 690 -340" class="hidden-edge" />
+<path d="M 690 -340 L 590 660" class="hidden-edge" />
+<path d="M 590 660 L 688.0785274505615 -340" class="hidden-edge" />
+<path d="M 590 660 L 690 660" class="hidden-edge" />
+<path d="M 690 660 L 688.0785274505615 660" class="visible-edge" />
+<path d="M 688.0785274505615 660 L 590 660" class="visible-edge" />
+<path d="M 682.3879528045654 660 L 673.1469631195068 660" class="visible-edge" />
+<path d="M 673.1469631195068 660 L 660.7106781005859 660" class="visible-edge" />
+<path d="M 660.7106781005859 660 L 682.3879528045654 660" class="visible-edge" />
+<path d="M 645.5570220947266 660 L 628.2683444023132 660" class="visible-edge" />
+<path d="M 628.2683444023132 660 L 609.5090317726135 660" class="visible-edge" />
+<path d="M 609.5090317726135 660 L 645.5570220947266 660" class="visible-edge" />
+<path d="M 590 660 L 570.4909682273865 660" class="visible-edge" />
+<path d="M 570.4909682273865 660 L 551.7316555976868 660" class="visible-edge" />
+<path d="M 551.7316555976868 660 L 590 660" class="visible-edge" />
+<path d="M 534.4429779052734 660 L 519.2893218994141 660" class="visible-edge" />
+<path d="M 519.2893218994141 660 L 506.85303688049316 660" class="visible-edge" />
+<path d="M 506.85303688049316 660 L 534.4429779052734 660" class="visible-edge" />
+<path d="M 497.61204719543457 660 L 491.9214725494385 660" class="visible-edge" />
+<path d="M 491.9214725494385 660 L 490 660" class="visible-edge" />
+<path d="M 490 660 L 497.61204719543457 660" class="visible-edge" />
+<path d="M 690 660 L 590 160" class="hidden-edge" />
+<path d="M 590 160 L 690 660" class="hidden-edge" />
+        <g class="center-lines" transform="translate(590, 160)">
+          <path d="M 0.00 550.00 L 0.00 -550.00" class="center-line" />
+        </g>
+        <g class="dimensions" data-view="right">
+<g class="linear-dimension" data-id="bbox-depth-right">
+<line x1="-50" y1="-70" x2="-50" y2="-160" class="extension-line" stroke="black" stroke-width="0.35" />
+<line x1="50" y1="-70" x2="50" y2="-160" class="extension-line" stroke="black" stroke-width="0.35" />
+<line x1="-50" y1="-130" x2="50" y2="-130" class="dimension-line" stroke="black" stroke-width="0.35" />
+<polygon points="-50,-130 -80,-125 -80,-135" class="arrowhead" fill="black" />
+<polygon points="50,-130 80,-135 80,-125" class="arrowhead" fill="black" />
+<text x="0" y="-130" class="dimension-text" font-family="Arial, sans-serif" font-size="35" text-anchor="middle" dominant-baseline="middle" fill="black">10</text>
+</g>
+<g class="linear-dimension" data-id="bbox-height-right">
+<line x1="70" y1="-50" x2="160" y2="-50" class="extension-line" stroke="black" stroke-width="0.35" />
+<line x1="70" y1="50" x2="160" y2="50" class="extension-line" stroke="black" stroke-width="0.35" />
+<line x1="130" y1="-50" x2="130" y2="50" class="dimension-line" stroke="black" stroke-width="0.35" />
+<polygon points="130,-50 125,-80 135,-80" class="arrowhead" fill="black" />
+<polygon points="130,50 135,80 125,80" class="arrowhead" fill="black" />
+<text x="130" y="0" class="dimension-text" font-family="Arial, sans-serif" font-size="35" text-anchor="middle" dominant-baseline="middle" fill="black" transform="rotate(-90 130 0)">10</text>
+</g>
+</g>
+      </g>
+    
+      
+    <g transform="translate(180 200)">
+      <rect x="0" y="0" width="100" height="50" fill="none" stroke="black" strokeWidth="0.5" />
+      <text x="5" y="15" font-family="sans-serif" font-size="8">L-Bracket</text>
+      <text x="5" y="30" font-family="sans-serif" font-size="8">Scale: 5:1</text>
+      <text x="5" y="45" font-family="sans-serif" font-size="8">Units: mm</text>
+    </g>
+  
+    </svg>
+  

@@ -98,9 +98,13 @@ Detailed sub-tasks (tree):
      - **implemented**: extractCenterLines(), extractCylinderCenterLines(), extractConeCenterLines(), renderCenterLines()
      - **features**: Cross lines for end-on views, axis lines for side views, extends 5mm beyond features, min 10mm diameter threshold
      - **tested**: block-hole fixture shows crossed center lines in front view, axis lines in top/right views
-   - [ ] 2D-22: Scale selection algorithm
+   - [x] 2D-22: Scale selection algorithm (✅ Complete - Nov 8, 2025)
      - goal: Automatically select standard scale (1:1, 1:2, 2:1, etc.) to fit drawing on page
      - acceptance: Drawing fits within A4/A3 margins with appropriate scale
+     - **status**: ✅ Integrated scale selection into `src/drawing/svg.ts` with ISO 5455 compliant scales
+     - **implemented**: Page layout (2×2 grid with margins/gaps), per-view bounding calculation, standard scale array [10, 5, 2, 1, 0.5, 0.25, 0.2, 0.1], global fit constraint selection, dynamic view centering, title block scale label formatting
+     - **algorithm**: Computes usable area after margins (15mm) and gaps (10mm), divides into slots for front/top/right views, estimates mm extents from bounding box, calculates max scale fitting each view, selects largest standard scale ≤ global limit
+     - **tested**: Test suite validates 1:1 (default 100×50×25mm part), 1:2 (large 250×200×150mm part), 5:1 (tiny 20×10×10mm part)
    - [ ] 2D-23: Dimension collision detection
      - goal: Detect overlapping dimensions and text, relocate to prevent collisions
      - acceptance: No overlapping dimension text or extension lines in output

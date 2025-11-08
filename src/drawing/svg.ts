@@ -41,6 +41,11 @@ const VIEW_CONFIGS: Record<View, ViewConfig> = {
   }
 }
 
+// SVG canvas/page constants
+const PAGE_WIDTH = 800 // SVG units
+const PAGE_HEIGHT = 600 // SVG units
+const UNIT_SCALE = 2.0 // SVG units per mm (affects sizes like stroke width)
+
 function createTitleBlock(name: string, scale = '1:1', units = 'mm') {
   const y = 200 // Title block at bottom of page
   return `
@@ -152,22 +157,73 @@ export function generateDrawing(recipe: PartRecipe): string {
   const dimensions = generateDimensions(recipe, DEFAULT_DIMENSION_CONFIG)
   console.log(`[SVG] Generated ${dimensions.length} dimensions`)
 
+  // ----- Scale selection (Phase 3.3) -----
+  // Define page layout in mm (derived from SVG units and UNIT_SCALE)
+  const marginMM = 15
+  const gapMM = 10
+
+  const marginU = marginMM * UNIT_SCALE
+  const gapU = gapMM * UNIT_SCALE
+
+  const contentW = PAGE_WIDTH - 2 * marginU
+  const contentH = PAGE_HEIGHT - 2 * marginU
+
+  // Split content area into a 2x2 grid; bottom-right is left mostly for title block
+  const slotW = (contentW - gapU) / 2
+  const slotH = (contentH - gapU) / 2
+
+  // Estimate view extents from bounding box (mm)
+  const bb = recipe.bounding_mm
+  const viewMM: Record<View, { w: number; h: number }> = {
+    front: { w: Math.max(1, bb.x), h: Math.max(1, bb.z) },
+    top: { w: Math.max(1, bb.x), h: Math.max(1, bb.y) },
+    right: { w: Math.max(1, bb.y), h: Math.max(1, bb.z) },
+  }
+
+  // Compute the maximum view scale (geometry scale, not stroke width) that fits each slot
+  const limitFront = Math.min(slotW / (viewMM.front.w * UNIT_SCALE), slotH / (viewMM.front.h * UNIT_SCALE))
+  const limitTop   = Math.min(slotW / (viewMM.top.w   * UNIT_SCALE), slotH / (viewMM.top.h   * UNIT_SCALE))
+  const limitRight = Math.min(slotW / (viewMM.right.w * UNIT_SCALE), slotH / (viewMM.right.h * UNIT_SCALE))
+  const globalLimit = Math.max(0.01, Math.min(limitFront, limitTop, limitRight))
+
+  // Allowed standard scales per ISO 5455 (geometry multipliers)
+  const STANDARD_SCALES = [10, 5, 2, 1, 0.5, 0.25, 0.2, 0.1]
+  const viewScale = STANDARD_SCALES.find(s => s <= globalLimit) ?? STANDARD_SCALES[STANDARD_SCALES.length - 1]
+
+  // Helper to format scale label
+  const formatScaleLabel = (s: number) => (s >= 1 ? `${Math.round(s)}:1` : `1:${Math.round(1 / s)}`)
+  const scaleLabel = formatScaleLabel(viewScale)
+
+  // Total conversion from mm to SVG units for geometry positions/lengths
+  const totalScale = UNIT_SCALE * viewScale
+
+  // Compute per-slot centers (offsets) in SVG units
+  const frontCenter = new Vector3(marginU + slotW / 2, marginU + slotH / 2, 0)
+  const topCenter   = new Vector3(marginU + slotW / 2, marginU + slotH + gapU + slotH / 2, 0)
+  const rightCenter = new Vector3(marginU + slotW + gapU + slotW / 2, marginU + slotH / 2, 0)
+
   // Project each view
-  const views = Object.entries(VIEW_CONFIGS).map(([name, config]) => {
-    const paths = projectEdges(edges, config)
-    const dimensionSVG = renderDimensions(dimensions, name as 'front' | 'top' | 'right', 2.0)
+  const views = (Object.entries(VIEW_CONFIGS) as Array<[View, ViewConfig]>).map(([name, config]) => {
+    // Override offsets with computed centers
+    const withOffset: ViewConfig = {
+      ...config,
+      offset: name === 'front' ? frontCenter : name === 'top' ? topCenter : rightCenter
+    }
+
+    const paths = projectEdges(edges, withOffset, totalScale)
+    const dimensionSVG = renderDimensions(dimensions, name as 'front' | 'top' | 'right', totalScale)
     
     // Extract and render center lines for cylindrical features
     const centerLines = extractCenterLines(recipe, name as 'front' | 'top' | 'right', DEFAULT_CENTER_LINE_CONFIG)
-    const centerLineSVG = renderCenterLines(centerLines, 2.0)
+    const centerLineSVG = renderCenterLines(centerLines, totalScale)
     console.log(`[SVG] Generated ${centerLines.length} center lines for ${name} view`)
     
     return `
       <g class="view ${name}">
-        <text x="${config.offset.x}" y="${config.offset.y - 10}" 
-              font-family="sans-serif" font-size="8" text-anchor="middle">${config.name}</text>
+        <text x="${withOffset.offset.x}" y="${withOffset.offset.y - 10}" 
+              font-family="sans-serif" font-size="8" text-anchor="middle">${withOffset.name}</text>
         ${paths.join('\n')}
-        <g class="center-lines" transform="translate(${config.offset.x}, ${config.offset.y})">
+        <g class="center-lines" transform="translate(${withOffset.offset.x}, ${withOffset.offset.y})">
           ${centerLineSVG}
         </g>
         ${dimensionSVG}
@@ -177,10 +233,10 @@ export function generateDrawing(recipe: PartRecipe): string {
 
   // Compose final SVG with style block for line types
   // Using ISO 128-24 compliant line styles (scale 2.0 = 2 SVG units per mm)
-  const lineStylesCSS = generateAllLineStylesCSS(2.0)
+  const lineStylesCSS = generateAllLineStylesCSS(UNIT_SCALE)
   
   return `
-    <svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+    <svg xmlns="http://www.w3.org/2000/svg" width="${PAGE_WIDTH}" height="${PAGE_HEIGHT}" viewBox="0 0 ${PAGE_WIDTH} ${PAGE_HEIGHT}">
       <defs>
         <style>
 ${lineStylesCSS}
@@ -188,7 +244,7 @@ ${lineStylesCSS}
       </defs>
       
       ${views.join('\n')}
-      ${createTitleBlock(recipe.name)}
+      ${createTitleBlock(recipe.name, scaleLabel)}
     </svg>
   `
 }

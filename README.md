@@ -81,7 +81,14 @@ Recent Progress (Nov 8, 2025)
   - Chain line pattern (8,2,2,2 dasharray) per ISO 128-24
   - Extends 5mm beyond feature boundaries, 10mm diameter minimum threshold
   - Supports cylinders and cones with any axis orientation (x, y, z)
-- ⚠️ **Next**: Phase 3.3 - Scale selection algorithm
+- ✅ **Phase 3.3 Complete - Scale Selection**: Automatic drawing scale fitting with ISO 5455 scales
+  - Standard scales: 10:1, 5:1, 2:1, 1:1, 1:2, 1:4, 1:5, 1:10
+  - Automatic page layout with 2×2 grid (front/top/right views + title block area)
+  - Computes optimal scale fitting all views within margins (15mm) and gaps (10mm)
+  - Dynamic view centering in allocated slots
+  - Title block displays selected scale (e.g., "Scale: 1:2")
+  - Tested with default (1:1), large (1:2), and tiny (5:1) parts
+- ⚠️ **Next**: Phase 3.4 - Dimension collision detection
 
 Recent Progress (Nov 7, 2025)
 - ✅ **Ribs and webs features**: Complete structural reinforcement generators (ribs, webs, radial ribs)

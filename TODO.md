@@ -118,6 +118,26 @@
   - Section plane selection
   - Contour extraction
   - Hatch pattern rendering
+- [x] Implement line weight system (Phase 3.1)
+  - ✅ Add thick (0.7mm) and thin (0.35mm) line weights per ISO 128-24
+  - ✅ Created LineType enum with 8 ISO-compliant line types
+  - ✅ Outlines use thick lines, dimensions/hatching/center lines use thin lines
+- [x] Implement center lines for cylindrical features (Phase 3.2)
+  - ✅ Add crossed chain lines (8,2,2,2 dasharray) showing axes of cylinders and cones
+  - ✅ Extend beyond feature boundaries per ISO 128-24
+  - ✅ Detect cylindrical primitives from recipe, calculate axis positions/orientations
+  - ✅ Render chain lines with LineType.CENTER_LINE
+  - ✅ Tested with block-hole fixture
+- [x] Implement scale selection algorithm (Phase 3.3)
+  - ✅ Automatically select standard scale (1:1, 1:2, 2:1, 1:5, 5:1, etc.)
+  - ✅ Fit drawing within page margins using ISO 5455 scales
+  - ✅ Compute usable page area, estimate view extents from bounding box
+  - ✅ Pick largest standard scale that fits all views
+  - ✅ Set view offsets to center in slots, update title block label
+  - ✅ Tested with default, large, and tiny parts
+- [ ] Implement dimension collision detection (Phase 3.4)
+  - Detect overlapping dimension text and extension lines
+  - Use priority-based relocation algorithm to prevent collisions
 
 ## UI/UX and Integration
 
