@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added (Nov 8, 2025)
+- **2D Drawing Engine: ISO Standards Specification**: Comprehensive technical reference for engineering drawings
+  - Created `docs/specs/iso-drawing-standards.md` (500+ lines)
+  - **Projection systems**: ISO first-angle (default) and third-angle projection per ISO 5456-2
+  - **Line standards**: Complete ISO 128-24 line types (thick/thin, solid/dashed/chain) with SVG implementation
+  - **Title block**: ISO 7200 requirements (part name, scale, projection symbol, units, date, seed)
+  - **Dimensioning**: ISO 129-1 rules for linear, radial, angular dimensions with automatic placement algorithms
+  - **Section views**: ISO 128-50 standards (cutting planes, hatch patterns, section labeling)
+  - **Sheet sizes**: ISO 5457 A-series paper sizes and drawing areas with margins
+  - **Scales**: ISO 5455 standard scales (2:1, 1:1, 1:2, 1:5) with auto-selection algorithm
+  - **View arrangement**: First-angle layout strategies for 2-3 orthographic views
+  - **Implementation roadmap**: 5 phases from basic projection to advanced features
+  - **SVG examples**: Code snippets for hatching, dimensions, title blocks, projection symbols
+  - Ready to implement Phase 2 (dimensioning system)
 - **2D Drawing Engine: SVG Integration Complete**: Integrated edge extraction with SVG renderer
   - Updated `src/drawing/svg.ts` to use `extractRecipeEdges()` from edges module
   - Removed legacy 105-line `extractEdges()` function - single source of truth

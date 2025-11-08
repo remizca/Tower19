@@ -50,8 +50,17 @@
 
 ## 2D Drawing Engine (Priority: Medium)
 
-- [ ] Specify 2D drawing engine & ISO conventions
-  - Detail projection (ISO first-angle), standards to follow (ISO 128, 129, 5456, 7200), dimensioning rules, line types, title block, section-view rules and how to generate them programmatically.
+- [x] Specify 2D drawing engine & ISO conventions
+  - ✅ Created comprehensive specification: `docs/specs/iso-drawing-standards.md`
+  - ✅ Documented ISO first-angle projection system (ISO 5456-2)
+  - ✅ Line types and weights per ISO 128-24 (thick/thin, solid/dashed/chain)
+  - ✅ Title block requirements per ISO 7200 (part name, scale, projection, units, date)
+  - ✅ Dimensioning rules per ISO 129-1 (linear, radial, angular with placement algorithms)
+  - ✅ Section view standards per ISO 128-50 (cutting planes, hatching, labeling)
+  - ✅ Sheet sizes and scales per ISO 5457 and ISO 5455
+  - ✅ View selection and arrangement strategies
+  - ✅ Implementation roadmap with 5 phases
+  - **Reference**: All standards documented with SVG implementation examples
 - [x] Implement SVG projection and rendering (PHASE 1 COMPLETE)
   - **Status**: ✅ Edge extraction and basic SVG generation complete
   - **Progress**: 
