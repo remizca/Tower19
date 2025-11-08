@@ -63,6 +63,20 @@ Recent Progress (Nov 8, 2025)
   - Tested with 222 edges from block-hole fixture
   - Ready for CSG integration
 
+Recent Progress (Nov 8, 2025)
+- ✅ **Phase 2 Complete - Dimensioning System**: ISO-compliant dimensioning with automatic placement
+  - Linear dimensions (horizontal/vertical) with extension lines and arrowheads
+  - Radial dimensions (Ø prefix) with center marks and leader lines
+  - Automatic text formatting (no trailing zeros: "100" not "100.0")
+  - 6 bounding box dimensions + feature dimensions (cylinder diameters)
+  - Proper spacing per ISO 129-1 (8mm offset, 6mm between dimensions)
+- ✅ **Phase 3.1 Complete - Line Weight System**: ISO 128-24 compliant line types
+  - Thick lines (0.7mm) for visible edges and outlines
+  - Thin lines (0.35mm) for dimensions, hidden edges, center lines
+  - 11 line types: visible-edge, hidden-edge, dimension, extension, leader, hatching, center-line, pitch-circle, phantom, cutting-plane
+  - Proper dasharray patterns for hidden (3,1.5) and chain lines (8,2,2,2)
+- ⚠️ **Next**: Phase 3.2 - Center lines for cylindrical features
+
 Recent Progress (Nov 7, 2025)
 - ✅ **Ribs and webs features**: Complete structural reinforcement generators (ribs, webs, radial ribs)
 - ✅ **Intermediate difficulty generator implemented**: 4 complex strategies with 5-15 primitives each
@@ -83,14 +97,15 @@ Known Issues
 - Expert difficulty generator not yet implemented
 
 Next steps (prioritized)
-1. **[HIGH PRIORITY]** Complete 2D renderer integration
-   - Integrate edge extraction module with CSG renderer for final merged geometry
-   - Replace Z-depth heuristics with ray-casting visibility in projectEdges()
-   - Test with all fixtures (block-hole, L-bracket, T-bracket, cylinder-cutout)
-2. Create expert difficulty generator (8-12+ primitives, advanced features, combined ribs/webs/fillets)
-3. Migrate bookmarking/storage from localStorage to IndexedDB
-4. Add timer functionality and local records storage
-5. Add CI (GitHub Actions) that runs `npm run build` on PRs
-6. Add comprehensive tests and example models
+1. **[HIGH PRIORITY]** Complete Phase 3 of 2D drawing engine
+   - Center lines for cylindrical features (chain lines showing axes)
+   - Scale selection algorithm (fit drawing on A4/A3 with standard scales)
+   - Dimension collision detection (prevent overlapping text and lines)
+2. **Phase 4**: Section views and hatching patterns
+3. Create expert difficulty generator (8-12+ primitives, advanced features, combined ribs/webs/fillets)
+4. Migrate bookmarking/storage from localStorage to IndexedDB
+5. Add timer functionality and local records storage
+6. Add CI (GitHub Actions) that runs `npm run build` on PRs
+7. Add comprehensive tests and example models
 
-See `TODO.md` and `docs/` for project tracking and technical notes.
+See `TODO.md`, `docs/progress/PROGRESS.md`, and `docs/roadmaps/` for project tracking and technical notes.
