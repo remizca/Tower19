@@ -46,6 +46,10 @@ const PAGE_WIDTH = 800 // SVG units
 const PAGE_HEIGHT = 600 // SVG units
 const UNIT_SCALE = 2.0 // SVG units per mm (affects sizes like stroke width)
 
+// Debug logging flag for SVG generation; set to true to enable verbose logs
+const DEBUG_DRAWING = false
+const debug = (...args: any[]) => { if (DEBUG_DRAWING) console.log(...args) }
+
 function createTitleBlock(name: string, scale = '1:1', units = 'mm') {
   const y = 200 // Title block at bottom of page
   return `
@@ -66,20 +70,20 @@ function projectEdges(edges: Edge[], viewConfig: ViewConfig, scale = 1): string[
     const { start, end } = edge
     
     // Debug log input points
-    console.log(`Edge: ${start.toArray()} -> ${end.toArray()}`)
+    debug(`Edge: ${start.toArray()} -> ${end.toArray()}`)
 
     // Transform to view space
     const v1 = start.clone().applyMatrix4(viewConfig.matrix)
     const v2 = end.clone().applyMatrix4(viewConfig.matrix)
     
-    console.log(`  After transform: ${v1.toArray()} -> ${v2.toArray()}`)
+  debug(`  After transform: ${v1.toArray()} -> ${v2.toArray()}`)
 
     // Skip edges that are exactly parallel to view direction (have same Z)
     // Allow small variations for near-parallel edges
     if (Math.abs(v1.z - v2.z) < 0.0001 &&
           Math.abs(v1.x - v2.x) < 0.0001 &&
           Math.abs(v1.y - v2.y) < 0.0001) {
-      console.log('  Skipping - parallel')
+      debug('  Skipping - parallel')
       return
     }
     
@@ -90,11 +94,11 @@ function projectEdges(edges: Edge[], viewConfig: ViewConfig, scale = 1): string[
     const p1Behind = v1.z > 0.0001
     const p2Behind = v2.z > 0.0001
 
-    console.log(`  p1InFront: ${p1InFront}, p2InFront: ${p2InFront}, p1Behind: ${p1Behind}, p2Behind: ${p2Behind}`)
+  debug(`  p1InFront: ${p1InFront}, p2InFront: ${p2InFront}, p1Behind: ${p1Behind}, p2Behind: ${p2Behind}`)
 
     // If both endpoints are behind the view plane, skip the edge entirely
     if (p1Behind && p2Behind) {
-      console.log('  Skipping - both endpoints behind view plane')
+      debug('  Skipping - both endpoints behind view plane')
       return
     }
     
@@ -106,7 +110,7 @@ function projectEdges(edges: Edge[], viewConfig: ViewConfig, scale = 1): string[
 
     // Skip near-zero length projected edges
       if (Math.abs(x2 - x1) < 0.01 && Math.abs(y2 - y1) < 0.01) {
-      console.log('  Skipping - zero length')
+      debug('  Skipping - zero length')
       return
     }
 
@@ -133,7 +137,7 @@ function projectEdges(edges: Edge[], viewConfig: ViewConfig, scale = 1): string[
       // ignore heuristics on failure
     }
 
-    console.log(`  Adding ${type} edge: (${x1},${y1}) -> (${x2},${y2})`)
+  debug(`  Adding ${type} edge: (${x1},${y1}) -> (${x2},${y2})`)
     
     // Map visibility to ISO line type
     const lineType = getEdgeLineType(type === 'visible')
@@ -151,11 +155,11 @@ export function generateDrawing(recipe: PartRecipe): string {
   // This provides better support for all primitive types and proper sharp edge detection
   const edges = extractRecipeEdges(recipe)
   
-  console.log(`[SVG] Extracted ${edges.length} edges from recipe with ${recipe.primitives.length} primitives`)
+  debug(`[SVG] Extracted ${edges.length} edges from recipe with ${recipe.primitives.length} primitives`)
 
   // Generate dimensions using ISO 129-1 compliant system
   const dimensions = generateDimensions(recipe, DEFAULT_DIMENSION_CONFIG)
-  console.log(`[SVG] Generated ${dimensions.length} dimensions`)
+  debug(`[SVG] Generated ${dimensions.length} dimensions`)
 
   // ----- Scale selection (Phase 3.3) -----
   // Define page layout in mm (derived from SVG units and UNIT_SCALE)
@@ -188,7 +192,9 @@ export function generateDrawing(recipe: PartRecipe): string {
 
   // Allowed standard scales per ISO 5455 (geometry multipliers)
   const STANDARD_SCALES = [10, 5, 2, 1, 0.5, 0.25, 0.2, 0.1]
-  const viewScale = STANDARD_SCALES.find(s => s <= globalLimit) ?? STANDARD_SCALES[STANDARD_SCALES.length - 1]
+  const MIN_SCALE = STANDARD_SCALES[STANDARD_SCALES.length - 1]
+  const viewScale = STANDARD_SCALES.find(s => s <= globalLimit) ?? MIN_SCALE
+  const oversize = globalLimit < MIN_SCALE
 
   // Helper to format scale label
   const formatScaleLabel = (s: number) => (s >= 1 ? `${Math.round(s)}:1` : `1:${Math.round(1 / s)}`)
@@ -216,7 +222,7 @@ export function generateDrawing(recipe: PartRecipe): string {
     // Extract and render center lines for cylindrical features
     const centerLines = extractCenterLines(recipe, name as 'front' | 'top' | 'right', DEFAULT_CENTER_LINE_CONFIG)
     const centerLineSVG = renderCenterLines(centerLines, totalScale)
-    console.log(`[SVG] Generated ${centerLines.length} center lines for ${name} view`)
+  debug(`[SVG] Generated ${centerLines.length} center lines for ${name} view`)
     
     return `
       <g class="view ${name}">
@@ -235,6 +241,15 @@ export function generateDrawing(recipe: PartRecipe): string {
   // Using ISO 128-24 compliant line styles (scale 2.0 = 2 SVG units per mm)
   const lineStylesCSS = generateAllLineStylesCSS(UNIT_SCALE)
   
+  const warningSVG = oversize
+    ? `<text x="${marginU}" y="${PAGE_HEIGHT - marginU / 2}" font-family="sans-serif" font-size="10" fill="red">Warning: Part exceeds page at 1:10; drawing may be clipped</text>`
+    : ''
+
+  if (oversize) {
+    // Emit a single console warning to aid in debugging oversized drawings
+    console.warn('[SVG] Oversize part: selected 1:10 but geometry may exceed page bounds')
+  }
+
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="${PAGE_WIDTH}" height="${PAGE_HEIGHT}" viewBox="0 0 ${PAGE_WIDTH} ${PAGE_HEIGHT}">
       <defs>
@@ -245,6 +260,7 @@ ${lineStylesCSS}
       
       ${views.join('\n')}
       ${createTitleBlock(recipe.name, scaleLabel)}
+      ${warningSVG}
     </svg>
   `
 }
