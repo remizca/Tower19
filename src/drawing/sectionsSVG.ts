@@ -9,6 +9,7 @@
  */
 
 import type { SectionView, SectionContour, HatchLine, CuttingPlane, Point2D } from './sections'
+import { generateHatchLines } from './sections'
 import { LineType, LINE_STYLES } from './lineTypes'
 
 /**
@@ -66,14 +67,17 @@ export function renderSectionContour(
   elements.push(
     `<path d="${pathData}" ` +
     `fill="none" ` +
-    `stroke="${style.color}" ` +
-    `stroke-width="${style.width}" ` +
+      `stroke="${style.stroke}" ` +
+      `stroke-width="${style.strokeWidth}" ` +
     `stroke-linecap="round" ` +
     `stroke-linejoin="round" />`
   )
   
-  // TODO: Add hatch pattern rendering here
-  // Will be implemented in next step
+    // Generate and render hatch pattern for outer contours only
+    if (contour.isOuter) {
+      const hatchLines = generateHatchLines(contour, hatchPattern)
+      elements.push(renderHatchLines(hatchLines, scale))
+    }
   
   elements.push(`</g>`)
   
@@ -132,8 +136,8 @@ export function renderHatchLines(hatchLines: HatchLine[], scale: number): string
     
     elements.push(
       `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" ` +
-      `stroke="${style.color}" ` +
-      `stroke-width="${style.width}" ` +
+        `stroke="${style.stroke}" ` +
+        `stroke-width="${style.strokeWidth}" ` +
       `stroke-linecap="butt" />`
     )
   }
@@ -215,9 +219,9 @@ export function renderCuttingPlaneIndicator(
   elements.push(
     `<line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" ` +
     `x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" ` +
-    `stroke="${style.color}" ` +
-    `stroke-width="${style.width * 2}" ` +  // Thick chain line
-    `stroke-dasharray="${style.dasharray}" ` +
+      `stroke="${style.stroke}" ` +
+      `stroke-width="${style.strokeWidth * 2}" ` +  // Thick chain line
+      `stroke-dasharray="${style.strokeDasharray}" ` +
     `stroke-linecap="butt" />`
   )
   
