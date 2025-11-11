@@ -8,6 +8,8 @@ import type { Transform, Difficulty } from './types/part'
 import { validatePartRecipe } from './schema/validate'
 import migrateLegacyBeginnerToPartRecipe from './storage/migrate'
 import { Geometry, Base, Subtraction, Addition } from '@react-three/csg'
+import { DrawingViewer } from './viewers/DrawingViewer'
+import type { BufferGeometry } from 'three'
 
 // Helper to compute position, rotation, and scale from transform + axis fallback
 function computeTransform(
@@ -60,7 +62,9 @@ function Controls() {
   return null
 }
 
-function ModelRenderer({ recipe }: { recipe: PartRecipe | null }) {
+function ModelRenderer({ recipe, onGeometryReady }: { recipe: PartRecipe | null; onGeometryReady?: (geometry: BufferGeometry | null) => void }) {
+  const geometryRef = useRef<BufferGeometry | null>(null)
+
   if (!recipe) {
     console.log('[ModelRenderer] no recipe')
     return null
@@ -85,7 +89,15 @@ function ModelRenderer({ recipe }: { recipe: PartRecipe | null }) {
 
   return (
     <group position={[0, 0, 0]}>
-      <mesh>
+      <mesh ref={(mesh) => {
+        if (mesh && mesh.geometry) {
+          const geom = mesh.geometry as BufferGeometry
+          if (geometryRef.current !== geom) {
+            geometryRef.current = geom
+            onGeometryReady?.(geom)
+          }
+        }
+      }}>
         <Geometry>
           <Base>
             {base.kind === 'box' && (() => {
@@ -259,6 +271,8 @@ function App() {
   const [difficulty, setDifficulty] = useState<Difficulty>('Beginner')
   const [seed, setSeed] = useState<number>(() => Date.now())
   const [recipe, setRecipe] = useState<PartRecipe | null>(() => generateBeginnerPartRecipe(seed))
+  const [viewMode, setViewMode] = useState<'3D' | '2D'>('3D')
+  const [csgGeometry, setCsgGeometry] = useState<BufferGeometry | null>(null)
   const [bookmarks, setBookmarks] = useState<PartRecipe[]>(() => {
     try {
       const raw = localStorage.getItem('tower19:bookmarks')
@@ -328,8 +342,13 @@ function App() {
     localStorage.setItem('tower19:bookmarks', JSON.stringify(next))
   }
 
+  const handleGeometryReady = (geometry: BufferGeometry | null) => {
+    setCsgGeometry(geometry)
+  }
+
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+      {/* Top controls */}
       <div style={{ position: 'absolute', zIndex: 10, left: 12, top: 12, display: 'flex', gap: 8, pointerEvents: 'auto' }}>
         <button onClick={generate}>Generate</button>
         <select value={difficulty} onChange={handleDifficultyChange} style={{ padding: '4px 8px' }}>
@@ -339,12 +358,68 @@ function App() {
         <button onClick={saveBookmark}>Save / Bookmark</button>
         <span style={{ alignSelf: 'center', opacity: 0.7 }}>seed: {seed}</span>
       </div>
-      <Canvas>
-        <ambientLight intensity={0.6} />
-        <pointLight position={[100, 100, 100]} />
-        <ModelRenderer recipe={recipe} />
-        <Controls />
-      </Canvas>
+
+      {/* View mode tabs */}
+      <div style={{
+        position: 'absolute',
+        zIndex: 10,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        top: 12,
+        display: 'flex',
+        gap: 4,
+        background: 'rgba(255, 255, 255, 0.1)',
+        padding: 4,
+        borderRadius: 6,
+        pointerEvents: 'auto'
+      }}>
+        <button
+          onClick={() => setViewMode('3D')}
+          style={{
+            padding: '8px 16px',
+            background: viewMode === '3D' ? 'rgba(136, 136, 204, 0.8)' : 'transparent',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 4,
+            cursor: 'pointer',
+            fontWeight: viewMode === '3D' ? 600 : 400
+          }}
+        >
+          3D Model
+        </button>
+        <button
+          onClick={() => setViewMode('2D')}
+          style={{
+            padding: '8px 16px',
+            background: viewMode === '2D' ? 'rgba(136, 136, 204, 0.8)' : 'transparent',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 4,
+            cursor: 'pointer',
+            fontWeight: viewMode === '2D' ? 600 : 400
+          }}
+        >
+          2D Drawing
+        </button>
+      </div>
+
+      {/* 3D Viewer */}
+      {viewMode === '3D' && (
+        <Canvas>
+          <ambientLight intensity={0.6} />
+          <pointLight position={[100, 100, 100]} />
+          <ModelRenderer recipe={recipe} onGeometryReady={handleGeometryReady} />
+          <Controls />
+        </Canvas>
+      )}
+
+      {/* 2D Viewer */}
+      {viewMode === '2D' && recipe && (
+        <DrawingViewer
+          recipe={recipe}
+          geometry={csgGeometry ?? undefined}
+        />
+      )}
 
       <div style={{ position: 'absolute', right: 12, top: 12, zIndex: 10, background: 'rgba(255,255,255,0.06)', padding: 8, borderRadius: 6, color: '#fff', pointerEvents: 'auto' }}>
         <div style={{ fontWeight: 600, marginBottom: 6 }}>Bookmarks</div>
