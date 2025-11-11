@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import type PartRecipe from '../types/part'
 import { generateDrawing } from '../drawing/svg'
 import type { BufferGeometry } from 'three'
+import { exportToPDF, isPDFExportSupported } from '../exporters'
 
 interface DrawingViewerProps {
   recipe: PartRecipe
@@ -89,7 +90,7 @@ export function DrawingViewer({ recipe, geometry, onTimerUpdate }: DrawingViewer
   }
 
   // Download SVG
-  const handleDownload = () => {
+  const handleDownloadSVG = () => {
     if (!svgContent) return
     const blob = new Blob([svgContent], { type: 'image/svg+xml' })
     const url = URL.createObjectURL(blob)
@@ -100,6 +101,26 @@ export function DrawingViewer({ recipe, geometry, onTimerUpdate }: DrawingViewer
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+  }
+
+  // Download PDF
+  const handleDownloadPDF = async () => {
+    if (!svgContent || !isPDFExportSupported()) {
+      console.error('[DrawingViewer] PDF export not supported or no content')
+      return
+    }
+    
+    try {
+      await exportToPDF({
+        recipe,
+        svgContent,
+        orientation: 'landscape',
+        includeTimestamp: true
+      })
+    } catch (error) {
+      console.error('[DrawingViewer] PDF export failed:', error)
+      alert('PDF export failed. Please try again.')
+    }
   }
 
   // Format time as MM:SS
@@ -153,10 +174,17 @@ export function DrawingViewer({ recipe, geometry, onTimerUpdate }: DrawingViewer
         background: 'rgba(255, 255, 255, 0.1)',
         padding: 8,
         borderRadius: 6,
-        color: '#fff'
+        color: '#fff',
+        flexWrap: 'wrap',
+        maxWidth: '400px'
       }}>
         <button onClick={handleReset} style={{ padding: '4px 8px' }}>Reset View</button>
-        <button onClick={handleDownload} style={{ padding: '4px 8px' }}>Download SVG</button>
+        <button onClick={handleDownloadSVG} style={{ padding: '4px 8px' }}>
+          📄 SVG
+        </button>
+        <button onClick={handleDownloadPDF} style={{ padding: '4px 8px' }}>
+          📑 PDF
+        </button>
         <span style={{ alignSelf: 'center', opacity: 0.8 }}>
           Zoom: {(scale * 100).toFixed(0)}%
         </span>
