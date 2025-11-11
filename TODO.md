@@ -114,15 +114,12 @@
     - Hole callouts (counterbores, countersinks)
     - Feature detection: slots, pockets, bosses
     - Dimension stacking for multiple parallel dimensions
-- [x] Section view generation (PHASE 4 COMPLETE - Nov 11, 2025)
-  - ✅ Section plane selection (midplane heuristic; `selectCuttingPlane()`)
-  - ✅ Contour extraction with dual modes:
-    - **CSG slicing**: Accurate BufferGeometry intersection (plane-triangle algorithm)
-    - **Simplified slicing**: Rectangular bounds + cylindrical holes (fallback)
-  - ✅ Contour projection (`projectContours()`) and classification (`classifyContours()`)
-  - ✅ Hatch pattern rendering (`generateHatchLines()` 45° @ 3mm spacing)
-  - ✅ Full test coverage: `test:slicing`, `test:hatch`, `test:section`
-  - [ ] Integration into main `svg.ts` (placement + cutting plane indicator) — NEXT
+- [x] Implement section views (Phase 4 - COMPLETE Nov 11, 2025)
+  - [x] 2D-24: Section plane selection and cutting algorithm
+  - [x] 2D-25: Contour extraction (dual mode: CSG intersection + simplified fallback)
+  - [x] 2D-26: Hatch pattern rendering (45° lines, 3mm spacing per ISO 128-50)
+  - [x] 2D-27: CSG slicing with plane-mesh intersection and loop stitching
+  - [x] 2D-28: SVG integration with layout and cutting plane indicators
 - [x] Implement line weight system (Phase 3.1)
   - ✅ Add thick (0.7mm) and thin (0.35mm) line weights per ISO 128-24
   - ✅ Created LineType enum with 8 ISO-compliant line types

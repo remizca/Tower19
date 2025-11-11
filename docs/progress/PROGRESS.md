@@ -140,14 +140,48 @@ Detailed sub-tasks (tree):
      - `clipLineToPolygon()` + `lineSegmentIntersection()` implementations
      - SVG rendering via `renderSectionView()` and `renderHatchLines()`
      - Thick (0.7mm) outlines, thin (0.35mm) hatch per ISO 128-50
+   - [x] 2D-27: CSG slicing implementation (Complete Nov 11, 2025)
+     - **status**: ✅ Created `src/drawing/slicing.ts` (560+ lines) with accurate geometry slicing
+     - **implemented**:
+       - `sliceGeometryCSG()`: Main entry point accepting BufferGeometry and cutting plane
+       - `extractIntersectionSegments()`: Iterates all triangles, finds plane intersections
+       - `intersectTriangleWithPlane()`: Geometric algorithm using signed distances
+       - `projectSegmentsTo2D()`: Establishes cutting plane coordinate system (X/Y perpendicular to normal)
+       - `stitchSegmentsIntoLoops()`: Graph traversal to connect segments within tolerance (0.001mm)
+       - `buildLoop()`: Recursive path builder for closed contours
+       - `classifyLoops()`: Relative area-based classification (largest = outer, same sign = outer, opposite = inner)
+     - **algorithm details**: For each triangle: compute signed distances of vertices to plane → classify as above/on/below → find 2 edge-plane intersection points → collect all segments → project to 2D plane coordinates → build edge graph → stitch into loops matching endpoints → classify by area
+     - **tested**: `npm run test:slicing` → Box: 8 vertices, 1 outer contour; Cylinder: 64 vertices, 1 outer contour
+   - [x] 2D-28: SVG integration with layout and indicators (Complete Nov 11, 2025)
+     - **status**: ✅ Section views fully integrated into main drawing layout
+     - **implemented**:
+       - Modified `generateDrawing()` to accept optional BufferGeometry parameter
+       - Automatic section view generation when part has subtraction operations
+       - Section positioned in bottom-right quadrant (below right view)
+       - Cutting plane indicator rendered in parent orthographic view with:
+         - Chain-thick line style (2× center line weight per ISO 128-50)
+         - Arrowheads pointing in viewing direction
+         - A-A labels at line ends
+       - View bounds calculation for proper indicator placement
+       - Error handling with graceful fallback
+     - **integration details**: 
+       - Section view placement: `marginU + slotW + gapU + slotW/2` (right side), `marginU + slotH + gapU + slotH/2` (bottom)
+       - Parent view determined by `plane.parentView` property ('front' | 'top' | 'right')
+       - Cutting plane indicator drawn with `renderCuttingPlaneIndicator()` in parent view coordinate system
+       - Both simplified and CSG modes supported with automatic fallback
+     - **tested**: `npm run test:svg-integration` → All 6 checks passed:
+       - Simplified mode: section view ✓, cutting plane ✓, hatch pattern ✓
+       - CSG mode: section view ✓, cutting plane ✓, hatch pattern ✓
+       - Output files: `tests/output/drawing-simplified.svg`, `tests/output/drawing-csg.svg`
    - [x] Projection & classification utilities
      - `projectContours()`: Scales & orients 2D cut to view space
      - `classifyContours()`: Separates hatched (outer) vs outline-only (inner holes)
-   - Tests
+   - **Test Coverage**:
      - `npm run test:slicing` → Box: 8 vertices, Cylinder: 64 vertices (2/2 passed)
      - `npm run test:hatch` → 19 hatch lines for 50×30 rectangle
-     - `npm run test:section` → Validates both simplified and CSG modes
-   - **Next**: Integration into main `svg.ts` for layout + cutting plane indicator5. Prototype & renderer (Legacy tasks - integrated above)
+     - `npm run test:section` → Validates both simplified and CSG modes (2 contours vs 1 contour)
+     - `npm run test:svg-integration` → Validates complete drawing with section + indicator (6/6 passed)
+   - **Phase 4 Summary**: Complete section view system with dual-mode slicing (CSG + simplified), hatch rendering, and full SVG integration. Cutting plane indicators properly placed in parent views with ISO-compliant styling. All test suites passing.5. Prototype & renderer (Legacy tasks - integrated above)
    - [x] 2D-15: Prototype Block+Hole SVG renderer (✅ Complete - Phase 1)
      - goal: output single-page SVG for Block+Hole fixture
      - acceptance: SVG contains expected visible/hidden edge counts and a title block
