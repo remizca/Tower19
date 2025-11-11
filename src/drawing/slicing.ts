@@ -13,7 +13,7 @@
  * - Winding order classification (ccw = outer, cw = inner)
  */
 
-import type { BufferGeometry, Plane, Vector3 } from 'three'
+import type { BufferGeometry, Vector3 } from 'three'
 import type { CuttingPlane, SectionContour, Point2D } from './sections'
 import { Vector3 as ThreeVector3, Plane as ThreePlane } from 'three'
 
