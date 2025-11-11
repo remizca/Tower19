@@ -144,12 +144,6 @@
   - ✅ Bounding box calculation for all dimension types
   - ✅ Extension lines excluded from bounds (allowed to cross)
   - ✅ Test suite validates zero collisions in output
-- [x] Implement section views (Phase 4 - COMPLETE Nov 11, 2025)
-  - [x] 2D-24: Section plane selection and cutting algorithm
-  - [x] 2D-25: Contour extraction (dual mode: CSG intersection + simplified fallback)
-  - [x] 2D-26: Hatch pattern rendering (45° lines, 3mm spacing per ISO 128-50)
-  - [x] CSG slicing: Plane-mesh intersection with loop stitching
-  - [ ] SVG integration: Layout + cutting plane indicator — IN PROGRESS
 
 ## UI/UX and Integration
 

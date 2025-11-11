@@ -46,10 +46,10 @@ This document tracks detailed implementation progress and technical decisions fo
 - [ ] Export generation
 - [ ] Offline support configuration
 
-## 2D Drawing Engine (In Progress)
+## 2D Drawing Engine ✅ COMPLETE
 A centralized, actionable checklist for the 2D drawing engine lives here. Subtasks are tracked in the managed todo list as well (see in-repo todo). The high-level objective is to produce ISO-compliant orthographic drawings (SVG) with dimensions, title block, and optional sections.
 
-**Overall Status**: Phase 4 Complete ✅
+**Overall Status**: Phase 4 Complete ✅ (Nov 11, 2025)
 
 - [x] ISO standard compliance (references added)
 - [x] Projection system documented (first-angle)
@@ -209,7 +209,7 @@ Detailed sub-tasks (tree):
    - [ ] 2D-19: Section generation prototype → **Now 2D-24, 2D-25, 2D-26** (Phase 4)
      - goal: select cutting plane, extract contour, render 45° hatch for cut faces
 
-**Current Focus**: Advancing section view fidelity (CSG slicing, SVG integration) & export pipeline prep
+**Current Focus**: Phase 4 complete. Next priorities: UI/UX integration (2D viewer, export pipeline) and advanced features (extended section types, angular dimensions)
 
 Notes:
 - Each numbered sub-task maps to the managed in-repo todo items (2D-15..2D-19) so status is visible in both the todo list and this PROGRESS document.
