@@ -118,6 +118,15 @@ Recent Progress (Nov 11, 2025)
   - Download SVG functionality for offline practice
   - Real-time CSG geometry extraction for accurate section views
   - Overlay controls with part info and zoom percentage
+- ✅ **PDF Export**: Professional printable documents
+  - ISO A4 page format with landscape orientation
+  - Automatic scaling with margins
+  - Metadata includes part name, difficulty, seed, and timestamp
+  - jsPDF integration with high-quality SVG rendering
+- ✅ **Drawing Accuracy Fix**: CSG geometry integration
+  - Fixed artifacts showing subtraction tools as solid parts
+  - Edges now extracted from final CSG boolean result
+  - Accurate 2D representation matches 3D model exactly
 
 Recent Progress (Nov 7, 2025)
 - ✅ **Ribs and webs features**: Complete structural reinforcement generators (ribs, webs, radial ribs)
@@ -136,12 +145,13 @@ Recent Progress (Nov 7, 2025)
 
 Known Issues
 - Expert difficulty generator not yet implemented
+- DXF export foundation created but not yet wired to UI
 
 Next steps (prioritized)
-1. **[HIGH PRIORITY]** Export pipeline: PDF/DXF/STEP export functionality
+1. **Complete DXF export**: Wire up DXF generation with proper edge/dimension data
 2. **Advanced 2D features**: Angular dimensions, extended section types (half, offset, broken-out)
-4. Create expert difficulty generator (8-12+ primitives, advanced features, combined ribs/webs/fillets)
-5. Migrate bookmarking/storage from localStorage to IndexedDB
-6. Add CI (GitHub Actions) that runs `npm run build` on PRs
+3. Create expert difficulty generator (8-12+ primitives, advanced features, combined ribs/webs/fillets)
+4. Migrate bookmarking/storage from localStorage to IndexedDB
+5. Add CI (GitHub Actions) that runs `npm run build` on PRs
 
 See `TODO.md`, `docs/progress/PROGRESS.md`, and `docs/roadmaps/` for project tracking and technical notes.

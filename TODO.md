@@ -156,13 +156,15 @@
   - ✅ View mode switcher (3D/2D tabs) (UI-02 - Nov 11, 2025)
   - ✅ Timer tracking for 2D view sessions (UI-03 - Nov 11, 2025)
   - ✅ Download SVG functionality (UI-04 - Nov 11, 2025)
+  - ✅ Export to PDF (UI-05 - Nov 11, 2025)
   - [ ] View presets (front/top/right quick views)
-  - [ ] Export to PDF/DXF/STP
+  - [ ] Export to DXF (CAD-compatible format)
 - [-] Client-side persistence and export
   - ✅ Bookmarking with localStorage
   - ✅ Legacy migration support for old data format
+  - ✅ Client-side PDF generation (UI-05 - Nov 11, 2025)
   - [ ] Migrate to IndexedDB for better storage
-  - [ ] Client-side PDF/SVG generation
+  - [ ] Client-side DXF generation (foundation created)
   - [ ] Offline support / service worker
 - [ ] Scoring and timer implementation
   - Implement client-side timer, local records storage, prepare for optional cloud features later.
