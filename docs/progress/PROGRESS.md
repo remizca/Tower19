@@ -142,6 +142,8 @@ Detailed sub-tasks (tree):
    - Tests
      - `npm run test:hatch` → 19 hatch lines for 50×30 rectangle
      - `npm run test:section` → section-test.svg generated with contours + hatching
+    - Projection & classification utilities added: `projectContours()` (scales & orients 2D cut) and `classifyContours()` (hatched vs outline-only)
+    - Next (enhancement): full CSG plane intersection for arbitrary internal profiles; integration into main `svg.ts` for layout + cutting plane indicator
 
 5. Prototype & renderer (Legacy tasks - integrated above)
    - [x] 2D-15: Prototype Block+Hole SVG renderer (✅ Complete - Phase 1)
@@ -171,7 +173,7 @@ Detailed sub-tasks (tree):
    - [ ] 2D-19: Section generation prototype → **Now 2D-24, 2D-25, 2D-26** (Phase 4)
      - goal: select cutting plane, extract contour, render 45° hatch for cut faces
 
-**Current Focus**: Core 2D engine Phases 1–4 complete; preparing enhancements and exports
+**Current Focus**: Advancing section view fidelity (CSG slicing, SVG integration) & export pipeline prep
 
 Notes:
 - Each numbered sub-task maps to the managed in-repo todo items (2D-15..2D-19) so status is visible in both the todo list and this PROGRESS document.
