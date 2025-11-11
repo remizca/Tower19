@@ -29,17 +29,34 @@ Current Status
   - Shared features module for reusable chamfer/fillet/pattern/rib/web helpers
 - ✅ **UI difficulty selector** for switching between Beginner and Intermediate
 - ✅ Build optimizations: manual chunk splitting, reduced bundle size
-- ✅ **2D Drawing Engine: Phase 1 Complete**
-  - **Edge Extraction Module**: Mesh-based edge extraction with sharp edge detection (30° angle threshold)
-  - **SVG Integration**: Integrated extractRecipeEdges() with SVG renderer, removed legacy code
-  - **Orthographic Views**: Front/Top/Right views with visible (solid) and hidden (dashed) lines
-  - **Test Suite**: Validates edge counts (60-100 edges per view for block-hole fixture)
-  - **SVG Output**: Generated `tests/output/block-hole.svg` with proper styling
+- ✅ **2D Drawing Engine: Phases 1-4 Complete** (Nov 7-11, 2025)
+  - **Phase 1: Edge Extraction Module**: Mesh-based edge extraction with sharp edge detection (30° angle threshold)
+  - **Phase 1: SVG Integration**: Integrated extractRecipeEdges() with SVG renderer, removed legacy code
+  - **Phase 1: Orthographic Views**: Front/Top/Right views with visible (solid) and hidden (dashed) lines
+  - **Phase 2: Dimensioning System**: ISO-compliant dimensioning with automatic placement
+  - **Phase 3: Line Weights, Center Lines, Scale Selection, Collision Detection**: All ISO 128-24 compliant
+  - **Phase 4: Section Views**: Dual-mode slicing (CSG + simplified), hatch patterns, cutting plane indicators
+  - **Test Suite**: Comprehensive coverage with `test:svg`, `test:slicing`, `test:section`, `test:svg-integration`
+  - **SVG Output**: Generated drawings with dimensions, center lines, and section views
   - Silhouette edge detection for view-dependent visibility
   - Ray-casting visibility classification framework
   - Support for all primitive types (box, cylinder, sphere, cone, torus)
   - Transform handling (position, rotation, scale)
-- ⚠️ **Next**: Dimensioning system, section views, edge simplification
+- ⚠️ **Next**: UI integration (2D viewer), export pipeline (PDF/DXF), advanced features
+
+Recent Progress (Nov 11, 2025)
+- ✅ **Phase 4 Complete - Section Views**: ISO-compliant section views with dual-mode slicing
+  - CSG slicing: Plane-triangle intersection with loop stitching (accurate geometry slicing)
+  - Simplified slicing: Rectangular bounds + cylindrical holes (fallback mode)
+  - Hatch pattern rendering: 45° lines at 3mm spacing per ISO 128-50
+  - SVG integration: Section views positioned in layout with cutting plane indicators
+  - Cutting plane indicators: Chain-thick lines with arrows and A-A labels in parent views
+  - Test coverage: `test:slicing`, `test:hatch`, `test:section`, `test:svg-integration` all passing
+- ✅ **Phase 3.4 Complete - Dimension Collision Detection**: View-aware collision resolution
+  - Priority-based relocation algorithm prevents overlapping dimensions
+  - Bounding box calculation for all dimension types (linear, radial, angular)
+  - Extension lines excluded from bounds (allowed to cross per drafting conventions)
+  - Test suite validates zero collisions in output
 
 Recent Progress (Nov 8, 2025)
 - ✅ **SVG Integration Complete**: Edge extraction now powering SVG renderer
@@ -88,7 +105,6 @@ Recent Progress (Nov 8, 2025)
   - Dynamic view centering in allocated slots
   - Title block displays selected scale (e.g., "Scale: 1:2")
   - Tested with default (1:1), large (1:2), and tiny (5:1) parts
-- ⚠️ **Next**: Phase 3.4 - Dimension collision detection
 
 Recent Progress (Nov 7, 2025)
 - ✅ **Ribs and webs features**: Complete structural reinforcement generators (ribs, webs, radial ribs)
@@ -106,19 +122,18 @@ Recent Progress (Nov 7, 2025)
 - ✅ **Pattern generators**: Linear and circular hole patterns using position transforms
 
 Known Issues
-- 2D SVG renderer edge visibility integration pending (edge extraction module complete, needs CSG integration)
 - Expert difficulty generator not yet implemented
+- UI integration for 2D viewer pending
 
 Next steps (prioritized)
-1. **[HIGH PRIORITY]** Complete Phase 3 of 2D drawing engine
-   - Center lines for cylindrical features (chain lines showing axes)
-   - Scale selection algorithm (fit drawing on A4/A3 with standard scales)
-   - Dimension collision detection (prevent overlapping text and lines)
-2. **Phase 4**: Section views and hatching patterns
-3. Create expert difficulty generator (8-12+ primitives, advanced features, combined ribs/webs/fillets)
-4. Migrate bookmarking/storage from localStorage to IndexedDB
-5. Add timer functionality and local records storage
+1. **[HIGH PRIORITY]** UI integration for 2D drawing viewer
+   - Interactive 2D viewer component
+   - Timer functionality (start on 2D view)
+   - Drawing comparison and validation tools
+2. **Export pipeline**: PDF/DXF/STEP export functionality
+3. **Advanced 2D features**: Angular dimensions, extended section types (half, offset, broken-out)
+4. Create expert difficulty generator (8-12+ primitives, advanced features, combined ribs/webs/fillets)
+5. Migrate bookmarking/storage from localStorage to IndexedDB
 6. Add CI (GitHub Actions) that runs `npm run build` on PRs
-7. Add comprehensive tests and example models
 
 See `TODO.md`, `docs/progress/PROGRESS.md`, and `docs/roadmaps/` for project tracking and technical notes.
