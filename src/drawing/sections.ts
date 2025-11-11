@@ -12,9 +12,18 @@
  * - ISO 128-24: Line types for section planes (chain thick)
  */
 
-import type { PartRecipe } from '../types'
-import type { Vector3, BufferGeometry } from 'three'
+import type { PartRecipe, Primitive, CylinderParams } from '../types/part'
+import type { BufferGeometry } from 'three'
 import { sliceGeometryCSG, DEFAULT_SLICING_OPTIONS } from './slicing'
+
+/**
+ * 3D vector type (simplified, compatible with Three.js Vector3)
+ */
+export interface Vector3Like {
+  x: number
+  y: number
+  z: number
+}
 
 /**
  * Section plane definition
@@ -28,13 +37,13 @@ export interface CuttingPlane {
   type: 'full' | 'half' | 'offset' | 'broken'
   
   /** Point on the plane (position) */
-  position: Vector3
+  position: Vector3Like
   
   /** Plane normal vector (direction of cutting) */
-  normal: Vector3
+  normal: Vector3Like
   
   /** Viewing direction (where to look from after cutting) */
-  viewDirection: Vector3
+  viewDirection: Vector3Like
   
   /** Label for the section view (e.g., "SECTION A-A") */
   label: string
@@ -225,16 +234,17 @@ export function sliceGeometry(
     
       // Add hole contours for subtraction primitives
       for (const op of recipe.operations) {
-        if (op.type === 'subtraction') {
-          const primitive = recipe.primitives.find(p => p.id === op.tool)
-          if (primitive && primitive.type === 'cylinder') {
+        if (op.op === 'subtract') {
+          const primitive = recipe.primitives.find((p: Primitive) => p.id === op.toolId)
+          if (primitive && primitive.kind === 'cylinder') {
             // Check if cylinder intersects the cutting plane
-            const pos = primitive.position
-            const axis = primitive.axis || 'z'
+            const pos = primitive.transform?.position || { x: 0, y: 0, z: 0 }
+            const params = primitive.params as CylinderParams
+            const axis = params.axis || 'z'
           
             // Only show hole if cylinder axis is perpendicular to cut plane
             if (axis === 'z' || axis === 'y') {
-              const holeRadius = primitive.parameters.radius
+              const holeRadius = params.radius
               const holeY = axis === 'z' ? pos.y : pos.x
               const holeZ = pos.z
             
@@ -274,14 +284,15 @@ export function sliceGeometry(
     
       // Add holes from subtractions
       for (const op of recipe.operations) {
-        if (op.type === 'subtraction') {
-          const primitive = recipe.primitives.find(p => p.id === op.tool)
-          if (primitive && primitive.type === 'cylinder') {
-            const pos = primitive.position
-            const axis = primitive.axis || 'z'
+        if (op.op === 'subtract') {
+          const primitive = recipe.primitives.find((p: Primitive) => p.id === op.toolId)
+          if (primitive && primitive.kind === 'cylinder') {
+            const pos = primitive.transform?.position || { x: 0, y: 0, z: 0 }
+            const params = primitive.params as CylinderParams
+            const axis = params.axis || 'z'
           
             if (axis === 'z' || axis === 'x') {
-              const holeRadius = primitive.parameters.radius
+              const holeRadius = params.radius
               const holeX = axis === 'z' ? pos.x : pos.y
               const holeZ = pos.z
             
@@ -335,7 +346,7 @@ export function sliceGeometry(
  */
 export function projectContours(
   contours: SectionContour[],
-  plane: CuttingPlane, // Reserved for future rotation/orientation transforms
+  _plane: CuttingPlane, // Reserved for future rotation/orientation transforms
   viewScale: number = 1.0
 ): SectionContour[] {
   // The contours from sliceGeometry are already in 2D (Point2D),
