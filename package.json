@@ -11,9 +11,10 @@
     "test:svg": "tsx tests/test-svg.ts",
     "test:generator": "tsx tests/test-generator-variety.ts",
     "test:scale": "tsx tests/test-scale-selection.ts",
-      "test:collision": "tsx tests/test-collision-detection.ts",
-      "test:hatch": "tsx tests/test-hatch.ts",
-      "test:section": "tsx tests/test-section.ts"
+    "test:collision": "tsx tests/test-collision-detection.ts",
+    "test:hatch": "tsx tests/test-hatch.ts",
+    "test:section": "tsx tests/test-section.ts",
+    "test:slicing": "tsx tests/test-slicing.ts"
   },
   "dependencies": {
     "@react-three/csg": "^4.0.0",
