@@ -8,7 +8,7 @@
  * - Contour classification
  */
 
-import { BoxGeometry, CylinderGeometry, Mesh, BufferGeometry } from 'three'
+import { BoxGeometry, CylinderGeometry } from 'three'
 import { sliceGeometryCSG, DEFAULT_SLICING_OPTIONS } from '../src/drawing/slicing'
 import type { CuttingPlane } from '../src/drawing/sections'
 
