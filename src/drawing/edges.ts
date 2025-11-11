@@ -414,3 +414,19 @@ export function extractRecipeEdges(recipe: PartRecipe): Edge[] {
   
   return allEdges
 }
+
+/**
+ * Extract edges from a CSG BufferGeometry (the final boolean result)
+ * This provides accurate edges after all boolean operations are applied
+ * 
+ * @param geometry - The CSG result geometry
+ * @returns Array of edges
+ */
+export function extractGeometryEdges(geometry: BufferGeometry): Edge[] {
+  // Compute normals if not present
+  if (!geometry.attributes.normal) {
+    geometry.computeVertexNormals()
+  }
+  
+  return extractSharpEdges(geometry)
+}

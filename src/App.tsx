@@ -310,6 +310,8 @@ function App() {
       }
       setSeed(nextSeed)
       setRecipe(next)
+      setCsgGeometry(null) // Clear old geometry
+      setViewMode('3D') // Switch to 3D to capture new geometry
       // Debug marker for deployed builds
       console.log('[generate] seed', nextSeed, 'difficulty', difficulty, 'name', next.name)
     } catch (err) {
@@ -320,6 +322,8 @@ function App() {
   const handleDifficultyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newDifficulty = e.target.value as Difficulty
     setDifficulty(newDifficulty)
+    setCsgGeometry(null) // Clear old geometry
+    setViewMode('3D') // Switch to 3D to capture new geometry
     // Regenerate with current seed using new difficulty
     try {
       let next: PartRecipe
@@ -427,7 +431,11 @@ function App() {
         <ul style={{ listStyle: 'none', margin: 0, padding: 0, maxHeight: 300, overflow: 'auto' }}>
           {bookmarks.map((b) => (
             <li key={b.id} style={{ marginBottom: 6 }}>
-              <button onClick={() => setRecipe(b)} style={{ display: 'block', width: '100%', textAlign: 'left' }}>
+              <button onClick={() => {
+                setRecipe(b)
+                setCsgGeometry(null) // Clear old geometry
+                setViewMode('3D') // Switch to 3D to capture new geometry
+              }} style={{ display: 'block', width: '100%', textAlign: 'left' }}>
                 {b.name} ({b.bounding_mm.x}×{b.bounding_mm.y}×{b.bounding_mm.z} mm)
               </button>
             </li>

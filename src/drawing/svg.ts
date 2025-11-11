@@ -5,7 +5,7 @@
 import { Matrix4, Vector3 } from 'three'
 import type { BufferGeometry } from 'three'
 import type { PartRecipe } from '../types/part'
-import { extractRecipeEdges, type Edge } from './edges'
+import { extractRecipeEdges, extractGeometryEdges, type Edge } from './edges'
 import { generateDimensions, DEFAULT_DIMENSION_CONFIG } from './dimensions'
 import { renderDimensions } from './dimensionsSVG'
 import { getEdgeLineType, generateAllLineStylesCSS } from './lineTypes'
@@ -157,11 +157,12 @@ function projectEdges(edges: Edge[], viewConfig: ViewConfig, scale = 1): string[
  * @param geometry - Optional BufferGeometry for accurate section views
  */
 export function generateDrawing(recipe: PartRecipe, geometry?: BufferGeometry): string {
-  // Extract edges from primitives using new edge extraction module
-  // This provides better support for all primitive types and proper sharp edge detection
-  const edges = extractRecipeEdges(recipe)
+  // Extract edges: use CSG geometry if available, otherwise fall back to recipe primitives
+  const edges = geometry 
+    ? extractGeometryEdges(geometry)
+    : extractRecipeEdges(recipe)
   
-  debug(`[SVG] Extracted ${edges.length} edges from recipe with ${recipe.primitives.length} primitives`)
+  debug(`[SVG] Extracted ${edges.length} edges from ${geometry ? 'CSG geometry' : 'recipe primitives'} with ${recipe.primitives.length} primitives`)
 
   // Generate dimensions using ISO 129-1 compliant system
   const dimensions = generateDimensions(recipe, DEFAULT_DIMENSION_CONFIG)

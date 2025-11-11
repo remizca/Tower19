@@ -179,6 +179,7 @@
           <path d="M -20.00 0.00 L 20.00 0.00" class="center-line" />
     <path d="M 0.00 20.00 L 0.00 -20.00" class="center-line" />
         </g>
+        
         <g class="dimensions" data-view="front">
 <g class="linear-dimension" data-id="bbox-width-front">
 <line x1="-100" y1="-29" x2="-100" y2="-47" class="extension-line" stroke="black" stroke-width="0.35" />
@@ -290,6 +291,16 @@
 <path d="M 210 440 L 210 420" class="hidden-edge" />
         <g class="center-lines" transform="translate(210, 440)">
           <path d="M 0.00 210.00 L 0.00 -210.00" class="center-line" />
+        </g>
+        
+        <g transform="translate(210, 440)">
+          <g class="cutting-plane" data-id="A">
+<line x1="0.00" y1="-50.00" x2="0.00" y2="50.00" stroke="#000" stroke-width="0.7" stroke-dasharray="8 2 2 2" stroke-linecap="butt" />
+<polygon points="0,-50 -8,-54 -8,-46" fill="black" />
+<polygon points="0,50 8,46 8,54" fill="black" />
+<text x="-12.00" y="-50.00" font-family="Arial, sans-serif" font-size="10" font-weight="bold" text-anchor="middle" dominant-baseline="middle" fill="black">A</text>
+<text x="12.00" y="50.00" font-family="Arial, sans-serif" font-size="10" font-weight="bold" text-anchor="middle" dominant-baseline="middle" fill="black">A</text>
+</g>
         </g>
         <g class="dimensions" data-view="top">
 <g class="linear-dimension" data-id="bbox-width-top">
@@ -416,6 +427,7 @@
         <g class="center-lines" transform="translate(590, 160)">
           <path d="M 0.00 210.00 L 0.00 -210.00" class="center-line" />
         </g>
+        
         <g class="dimensions" data-view="right">
 <g class="linear-dimension" data-id="bbox-depth-right">
 <line x1="-50" y1="-29" x2="-50" y2="-47" class="extension-line" stroke="black" stroke-width="0.35" />
@@ -436,6 +448,53 @@
 </g>
       </g>
     
+      <g class="section-view" data-id="A" transform="translate(590, 440)">
+<g class="section-contour">
+<path d="M -100.00 -50.00 L 100.00 -50.00 L 100.00 50.00 L -100.00 50.00 Z" fill="none" stroke="#000" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round" />
+<g class="hatch-pattern">
+<line x1="98.54" y1="-50.00" x2="100.00" y2="-48.54" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="90.06" y1="-50.00" x2="100.00" y2="-40.06" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="81.57" y1="-50.00" x2="100.00" y2="-31.57" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="73.09" y1="-50.00" x2="100.00" y2="-23.09" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="64.60" y1="-50.00" x2="100.00" y2="-14.60" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="56.12" y1="-50.00" x2="100.00" y2="-6.12" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="47.63" y1="-50.00" x2="100.00" y2="2.37" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="39.15" y1="-50.00" x2="100.00" y2="10.85" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="30.66" y1="-50.00" x2="100.00" y2="19.34" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="22.18" y1="-50.00" x2="100.00" y2="27.82" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="13.69" y1="-50.00" x2="100.00" y2="36.31" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="5.21" y1="-50.00" x2="100.00" y2="44.79" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-3.28" y1="-50.00" x2="96.72" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-11.76" y1="-50.00" x2="88.24" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-20.25" y1="-50.00" x2="79.75" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-28.74" y1="-50.00" x2="71.26" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-37.22" y1="-50.00" x2="62.78" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-45.71" y1="-50.00" x2="54.29" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-54.19" y1="-50.00" x2="45.81" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-62.68" y1="-50.00" x2="37.32" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-71.16" y1="-50.00" x2="28.84" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-79.65" y1="-50.00" x2="20.35" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-88.13" y1="-50.00" x2="11.87" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-96.62" y1="-50.00" x2="3.38" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-100.00" y1="-44.90" x2="-5.10" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-100.00" y1="-36.41" x2="-13.59" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-100.00" y1="-27.93" x2="-22.07" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-100.00" y1="-19.44" x2="-30.56" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-100.00" y1="-10.96" x2="-39.04" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-100.00" y1="-2.47" x2="-47.53" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-100.00" y1="6.01" x2="-56.01" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-100.00" y1="14.50" x2="-64.50" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-100.00" y1="22.98" x2="-72.98" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-100.00" y1="31.47" x2="-81.47" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-100.00" y1="39.96" x2="-89.96" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+<line x1="-100.00" y1="48.44" x2="-98.44" y2="50.00" stroke="#000" stroke-width="0.35" stroke-linecap="butt" />
+</g>
+</g>
+<g class="section-contour">
+<path d="M 40.00 0.00 L 28.28 28.28 L 0.00 40.00 L -28.28 28.28 L -40.00 0.00 L -28.28 -28.28 L -0.00 -40.00 L 28.28 -28.28 Z" fill="none" stroke="#000" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round" />
+</g>
+<text x="0" y="-20" font-family="Arial, sans-serif" font-size="10" font-weight="bold" text-anchor="middle" fill="black">SECTION A-A</text>
+</g>
       
     <g transform="translate(180 200)">
       <rect x="0" y="0" width="100" height="50" fill="none" stroke="black" strokeWidth="0.5" />
