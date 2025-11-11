@@ -135,9 +135,17 @@
   - ✅ Pick largest standard scale that fits all views
   - ✅ Set view offsets to center in slots, update title block label
   - ✅ Tested with default, large, and tiny parts
-- [ ] Implement dimension collision detection (Phase 3.4)
-  - Detect overlapping dimension text and extension lines
-  - Use priority-based relocation algorithm to prevent collisions
+- [x] Implement dimension collision detection (Phase 3.4 - 2D-23)
+  - ✅ Detect overlapping dimension text and extension lines
+  - ✅ Use priority-based relocation algorithm to prevent collisions
+  - ✅ View-aware collision detection (only within same view)
+  - ✅ Bounding box calculation for all dimension types
+  - ✅ Extension lines excluded from bounds (allowed to cross)
+  - ✅ Test suite validates zero collisions in output
+- [ ] Implement section views (Phase 4)
+  - [ ] 2D-24: Section plane selection and cutting algorithm
+  - [ ] 2D-25: Contour extraction from cut geometry
+  - [ ] 2D-26: Hatch pattern rendering (45° lines, 2mm spacing per ISO 128-50)
 
 ## UI/UX and Integration
 
