@@ -49,7 +49,7 @@ This document tracks detailed implementation progress and technical decisions fo
 ## 2D Drawing Engine (In Progress)
 A centralized, actionable checklist for the 2D drawing engine lives here. Subtasks are tracked in the managed todo list as well (see in-repo todo). The high-level objective is to produce ISO-compliant orthographic drawings (SVG) with dimensions, title block, and optional sections.
 
-**Overall Status**: Phase 2 Complete ✅ | Phase 3 In Progress 🔄
+**Overall Status**: Phase 4 Complete ✅
 
 - [x] ISO standard compliance (references added)
 - [x] Projection system documented (first-angle)
@@ -58,8 +58,8 @@ A centralized, actionable checklist for the 2D drawing engine lives here. Subtas
 - [x] Title block generation (template drafted)
 - [x] **Phase 1: Basic Projection & Rendering** (COMPLETE - Nov 7, 2025)
 - [x] **Phase 2: Dimensioning System** (COMPLETE - Nov 8, 2025)
-- [ ] **Phase 3: Enhanced Drawing Features** (IN PROGRESS - Started Nov 8, 2025)
-- [ ] Section view generation (algorithm drafted, needs prototyping)
+- [x] **Phase 3: Enhanced Drawing Features** (COMPLETE - Nov 8–11, 2025)
+- [x] **Phase 4: Section Views** (COMPLETE - Nov 11, 2025)
 
 Detailed sub-tasks (tree):
 
@@ -84,7 +84,7 @@ Detailed sub-tasks (tree):
    - [x] SVG integration and rendering (src/drawing/dimensionsSVG.ts - 350 lines)
    - [x] Test validation (7 dimensions in block-hole.svg)
 
-3. **Phase 3: Enhanced Drawing Features** 🔄 IN PROGRESS (Started Nov 8, 2025)
+3. **Phase 3: Enhanced Drawing Features** ✅ COMPLETE (Nov 8–11, 2025)
    - [x] 2D-20: Line weight implementation (✅ Complete - Nov 8, 2025)
      - goal: Thick lines (0.7mm) for outlines, thin (0.35mm) for dimensions/hatching per ISO 128-24
      - acceptance: SVG has proper stroke-width attributes for different line types
@@ -125,10 +125,23 @@ Detailed sub-tasks (tree):
        - View-based collision filtering prevents false positives from cross-view overlaps
      - **tested**: `npm run test:collision` validates block-hole fixture has zero collisions after resolution
 
-4. **Phase 4: Section Views** 📋 PLANNED
-   - [ ] 2D-24: Section plane selection and cutting
-   - [ ] 2D-25: Contour extraction from cut geometry
-   - [ ] 2D-26: Hatch pattern rendering (45° lines, 2mm spacing)
+4. **Phase 4: Section Views** ✅ COMPLETE (Nov 11, 2025)
+   - [x] 2D-24: Section plane selection and cutting
+     - Implemented `selectCuttingPlane()` with midplane heuristic (perpendicular to largest axis)
+     - CuttingPlane includes id, type, position, normal, viewDirection, parentView
+   - [x] 2D-25: Contour extraction from cut geometry
+     - Simplified primitive-based slicing: rectangular outer contour from bounding box
+     - Detect cylindrical subtraction holes and project as octagons
+     - Classify contours as outer (ccw) and inner (cw)
+     - Note: full CSG mesh intersection deferred
+   - [x] 2D-26: Hatch pattern rendering (45° lines, 3mm spacing)
+     - `generateHatchLines()` with polygon clipping
+     - `clipLineToPolygon()` + `lineSegmentIntersection()` implementations
+     - SVG rendering via `renderSectionView()` and `renderHatchLines()`
+     - Thick (0.7mm) outlines, thin (0.35mm) hatch per ISO 128-50
+   - Tests
+     - `npm run test:hatch` → 19 hatch lines for 50×30 rectangle
+     - `npm run test:section` → section-test.svg generated with contours + hatching
 
 5. Prototype & renderer (Legacy tasks - integrated above)
    - [x] 2D-15: Prototype Block+Hole SVG renderer (✅ Complete - Phase 1)
@@ -158,7 +171,7 @@ Detailed sub-tasks (tree):
    - [ ] 2D-19: Section generation prototype → **Now 2D-24, 2D-25, 2D-26** (Phase 4)
      - goal: select cutting plane, extract contour, render 45° hatch for cut faces
 
-**Current Focus**: Phase 3 - Line weights, center lines, scale selection, collision detection
+**Current Focus**: Core 2D engine Phases 1–4 complete; preparing enhancements and exports
 
 Notes:
 - Each numbered sub-task maps to the managed in-repo todo items (2D-15..2D-19) so status is visible in both the todo list and this PROGRESS document.

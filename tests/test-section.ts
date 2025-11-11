@@ -5,7 +5,7 @@ import { writeFile, mkdir } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createBlockHoleFixture } from './fixtures/block-hole'
-import { createSectionView, selectCuttingPlane } from '../src/drawing/sections'
+import { createSectionView, selectCuttingPlane, classifyContours } from '../src/drawing/sections'
 import { renderSectionView } from '../src/drawing/sectionsSVG'
 
 // Get current file directory in ESM
@@ -36,6 +36,12 @@ async function run() {
     const contour = sectionView.contours[i]
     console.log(`    Contour ${i + 1}: ${contour.isOuter ? 'outer' : 'inner'}, ${contour.points.length} points`)
   }
+  
+  // Classify contours for hatching
+  const { hatched, outlineOnly } = classifyContours(sectionView.contours)
+  console.log(`\nContour classification:`)
+  console.log(`  Hatched regions: ${hatched.length}`)
+  console.log(`  Outline only: ${outlineOnly.length}`)
   
   // Render to SVG
   const sectionSVG = renderSectionView(sectionView)

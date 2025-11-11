@@ -322,6 +322,79 @@ export function sliceGeometry(
 }
 
 /**
+ * Project 3D contours onto 2D view plane
+ * 
+ * Takes contours in 3D space (aligned to cutting plane) and projects them
+ * to final 2D drawing coordinates based on the viewing direction.
+ * 
+ * @param contours - Array of 3D contours from sliceGeometry
+ * @param plane - Cutting plane definition with view direction
+ * @param viewScale - Scale factor for the view (default 1.0)
+ * @returns Projected 2D contours ready for SVG rendering
+ */
+export function projectContours(
+  contours: SectionContour[],
+  plane: CuttingPlane, // Reserved for future rotation/orientation transforms
+  viewScale: number = 1.0
+): SectionContour[] {
+  // The contours from sliceGeometry are already in 2D (Point2D),
+  // but they're in the cutting plane's local coordinate system.
+  // We need to ensure they're oriented correctly for the final view.
+  
+  // For orthogonal cuts aligned with major axes, the coordinates
+  // are already in the correct 2D space (just need scaling/flipping if needed)
+  
+  const projected: SectionContour[] = []
+  
+  for (const contour of contours) {
+    // Apply view scaling and any coordinate transformations
+    const projectedPoints = contour.points.map(pt => ({
+      x: pt.x * viewScale,
+      y: pt.y * viewScale
+    }))
+    
+    projected.push({
+      points: projectedPoints,
+      isOuter: contour.isOuter,
+      winding: contour.winding
+    })
+  }
+  
+  return projected
+}
+
+/**
+ * Classify contours as interior (to be hatched) vs outline only
+ * 
+ * Rules per ISO 128-50:
+ * - Outer boundaries: thick outline, hatched interior
+ * - Inner holes: thick outline, no hatching (represents void)
+ * - Ribs/webs cut lengthwise: outline only, no hatching
+ * 
+ * @param contours - Array of section contours
+ * @returns Object with hatched and outline-only contour arrays
+ */
+export function classifyContours(contours: SectionContour[]): {
+  hatched: SectionContour[]
+  outlineOnly: SectionContour[]
+} {
+  const hatched: SectionContour[] = []
+  const outlineOnly: SectionContour[] = []
+  
+  for (const contour of contours) {
+    if (contour.isOuter) {
+      // Outer contours are hatched (represent solid material)
+      hatched.push(contour)
+    } else {
+      // Inner contours (holes) are outline only
+      outlineOnly.push(contour)
+    }
+  }
+  
+  return { hatched, outlineOnly }
+}
+
+/**
  * Generate hatch lines for a contour
  * 
  * Algorithm:
@@ -433,8 +506,11 @@ export function createSectionView(
   // Use provided plane or auto-select
   const cuttingPlane = plane ?? selectCuttingPlane(recipe)
   
-  // Slice geometry to get contours
-  const contours = sliceGeometry(recipe, cuttingPlane)
+  // Slice geometry to get contours in 3D cutting plane space
+  const rawContours = sliceGeometry(recipe, cuttingPlane)
+  
+  // Project contours to 2D view space with scaling
+  const contours = projectContours(rawContours, cuttingPlane, scale)
   
   return {
     plane: cuttingPlane,
