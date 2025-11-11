@@ -11,7 +11,7 @@
     "test:svg": "tsx tests/test-svg.ts",
     "test:generator": "tsx tests/test-generator-variety.ts",
     "test:scale": "tsx tests/test-scale-selection.ts",
-    "test:all": "npm run test:svg && npm run test:generator && npm run test:scale"
+    "test:collision": "tsx tests/test-collision-detection.ts"
   },
   "dependencies": {
     "@react-three/csg": "^4.0.0",

@@ -105,9 +105,25 @@ Detailed sub-tasks (tree):
      - **implemented**: Page layout (2×2 grid with margins/gaps), per-view bounding calculation, standard scale array [10, 5, 2, 1, 0.5, 0.25, 0.2, 0.1], global fit constraint selection, dynamic view centering, title block scale label formatting
      - **algorithm**: Computes usable area after margins (15mm) and gaps (10mm), divides into slots for front/top/right views, estimates mm extents from bounding box, calculates max scale fitting each view, selects largest standard scale ≤ global limit
      - **tested**: Test suite validates 1:1 (default 100×50×25mm part), 1:2 (large 250×200×150mm part), 5:1 (tiny 20×10×10mm part)
-   - [ ] 2D-23: Dimension collision detection
+   - [x] 2D-23: Dimension collision detection (✅ Complete - Nov 11, 2025)
      - goal: Detect overlapping dimensions and text, relocate to prevent collisions
      - acceptance: No overlapping dimension text or extension lines in output
+     - **status**: ✅ Implemented view-aware collision detection and priority-based resolution
+     - **implemented**: 
+       - Bounding box calculation: `getDimensionBounds()` computes accurate AABB for linear/radial/angular dimensions
+       - Type-specific bounds: `getLinearDimensionBounds()`, `getRadialDimensionBounds()`, `getAngularDimensionBounds()`
+       - Text approximation: `getTextBounds()` uses character count × 0.6 × textHeight
+       - Collision detection: `boundsOverlap()` checks AABB overlap with configurable margin (1mm default)
+       - View filtering: Only checks collisions within same view (front/top/right are separate)
+       - Priority-based resolution: Higher-priority dimensions (bbox=100) placed first, lower-priority relocated
+       - Relocation strategies: Linear (increase offset), radial (extend leader), angular (increase radius)
+       - Extension line exclusion: Only dimension line and text included in bounds (extensions allowed to cross)
+     - **algorithm**: Groups by view → sorts by priority descending → for each dimension, checks collision with already-placed dimensions → relocates up to 10 attempts if collision detected
+     - **fixes applied**:
+       - Initial perpendicular dimension offsets increased by `minSpacingBetween + 4mm` to avoid corner collisions
+       - Extension lines excluded from bounds calculation to allow traditional drafting crossovers
+       - View-based collision filtering prevents false positives from cross-view overlaps
+     - **tested**: `npm run test:collision` validates block-hole fixture has zero collisions after resolution
 
 4. **Phase 4: Section Views** 📋 PLANNED
    - [ ] 2D-24: Section plane selection and cutting

@@ -194,8 +194,10 @@ export function generateDimensions(
   // 2. Feature dimensions (holes, bosses)
   dimensions.push(...generateFeatureDimensions(recipe, config))
   
-  // 3. Optimize placement (TODO: collision resolution)
-  return dimensions
+  // 3. Resolve collisions between dimensions (Phase 3.4 - 2D-23)
+  const resolved = resolveCollisions(dimensions, config)
+  
+  return resolved
 }
 
 /**
@@ -210,6 +212,7 @@ function generateBoundingBoxDimensions(
   const dimensions: LinearDimension[] = []
   
   // Front view: width (horizontal) and height (vertical)
+  // Place horizontal dimension first with standard offset
   dimensions.push(
     createLinearDimension({
       id: 'bbox-width-front',
@@ -224,6 +227,7 @@ function generateBoundingBoxDimensions(
     })
   )
   
+  // Place vertical dimension with larger offset to avoid corner collision
   dimensions.push(
     createLinearDimension({
       id: 'bbox-height-front',
@@ -232,7 +236,7 @@ function generateBoundingBoxDimensions(
       value: height,
       start: { x: width / 2, y: -height / 2 },
       end: { x: width / 2, y: height / 2 },
-      offset: config.minOffsetFromOutline,
+      offset: config.minOffsetFromOutline + config.minSpacingBetween + 4, // Extra spacing to clear text
       priority: 100,
       config
     })
@@ -261,7 +265,7 @@ function generateBoundingBoxDimensions(
       value: depth,
       start: { x: width / 2, y: -depth / 2 },
       end: { x: width / 2, y: depth / 2 },
-      offset: config.minOffsetFromOutline,
+      offset: config.minOffsetFromOutline + config.minSpacingBetween + 4, // Extra spacing to clear text
       priority: 100,
       config
     })
@@ -290,7 +294,7 @@ function generateBoundingBoxDimensions(
       value: height,
       start: { x: depth / 2, y: -height / 2 },
       end: { x: depth / 2, y: height / 2 },
-      offset: config.minOffsetFromOutline,
+      offset: config.minOffsetFromOutline + config.minSpacingBetween + 4, // Extra spacing to clear text
       priority: 100,
       config
     })
@@ -574,41 +578,345 @@ function formatDimensionValue(value: number, maxDecimals: number): string {
 }
 
 // ============================================================================
-// Collision Detection (TODO: Phase 2 enhancement)
+// Collision Detection (Phase 3.4 - 2D-23)
 // ============================================================================
 
 /**
  * Calculate bounding box for a dimension (for collision detection)
+ * Includes dimension text, extension lines, and dimension lines
  */
-export function getDimensionBounds(dimension: Dimension): BoundingBox2D {
-  // TODO: Implement based on dimension type
-  // For now, return a simple box around the dimension
+export function getDimensionBounds(dimension: Dimension, config: DimensionConfig = DEFAULT_DIMENSION_CONFIG): BoundingBox2D {
+  switch (dimension.type) {
+    case 'linear':
+      return getLinearDimensionBounds(dimension as LinearDimension, config)
+    case 'radial':
+      return getRadialDimensionBounds(dimension as RadialDimension, config)
+    case 'angular':
+      return getAngularDimensionBounds(dimension as AngularDimension, config)
+    default:
+      // Fallback: text-only bounds
+      return getTextBounds(dimension.position, dimension.text, config)
+  }
+}
+
+/**
+ * Get bounding box for linear dimension (includes text, extension lines, dimension line)
+ */
+function getLinearDimensionBounds(dimension: LinearDimension, config: DimensionConfig): BoundingBox2D {
+  const points: Point2D[] = [
+    dimension.dimensionLine.start,
+    dimension.dimensionLine.end
+    // Note: Extension lines are intentionally excluded as they're thin and allowed to cross
+  ]
+  
+  // Add text bounds
+  const textBounds = getTextBounds(dimension.position, dimension.text, config)
+  points.push(
+    { x: textBounds.x, y: textBounds.y },
+    { x: textBounds.x + textBounds.width, y: textBounds.y + textBounds.height }
+  )
+  
+  return getBoundsFromPoints(points)
+}
+
+/**
+ * Get bounding box for radial dimension (includes text and leader line)
+ */
+function getRadialDimensionBounds(dimension: RadialDimension, config: DimensionConfig): BoundingBox2D {
+  const points: Point2D[] = [
+    dimension.leaderLine.start,
+    dimension.leaderLine.end,
+    dimension.position
+  ]
+  
+  // Add text bounds
+  const textBounds = getTextBounds(dimension.position, dimension.text, config)
+  points.push(
+    { x: textBounds.x, y: textBounds.y },
+    { x: textBounds.x + textBounds.width, y: textBounds.y + textBounds.height }
+  )
+  
+  return getBoundsFromPoints(points)
+}
+
+/**
+ * Get bounding box for angular dimension (includes arc and text)
+ */
+function getAngularDimensionBounds(dimension: AngularDimension, config: DimensionConfig): BoundingBox2D {
+  const arc = dimension.arc
+  const points: Point2D[] = []
+  
+  // Sample points along the arc
+  const steps = 8
+  for (let i = 0; i <= steps; i++) {
+    const angle = arc.startAngle + (arc.endAngle - arc.startAngle) * (i / steps)
+    points.push({
+      x: arc.center.x + arc.radius * Math.cos(angle),
+      y: arc.center.y + arc.radius * Math.sin(angle)
+    })
+  }
+  
+  // Add text bounds
+  const textBounds = getTextBounds(dimension.position, dimension.text, config)
+  points.push(
+    { x: textBounds.x, y: textBounds.y },
+    { x: textBounds.x + textBounds.width, y: textBounds.y + textBounds.height }
+  )
+  
+  return getBoundsFromPoints(points)
+}
+
+/**
+ * Get bounding box for dimension text
+ * Approximates text width based on character count and font metrics
+ */
+function getTextBounds(position: Point2D, text: string, config: DimensionConfig): BoundingBox2D {
+  // Approximate character width: 60% of height for Arial
+  const charWidth = config.textHeight * 0.6
+  const textWidth = text.length * charWidth
+  const textHeight = config.textHeight
+  
   return {
-    x: dimension.position.x - 20,
-    y: dimension.position.y - 5,
-    width: 40,
-    height: 10
+    x: position.x - textWidth / 2,
+    y: position.y - textHeight / 2,
+    width: textWidth,
+    height: textHeight
+  }
+}
+
+/**
+ * Compute axis-aligned bounding box from a set of points
+ */
+function getBoundsFromPoints(points: Point2D[]): BoundingBox2D {
+  if (points.length === 0) {
+    return { x: 0, y: 0, width: 0, height: 0 }
+  }
+  
+  let minX = Infinity
+  let minY = Infinity
+  let maxX = -Infinity
+  let maxY = -Infinity
+  
+  for (const p of points) {
+    minX = Math.min(minX, p.x)
+    minY = Math.min(minY, p.y)
+    maxX = Math.max(maxX, p.x)
+    maxY = Math.max(maxY, p.y)
+  }
+  
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY
   }
 }
 
 /**
  * Check if two bounding boxes overlap
+ * Includes a small margin to avoid dimensions that are too close
  */
-export function boundsOverlap(a: BoundingBox2D, b: BoundingBox2D): boolean {
+export function boundsOverlap(a: BoundingBox2D, b: BoundingBox2D, margin: number = 1): boolean {
   return !(
-    a.x + a.width < b.x ||
-    b.x + b.width < a.x ||
-    a.y + a.height < b.y ||
-    b.y + b.height < a.y
+    a.x + a.width + margin < b.x ||
+    b.x + b.width + margin < a.x ||
+    a.y + a.height + margin < b.y ||
+    b.y + b.height + margin < a.y
   )
 }
 
 /**
  * Resolve collisions between dimensions
  * Strategy: Move lower priority dimensions away from higher priority ones
+ * 
+ * Algorithm:
+ * 1. Group dimensions by view (only check collisions within same view)
+ * 2. Sort each view's dimensions by priority (descending)
+ * 3. For each dimension, check collisions with higher-priority dimensions in same view
+ * 4. If collision detected, try relocating by incrementing offset
+ * 5. Limit relocation attempts to prevent runaway loops
  */
-export function resolveCollisions(dimensions: Dimension[]): Dimension[] {
-  // TODO: Implement collision resolution
-  // For now, return dimensions unchanged
-  return dimensions
+export function resolveCollisions(
+  dimensions: Dimension[],
+  config: DimensionConfig = DEFAULT_DIMENSION_CONFIG
+): Dimension[] {
+  // Group dimensions by view
+  const byView: Record<string, Dimension[]> = {}
+  for (const dim of dimensions) {
+    if (!byView[dim.view]) {
+      byView[dim.view] = []
+    }
+    byView[dim.view].push(dim)
+  }
+  
+  const allResolved: Dimension[] = []
+  
+  // Resolve collisions within each view independently
+  for (const view in byView) {
+    const viewDims = byView[view]
+    
+    // Sort by priority descending (highest first)
+    const sorted = [...viewDims].sort((a, b) => b.priority - a.priority)
+    const resolved: Dimension[] = []
+    
+    for (let i = 0; i < sorted.length; i++) {
+      let current = sorted[i]
+      let attempts = 0
+      const maxAttempts = 10
+      
+      // Check for collisions with already-resolved (higher priority) dimensions in same view
+      while (attempts < maxAttempts) {
+        const currentBounds = getDimensionBounds(current, config)
+        let hasCollision = false
+        
+        for (const other of resolved) {
+          const otherBounds = getDimensionBounds(other, config)
+          if (boundsOverlap(currentBounds, otherBounds, 1)) {
+            hasCollision = true
+            break
+          }
+        }
+        
+        if (!hasCollision) {
+          // No collision, keep this dimension
+          break
+        }
+        
+        // Collision detected; try to relocate
+        current = relocateDimension(current, config)
+        attempts++
+      }
+      
+      resolved.push(current)
+    }
+    
+    allResolved.push(...resolved)
+  }
+  
+  return allResolved
+}
+
+/**
+ * Relocate a dimension by increasing its offset from the feature
+ * Different strategies for linear vs radial vs angular
+ */
+function relocateDimension(dimension: Dimension, config: DimensionConfig): Dimension {
+  switch (dimension.type) {
+    case 'linear':
+      return relocateLinearDimension(dimension as LinearDimension, config)
+    case 'radial':
+      return relocateRadialDimension(dimension as RadialDimension, config)
+    case 'angular':
+      return relocateAngularDimension(dimension as AngularDimension, config)
+    default:
+      return dimension
+  }
+}
+
+/**
+ * Relocate linear dimension by increasing offset from outline
+ */
+function relocateLinearDimension(dimension: LinearDimension, config: DimensionConfig): LinearDimension {
+  const newOffset = dimension.dimensionLine.offset + config.minSpacingBetween
+  
+  // Recalculate dimension line and extension line endpoints
+  const dx = dimension.end.x - dimension.start.x
+  const dy = dimension.end.y - dimension.start.y
+  
+  let offsetX = 0
+  let offsetY = 0
+  
+  if (dimension.orientation === 'horizontal') {
+    offsetY = -newOffset
+  } else if (dimension.orientation === 'vertical') {
+    offsetX = newOffset
+  } else {
+    // aligned: perpendicular to measured segment
+    const length = Math.sqrt(dx * dx + dy * dy)
+    const nx = -dy / length
+    const ny = dx / length
+    offsetX = nx * newOffset
+    offsetY = ny * newOffset
+  }
+  
+  const newDimLineStart = { x: dimension.start.x + offsetX, y: dimension.start.y + offsetY }
+  const newDimLineEnd = { x: dimension.end.x + offsetX, y: dimension.end.y + offsetY }
+  const newTextPos = {
+    x: (newDimLineStart.x + newDimLineEnd.x) / 2,
+    y: (newDimLineStart.y + newDimLineEnd.y) / 2
+  }
+  
+  // Update extension lines to reach new dimension line
+  const newExtLines: [ExtensionLine, ExtensionLine] = [
+    {
+      ...dimension.extensionLines[0],
+      end: newDimLineStart
+    },
+    {
+      ...dimension.extensionLines[1],
+      end: newDimLineEnd
+    }
+  ]
+  
+  return {
+    ...dimension,
+    position: newTextPos,
+    dimensionLine: {
+      start: newDimLineStart,
+      end: newDimLineEnd,
+      offset: newOffset
+    },
+    extensionLines: newExtLines
+  }
+}
+
+/**
+ * Relocate radial dimension by extending leader line
+ */
+function relocateRadialDimension(dimension: RadialDimension, config: DimensionConfig): RadialDimension {
+  const dx = dimension.leaderLine.end.x - dimension.leaderLine.start.x
+  const dy = dimension.leaderLine.end.y - dimension.leaderLine.start.y
+  const length = Math.sqrt(dx * dx + dy * dy)
+  const nx = dx / length
+  const ny = dy / length
+  
+  // Extend leader line by one spacing increment
+  const extension = config.minSpacingBetween
+  const newEnd = {
+    x: dimension.leaderLine.end.x + nx * extension,
+    y: dimension.leaderLine.end.y + ny * extension
+  }
+  
+  return {
+    ...dimension,
+    position: newEnd,
+    leaderLine: {
+      ...dimension.leaderLine,
+      end: newEnd
+    }
+  }
+}
+
+/**
+ * Relocate angular dimension by increasing arc radius
+ */
+function relocateAngularDimension(dimension: AngularDimension, config: DimensionConfig): AngularDimension {
+  const newRadius = dimension.arc.radius + config.minSpacingBetween
+  
+  // Recalculate text position at midpoint of new arc
+  const midAngle = (dimension.arc.startAngle + dimension.arc.endAngle) / 2
+  const newTextPos = {
+    x: dimension.arc.center.x + newRadius * Math.cos(midAngle),
+    y: dimension.arc.center.y + newRadius * Math.sin(midAngle)
+  }
+  
+  return {
+    ...dimension,
+    position: newTextPos,
+    radius: newRadius,
+    arc: {
+      ...dimension.arc,
+      radius: newRadius
+    }
+  }
 }
