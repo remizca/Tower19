@@ -1,9 +1,12 @@
 /**
  * Test section view generation with block-hole fixture
+ * 
+ * Tests both simplified and CSG slicing modes
  */
 import { writeFile, mkdir } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { BoxGeometry } from 'three'
 import { createBlockHoleFixture } from './fixtures/block-hole'
 import { createSectionView, selectCuttingPlane, classifyContours } from '../src/drawing/sections'
 import { renderSectionView } from '../src/drawing/sectionsSVG'
@@ -27,15 +30,39 @@ async function run() {
   console.log(`  Normal: (${plane.normal.x}, ${plane.normal.y}, ${plane.normal.z})`)
   console.log(`  Parent view: ${plane.parentView}`)
   
-  // Create section view
-  const sectionView = createSectionView(recipe, plane, { x: 150, y: 150 }, 1.0)
-  console.log(`\nGenerated section view:`)
-  console.log(`  Contours: ${sectionView.contours.length}`)
+  // Test 1: Simplified slicing (no geometry)
+  console.log(`\n${'='.repeat(60)}`)
+  console.log('Test 1: Simplified slicing (recipe-based)')
+  console.log('='.repeat(60))
   
-  for (let i = 0; i < sectionView.contours.length; i++) {
-    const contour = sectionView.contours[i]
+  const simplifiedView = createSectionView(recipe, plane, { x: 150, y: 150 }, 1.0)
+  console.log(`\nSimplified section view:`)
+  console.log(`  Contours: ${simplifiedView.contours.length}`)
+  
+  for (let i = 0; i < simplifiedView.contours.length; i++) {
+    const contour = simplifiedView.contours[i]
     console.log(`    Contour ${i + 1}: ${contour.isOuter ? 'outer' : 'inner'}, ${contour.points.length} points`)
   }
+  
+  // Test 2: CSG slicing (with BufferGeometry)
+  console.log(`\n${'='.repeat(60)}`)
+  console.log('Test 2: CSG slicing (BufferGeometry intersection)')
+  console.log('='.repeat(60))
+  
+  // Create simple box geometry matching fixture dimensions
+  const boxGeometry = new BoxGeometry(100, 50, 25)
+  
+  const csgView = createSectionView(recipe, plane, { x: 150, y: 150 }, 1.0, boxGeometry)
+  console.log(`\nCSG section view:`)
+  console.log(`  Contours: ${csgView.contours.length}`)
+  
+  for (let i = 0; i < csgView.contours.length; i++) {
+    const contour = csgView.contours[i]
+    console.log(`    Contour ${i + 1}: ${contour.isOuter ? 'outer' : 'inner'}, ${contour.points.length} points`)
+  }
+  
+  // Use CSG view for rendering (more accurate)
+  const sectionView = csgView
   
   // Classify contours for hatching
   const { hatched, outlineOnly } = classifyContours(sectionView.contours)

@@ -114,12 +114,15 @@
     - Hole callouts (counterbores, countersinks)
     - Feature detection: slots, pockets, bosses
     - Dimension stacking for multiple parallel dimensions
-- [x] Section view generation (PHASE 4 COMPLETE)
+- [x] Section view generation (PHASE 4 COMPLETE - Nov 11, 2025)
   - ✅ Section plane selection (midplane heuristic; `selectCuttingPlane()`)
-  - ✅ Contour extraction (simplified primitive-based; outer rectangle + cylindrical holes as octagons)
+  - ✅ Contour extraction with dual modes:
+    - **CSG slicing**: Accurate BufferGeometry intersection (plane-triangle algorithm)
+    - **Simplified slicing**: Rectangular bounds + cylindrical holes (fallback)
   - ✅ Contour projection (`projectContours()`) and classification (`classifyContours()`)
   - ✅ Hatch pattern rendering (`generateHatchLines()` 45° @ 3mm spacing)
-  - ⏳ Deferred: Full CSG mesh intersection for arbitrary contours (will replace simplified slicing)
+  - ✅ Full test coverage: `test:slicing`, `test:hatch`, `test:section`
+  - [ ] Integration into main `svg.ts` (placement + cutting plane indicator) — NEXT
 - [x] Implement line weight system (Phase 3.1)
   - ✅ Add thick (0.7mm) and thin (0.35mm) line weights per ISO 128-24
   - ✅ Created LineType enum with 8 ISO-compliant line types
@@ -144,13 +147,12 @@
   - ✅ Bounding box calculation for all dimension types
   - ✅ Extension lines excluded from bounds (allowed to cross)
   - ✅ Test suite validates zero collisions in output
-- [x] Implement section views (Phase 4)
+- [x] Implement section views (Phase 4 - COMPLETE Nov 11, 2025)
   - [x] 2D-24: Section plane selection and cutting algorithm
-  - [x] 2D-25: Contour extraction from cut geometry (simplified; holes: cylinders)
+  - [x] 2D-25: Contour extraction (dual mode: CSG intersection + simplified fallback)
   - [x] 2D-26: Hatch pattern rendering (45° lines, 3mm spacing per ISO 128-50)
-  - [x] Projection & classification utilities added (Nov 11, 2025)
-  - [ ] Integration into main `svg.ts` (placement + cutting plane indicator + label) — NEXT
-  - [ ] Full geometry slicing (CSG intersection loops) — IN PROGRESS PLANNING
+  - [x] CSG slicing: Plane-mesh intersection with loop stitching
+  - [ ] SVG integration: Layout + cutting plane indicator — IN PROGRESS
 
 ## UI/UX and Integration
 

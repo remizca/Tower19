@@ -13,7 +13,8 @@
  */
 
 import type { PartRecipe } from '../types'
-import type { Vector3 } from 'three'
+import type { Vector3, BufferGeometry } from 'three'
+import { sliceGeometryCSG, DEFAULT_SLICING_OPTIONS } from './slicing'
 
 /**
  * Section plane definition
@@ -491,23 +492,42 @@ export function generateHatchLines(
 /**
  * Create a complete section view for a part
  * 
+ * Supports two slicing modes:
+ * 1. CSG slicing (if geometry provided): Accurate contours from mesh intersection
+ * 2. Simplified slicing (fallback): Rectangular bounds + cylindrical holes
+ * 
  * @param recipe - Part recipe
  * @param plane - Optional cutting plane (auto-selected if not provided)
  * @param position - Position on drawing sheet
  * @param scale - Drawing scale
+ * @param geometry - Optional BufferGeometry for accurate CSG slicing
  * @returns Complete section view
  */
 export function createSectionView(
   recipe: PartRecipe,
   plane?: CuttingPlane,
   position: { x: number; y: number } = { x: 0, y: 0 },
-  scale: number = 1
+  scale: number = 1,
+  geometry?: BufferGeometry
 ): SectionView {
   // Use provided plane or auto-select
   const cuttingPlane = plane ?? selectCuttingPlane(recipe)
   
-  // Slice geometry to get contours in 3D cutting plane space
-  const rawContours = sliceGeometry(recipe, cuttingPlane)
+  let rawContours: SectionContour[]
+  
+  // Try CSG slicing if geometry provided
+  if (geometry) {
+    rawContours = sliceGeometryCSG(geometry, cuttingPlane, DEFAULT_SLICING_OPTIONS)
+    
+    // Fall back to simplified slicing if CSG fails
+    if (rawContours.length === 0) {
+      console.warn('CSG slicing produced no contours, falling back to simplified slicing')
+      rawContours = sliceGeometry(recipe, cuttingPlane)
+    }
+  } else {
+    // Use simplified slicing (no geometry available)
+    rawContours = sliceGeometry(recipe, cuttingPlane)
+  }
   
   // Project contours to 2D view space with scaling
   const contours = projectContours(rawContours, cuttingPlane, scale)

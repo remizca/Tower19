@@ -130,22 +130,24 @@ Detailed sub-tasks (tree):
      - Implemented `selectCuttingPlane()` with midplane heuristic (perpendicular to largest axis)
      - CuttingPlane includes id, type, position, normal, viewDirection, parentView
    - [x] 2D-25: Contour extraction from cut geometry
-     - Simplified primitive-based slicing: rectangular outer contour from bounding box
-     - Detect cylindrical subtraction holes and project as octagons
-     - Classify contours as outer (ccw) and inner (cw)
-     - Note: full CSG mesh intersection deferred
+     - **Dual-mode slicing**:
+       - CSG mode: `sliceGeometryCSG()` with plane-triangle intersection, segment extraction, loop stitching
+       - Simplified mode: Rectangular bounds + cylindrical holes (fallback when geometry unavailable)
+     - Classify contours as outer (ccw) and inner (cw) via relative area
+     - Automatic fallback ensures robustness
    - [x] 2D-26: Hatch pattern rendering (45° lines, 3mm spacing)
      - `generateHatchLines()` with polygon clipping
      - `clipLineToPolygon()` + `lineSegmentIntersection()` implementations
      - SVG rendering via `renderSectionView()` and `renderHatchLines()`
      - Thick (0.7mm) outlines, thin (0.35mm) hatch per ISO 128-50
+   - [x] Projection & classification utilities
+     - `projectContours()`: Scales & orients 2D cut to view space
+     - `classifyContours()`: Separates hatched (outer) vs outline-only (inner holes)
    - Tests
+     - `npm run test:slicing` → Box: 8 vertices, Cylinder: 64 vertices (2/2 passed)
      - `npm run test:hatch` → 19 hatch lines for 50×30 rectangle
-     - `npm run test:section` → section-test.svg generated with contours + hatching
-    - Projection & classification utilities added: `projectContours()` (scales & orients 2D cut) and `classifyContours()` (hatched vs outline-only)
-    - Next (enhancement): full CSG plane intersection for arbitrary internal profiles; integration into main `svg.ts` for layout + cutting plane indicator
-
-5. Prototype & renderer (Legacy tasks - integrated above)
+     - `npm run test:section` → Validates both simplified and CSG modes
+   - **Next**: Integration into main `svg.ts` for layout + cutting plane indicator5. Prototype & renderer (Legacy tasks - integrated above)
    - [x] 2D-15: Prototype Block+Hole SVG renderer (✅ Complete - Phase 1)
      - goal: output single-page SVG for Block+Hole fixture
      - acceptance: SVG contains expected visible/hidden edge counts and a title block
