@@ -3,12 +3,15 @@
  * Uses Three.js for matrix math and the edges module for extraction/classification.
  */
 import { Matrix4, Vector3 } from 'three'
+import type { BufferGeometry } from 'three'
 import type { PartRecipe } from '../types/part'
 import { extractRecipeEdges, type Edge } from './edges'
 import { generateDimensions, DEFAULT_DIMENSION_CONFIG } from './dimensions'
 import { renderDimensions } from './dimensionsSVG'
 import { getEdgeLineType, generateAllLineStylesCSS } from './lineTypes'
 import { extractCenterLines, renderCenterLines, DEFAULT_CENTER_LINE_CONFIG } from './centerLines'
+import { createSectionView, selectCuttingPlane, type CuttingPlane } from './sections'
+import { renderSectionView, renderCuttingPlaneIndicator } from './sectionsSVG'
 
 type View = 'front' | 'top' | 'right'
 
@@ -149,8 +152,11 @@ function projectEdges(edges: Edge[], viewConfig: ViewConfig, scale = 1): string[
 
 /**
  * Generate an SVG drawing for a part recipe
+ * 
+ * @param recipe - Part recipe with primitives and operations
+ * @param geometry - Optional BufferGeometry for accurate section views
  */
-export function generateDrawing(recipe: PartRecipe): string {
+export function generateDrawing(recipe: PartRecipe, geometry?: BufferGeometry): string {
   // Extract edges from primitives using new edge extraction module
   // This provides better support for all primitive types and proper sharp edge detection
   const edges = extractRecipeEdges(recipe)
@@ -208,6 +214,35 @@ export function generateDrawing(recipe: PartRecipe): string {
   const topCenter   = new Vector3(marginU + slotW / 2, marginU + slotH + gapU + slotH / 2, 0)
   const rightCenter = new Vector3(marginU + slotW + gapU + slotW / 2, marginU + slotH / 2, 0)
 
+  // Generate section view if there are subtraction operations (holes, pockets, etc.)
+  const hasSubtractions = recipe.operations?.some(op => op.op === 'subtract') ?? false
+  let sectionViewSVG = ''
+  let cuttingPlane: CuttingPlane | undefined
+  
+  if (hasSubtractions) {
+    try {
+      // Select cutting plane
+      cuttingPlane = selectCuttingPlane(recipe)
+      
+      // Position section view in bottom-right area (below right view)
+      const sectionPosition = {
+        x: marginU + slotW + gapU + slotW / 2,
+        y: marginU + slotH + gapU + slotH / 2
+      }
+      
+      // Create section view (with geometry if available for CSG mode)
+      const sectionView = createSectionView(recipe, cuttingPlane, sectionPosition, totalScale, geometry)
+      
+      // Render to SVG
+      sectionViewSVG = renderSectionView(sectionView)
+      
+      debug(`[SVG] Generated section view with ${sectionView.contours.length} contours`)
+    } catch (error) {
+      console.warn('[SVG] Failed to generate section view:', error)
+      cuttingPlane = undefined
+    }
+  }
+
   // Project each view
   const views = (Object.entries(VIEW_CONFIGS) as Array<[View, ViewConfig]>).map(([name, config]) => {
     // Override offsets with computed centers
@@ -222,7 +257,23 @@ export function generateDrawing(recipe: PartRecipe): string {
     // Extract and render center lines for cylindrical features
     const centerLines = extractCenterLines(recipe, name as 'front' | 'top' | 'right', DEFAULT_CENTER_LINE_CONFIG)
     const centerLineSVG = renderCenterLines(centerLines, totalScale)
-  debug(`[SVG] Generated ${centerLines.length} center lines for ${name} view`)
+    debug(`[SVG] Generated ${centerLines.length} center lines for ${name} view`)
+    
+    // Render cutting plane indicator if this is the parent view
+    let cuttingPlaneSVG = ''
+    if (cuttingPlane && cuttingPlane.parentView === name) {
+      // Calculate view bounds based on bounding box
+      const viewBounds = name === 'front' 
+        ? { minX: -bb.x/2, maxX: bb.x/2, minY: -bb.z/2, maxY: bb.z/2 }
+        : name === 'top'
+        ? { minX: -bb.x/2, maxX: bb.x/2, minY: -bb.y/2, maxY: bb.y/2 }
+        : { minX: -bb.y/2, maxX: bb.y/2, minY: -bb.z/2, maxY: bb.z/2 }
+      
+      cuttingPlaneSVG = `
+        <g transform="translate(${withOffset.offset.x}, ${withOffset.offset.y})">
+          ${renderCuttingPlaneIndicator(cuttingPlane, viewBounds, totalScale)}
+        </g>`
+    }
     
     return `
       <g class="view ${name}">
@@ -232,6 +283,7 @@ export function generateDrawing(recipe: PartRecipe): string {
         <g class="center-lines" transform="translate(${withOffset.offset.x}, ${withOffset.offset.y})">
           ${centerLineSVG}
         </g>
+        ${cuttingPlaneSVG}
         ${dimensionSVG}
       </g>
     `
@@ -259,6 +311,7 @@ ${lineStylesCSS}
       </defs>
       
       ${views.join('\n')}
+      ${sectionViewSVG}
       ${createTitleBlock(recipe.name, scaleLabel)}
       ${warningSVG}
     </svg>

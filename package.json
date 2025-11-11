@@ -14,7 +14,8 @@
     "test:collision": "tsx tests/test-collision-detection.ts",
     "test:hatch": "tsx tests/test-hatch.ts",
     "test:section": "tsx tests/test-section.ts",
-    "test:slicing": "tsx tests/test-slicing.ts"
+    "test:slicing": "tsx tests/test-slicing.ts",
+    "test:svg-integration": "tsx tests/test-svg-integration.ts"
   },
   "dependencies": {
     "@react-three/csg": "^4.0.0",
