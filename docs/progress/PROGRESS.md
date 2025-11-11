@@ -28,16 +28,23 @@ This document tracks detailed implementation progress and technical decisions fo
 - [x] Verified correct rendering in R3F
 - [x] Added type definitions for CSG operations
 
-## UI/UX and Interactions (In Progress)
-- [ ] Orbit controls
-- [ ] Pan controls
-- [ ] Zoom controls
-- [ ] View presets
-- [ ] 2D viewer scale selection
-- [ ] Timer integration
-- [ ] Save/bookmark functionality
+## UI/UX and Interactions ✅ COMPLETE (2D Viewer - Nov 11, 2025)
+- [x] Orbit controls (3D viewer)
+- [x] Pan controls (3D viewer)
+- [x] Zoom controls (3D viewer)
+- [x] View mode switcher (3D/2D tabs) (UI-02 - Nov 11, 2025)
+- [x] 2D Drawing Viewer component (UI-01 - Nov 11, 2025)
+  - Interactive pan/zoom controls for 2D drawings
+  - Download SVG functionality
+  - Part information overlay
+  - Zoom percentage display
+- [x] Timer integration (UI-03 - Nov 11, 2025)
+  - Automatic timer start when viewing 2D drawings
+  - Real-time display in MM:SS format
+- [x] Save/bookmark functionality
+- [x] Difficulty selector (Beginner/Intermediate)
+- [ ] View presets (quick front/top/right views)
 - [ ] Export options (PDF/DXF/STP)
-- [ ] Difficulty selector
 
 ## Client-side Storage (In Progress)
 - [ ] IndexedDB schema design
@@ -209,7 +216,22 @@ Detailed sub-tasks (tree):
    - [ ] 2D-19: Section generation prototype → **Now 2D-24, 2D-25, 2D-26** (Phase 4)
      - goal: select cutting plane, extract contour, render 45° hatch for cut faces
 
-**Current Focus**: Phase 4 complete. Next priorities: UI/UX integration (2D viewer, export pipeline) and advanced features (extended section types, angular dimensions)
+**Current Focus**: Phase 4 complete. 2D Drawing Viewer UI integration complete (Nov 11, 2025). Next priorities: Export pipeline (PDF/DXF), advanced features (extended section types, angular dimensions), expert difficulty generator.
+
+**Recent Completion (Nov 11, 2025)**: UI Integration
+- ✅ Created `src/viewers/DrawingViewer.tsx` - Interactive 2D drawing viewer component
+  - Pan/zoom controls using mouse (drag to pan, wheel to zoom)
+  - Reset view button to restore default viewport
+  - Download SVG button for offline practice
+  - Timer display in MM:SS format
+  - Part information overlay (name, dimensions, primitive/operation counts)
+  - Zoom percentage display
+- ✅ Modified `src/App.tsx` - View mode switcher and CSG geometry extraction
+  - Added 3D/2D tab buttons for seamless navigation
+  - CSG geometry extraction via ref callback on mesh
+  - Passes BufferGeometry to DrawingViewer for accurate section views
+  - Conditional rendering based on view mode state
+- ✅ Test results: Dev server running, UI fully functional, no compilation errors
 
 Notes:
 - Each numbered sub-task maps to the managed in-repo todo items (2D-15..2D-19) so status is visible in both the todo list and this PROGRESS document.

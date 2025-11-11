@@ -106,6 +106,19 @@ Recent Progress (Nov 8, 2025)
   - Title block displays selected scale (e.g., "Scale: 1:2")
   - Tested with default (1:1), large (1:2), and tiny (5:1) parts
 
+Recent Progress (Nov 11, 2025)
+- ✅ **Phase 4 Complete - Section Views with Cutting Planes**: Full SVG integration
+  - CSG-based and simplified slicing modes for section view generation
+  - Hatch patterns at 45° with 3mm spacing using thin lines
+  - Cutting plane indicators in parent views (chain-thick lines with A-A labels)
+  - Section views positioned in bottom-right quadrant of 2×2 layout
+- ✅ **2D Drawing Viewer UI**: Interactive viewer with pan/zoom controls
+  - View mode switcher (3D/2D tabs) for seamless navigation
+  - Timer tracking time spent viewing drawings
+  - Download SVG functionality for offline practice
+  - Real-time CSG geometry extraction for accurate section views
+  - Overlay controls with part info and zoom percentage
+
 Recent Progress (Nov 7, 2025)
 - ✅ **Ribs and webs features**: Complete structural reinforcement generators (ribs, webs, radial ribs)
 - ✅ **Intermediate difficulty generator implemented**: 4 complex strategies with 5-15 primitives each
@@ -123,15 +136,10 @@ Recent Progress (Nov 7, 2025)
 
 Known Issues
 - Expert difficulty generator not yet implemented
-- UI integration for 2D viewer pending
 
 Next steps (prioritized)
-1. **[HIGH PRIORITY]** UI integration for 2D drawing viewer
-   - Interactive 2D viewer component
-   - Timer functionality (start on 2D view)
-   - Drawing comparison and validation tools
-2. **Export pipeline**: PDF/DXF/STEP export functionality
-3. **Advanced 2D features**: Angular dimensions, extended section types (half, offset, broken-out)
+1. **[HIGH PRIORITY]** Export pipeline: PDF/DXF/STEP export functionality
+2. **Advanced 2D features**: Angular dimensions, extended section types (half, offset, broken-out)
 4. Create expert difficulty generator (8-12+ primitives, advanced features, combined ribs/webs/fillets)
 5. Migrate bookmarking/storage from localStorage to IndexedDB
 6. Add CI (GitHub Actions) that runs `npm run build` on PRs

@@ -152,9 +152,11 @@
   - ✅ Generate button with seed display
   - ✅ Bookmark/save functionality with localStorage
   - ✅ Difficulty selector (Beginner / Intermediate)
+  - ✅ 2D Drawing Viewer with pan/zoom/download (UI-01 - Nov 11, 2025)
+  - ✅ View mode switcher (3D/2D tabs) (UI-02 - Nov 11, 2025)
+  - ✅ Timer tracking for 2D view sessions (UI-03 - Nov 11, 2025)
+  - ✅ Download SVG functionality (UI-04 - Nov 11, 2025)
   - [ ] View presets (front/top/right quick views)
-  - [ ] 2D viewer with scale selection
-  - [ ] Start timer on 2D view
   - [ ] Export to PDF/DXF/STP
 - [-] Client-side persistence and export
   - ✅ Bookmarking with localStorage
