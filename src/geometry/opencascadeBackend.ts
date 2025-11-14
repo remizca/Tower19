@@ -39,7 +39,6 @@ export class OpenCascadeBackend implements GeometryBackend {
 
   private client = getWorkerClient();
   private initialized = false;
-  private shapeCounter = 0;
   private shapes = new Map<string, ShapeReference>();
 
   async initialize(): Promise<void> {
@@ -53,50 +52,38 @@ export class OpenCascadeBackend implements GeometryBackend {
 
   async createPrimitive(primitive: Primitive): Promise<GeometryResult> {
     this.ensureInitialized();
-
-    const shapeId = this.generateShapeId();
+    
+    let shapeId: string;
     
     switch (primitive.kind) {
       case 'box': {
         const params = primitive.params as { width: number; height: number; depth: number };
-        await this.client.makeBox(params.width, params.height, params.depth);
-        
-        this.shapes.set(shapeId, {
-          id: shapeId,
-          type: 'primitive'
-        });
-
-        // TODO: Get actual triangulated mesh from worker
-        // For now, create placeholder mesh
-        return this.createPlaceholderBox(params.width, params.height, params.depth, shapeId);
+        shapeId = await this.client.makeBox(params.width, params.height, params.depth);
+        break;
       }
 
       case 'cylinder': {
         const params = primitive.params as { radius: number; height: number };
-        await this.client.makeCylinder(params.radius, params.height);
-        
-        this.shapes.set(shapeId, {
-          id: shapeId,
-          type: 'primitive'
-        });
-
-        // TODO: Get actual triangulated mesh from worker
-        return this.createPlaceholderCylinder(params.radius, params.height, shapeId);
+        shapeId = await this.client.makeCylinder(params.radius, params.height);
+        break;
       }
 
       case 'sphere': {
-        // TODO: Implement sphere in worker
-        throw new Error('Sphere primitive not yet implemented in worker');
+        const params = primitive.params as { radius: number };
+        shapeId = await this.client.makeSphere(params.radius);
+        break;
       }
 
       case 'cone': {
-        // TODO: Implement cone in worker
-        throw new Error('Cone primitive not yet implemented in worker');
+        const params = primitive.params as { radius1: number; radius2: number; height: number };
+        shapeId = await this.client.makeCone(params.radius1, params.radius2, params.height);
+        break;
       }
 
       case 'torus': {
-        // TODO: Implement torus in worker
-        throw new Error('Torus primitive not yet implemented in worker');
+        const params = primitive.params as { majorRadius: number; minorRadius: number };
+        shapeId = await this.client.makeTorus(params.majorRadius, params.minorRadius);
+        break;
       }
 
       case 'custom':
@@ -105,6 +92,26 @@ export class OpenCascadeBackend implements GeometryBackend {
       default:
         throw new Error(`Unknown primitive type: ${(primitive as any).type}`);
     }
+    
+    // Store shape reference
+    this.shapes.set(shapeId, {
+      id: shapeId,
+      type: 'primitive'
+    });
+    
+    // Get triangulated mesh from worker
+    const { vertices, indices, normals } = await this.client.triangulate(shapeId);
+    
+    // Create Three.js BufferGeometry
+    const geometry = new BufferGeometry();
+    geometry.setAttribute('position', new BufferAttribute(vertices, 3));
+    geometry.setAttribute('normal', new BufferAttribute(normals, 3));
+    geometry.setIndex(new BufferAttribute(indices, 1));
+    
+    return {
+      mesh: geometry,
+      topology: { shapeId }
+    };
   }
 
   async booleanOperation(
@@ -116,31 +123,61 @@ export class OpenCascadeBackend implements GeometryBackend {
     if (operands.length < 2) {
       throw new Error('Boolean operation requires at least 2 operands');
     }
-
-    // TODO: Implement shape serialization/transfer
-    // For now, only support subtract operation with placeholder
-    if (operation === 'subtract') {
-      const shapeId = this.generateShapeId();
+    
+    // Extract shape IDs from operands
+    const shapeIds = operands.map(op => {
+      const topology = op.topology as { shapeId?: string } | undefined;
+      const shapeId = topology?.shapeId;
+      if (!shapeId) {
+        throw new Error('Operand missing shape topology information');
+      }
+      return shapeId;
+    });
+    
+    let resultShapeId: string;
+    
+    switch (operation) {
+      case 'union': {
+        resultShapeId = await this.client.booleanFuse(shapeIds);
+        break;
+      }
       
-      // Call worker boolean cut
-      // Note: Currently worker expects shapes to be created in worker context
-      // Need to implement shape management strategy
-      await this.client.booleanCut(null, null);
+      case 'subtract': {
+        if (operands.length !== 2) {
+          throw new Error('Subtract operation requires exactly 2 operands');
+        }
+        resultShapeId = await this.client.booleanCut(shapeIds[0], shapeIds[1]);
+        break;
+      }
       
-      this.shapes.set(shapeId, {
-        id: shapeId,
-        type: 'boolean'
-      });
-
-      // TODO: Get actual result mesh from worker
-      // For now, return first operand (placeholder)
-      return {
-        ...operands[0],
-        topology: { shapeId }
-      };
+      case 'intersect': {
+        // TODO: Implement intersect in worker
+        throw new Error('Intersect operation not yet implemented');
+      }
+      
+      default:
+        throw new Error(`Unknown boolean operation: ${operation}`);
     }
-
-    throw new Error(`Boolean operation '${operation}' not yet implemented`);
+    
+    // Store result shape reference
+    this.shapes.set(resultShapeId, {
+      id: resultShapeId,
+      type: 'boolean'
+    });
+    
+    // Get triangulated mesh from worker
+    const { vertices, indices, normals } = await this.client.triangulate(resultShapeId);
+    
+    // Create Three.js BufferGeometry
+    const geometry = new BufferGeometry();
+    geometry.setAttribute('position', new BufferAttribute(vertices, 3));
+    geometry.setAttribute('normal', new BufferAttribute(normals, 3));
+    geometry.setIndex(new BufferAttribute(indices, 1));
+    
+    return {
+      mesh: geometry,
+      topology: { shapeId: resultShapeId }
+    };
   }
 
   async filletEdges(
@@ -150,20 +187,27 @@ export class OpenCascadeBackend implements GeometryBackend {
   ): Promise<GeometryResult> {
     this.ensureInitialized();
 
-    const shapeId = this.generateShapeId();
+    const topology = geometry.topology as { shapeId?: string } | undefined;
+    const shapeId = topology?.shapeId;
+    if (!shapeId) {
+      throw new Error('Geometry missing shape topology information');
+    }
     
-    // Call worker fillet
-    // Note: Currently assumes shape is in worker context
-    await this.client.fillet(null, radius);
+    // Call worker fillet (modifies shape in place)
+    const { edgeCount } = await this.client.fillet(shapeId, radius);
+    console.log(`[OpenCascadeBackend] Filleted ${edgeCount} edges with radius ${radius}`);
     
-    this.shapes.set(shapeId, {
-      id: shapeId,
-      type: 'fillet'
-    });
+    // Get updated triangulated mesh from worker
+    const { vertices, indices, normals } = await this.client.triangulate(shapeId);
+    
+    // Create Three.js BufferGeometry
+    const newGeometry = new BufferGeometry();
+    newGeometry.setAttribute('position', new BufferAttribute(vertices, 3));
+    newGeometry.setAttribute('normal', new BufferAttribute(normals, 3));
+    newGeometry.setIndex(new BufferAttribute(indices, 1));
 
-    // TODO: Get actual filleted mesh from worker
     return {
-      ...geometry,
+      mesh: newGeometry,
       topology: { shapeId }
     };
   }
@@ -235,104 +279,5 @@ export class OpenCascadeBackend implements GeometryBackend {
     }
   }
 
-  private generateShapeId(): string {
-    return `shape_${++this.shapeCounter}`;
-  }
-
-  /**
-   * Create placeholder box mesh (temporary until worker returns triangulation)
-   */
-  private createPlaceholderBox(
-    width: number, 
-    height: number, 
-    depth: number,
-    shapeId: string
-  ): GeometryResult {
-    const geometry = new BufferGeometry();
-    
-    // Simple box vertices (8 corners)
-    const w = width / 2, h = height / 2, d = depth / 2;
-    const vertices = new Float32Array([
-      // Front face
-      -w, -h,  d,   w, -h,  d,   w,  h,  d,  -w,  h,  d,
-      // Back face
-      -w, -h, -d,  -w,  h, -d,   w,  h, -d,   w, -h, -d,
-      // Top face
-      -w,  h, -d,  -w,  h,  d,   w,  h,  d,   w,  h, -d,
-      // Bottom face
-      -w, -h, -d,   w, -h, -d,   w, -h,  d,  -w, -h,  d,
-      // Right face
-       w, -h, -d,   w,  h, -d,   w,  h,  d,   w, -h,  d,
-      // Left face
-      -w, -h, -d,  -w, -h,  d,  -w,  h,  d,  -w,  h, -d
-    ]);
-
-    const indices = new Uint16Array([
-      0,  1,  2,   0,  2,  3,   // Front
-      4,  5,  6,   4,  6,  7,   // Back
-      8,  9, 10,   8, 10, 11,   // Top
-      12, 13, 14,  12, 14, 15,  // Bottom
-      16, 17, 18,  16, 18, 19,  // Right
-      20, 21, 22,  20, 22, 23   // Left
-    ]);
-
-    geometry.setAttribute('position', new BufferAttribute(vertices, 3));
-    geometry.setIndex(new BufferAttribute(indices, 1));
-    geometry.computeVertexNormals();
-
-    return {
-      mesh: geometry,
-      topology: { shapeId }
-    };
-  }
-
-  /**
-   * Create placeholder cylinder mesh (temporary)
-   */
-  private createPlaceholderCylinder(
-    radius: number,
-    height: number,
-    shapeId: string
-  ): GeometryResult {
-    const geometry = new BufferGeometry();
-    
-    // Simple cylinder with 16 segments
-    const segments = 16;
-    const vertices: number[] = [];
-    const indices: number[] = [];
-
-    const h = height / 2;
-
-    // Generate vertices
-    for (let i = 0; i <= segments; i++) {
-      const angle = (i / segments) * Math.PI * 2;
-      const x = Math.cos(angle) * radius;
-      const z = Math.sin(angle) * radius;
-      
-      // Bottom
-      vertices.push(x, -h, z);
-      // Top
-      vertices.push(x, h, z);
-    }
-
-    // Generate indices for side faces
-    for (let i = 0; i < segments; i++) {
-      const a = i * 2;
-      const b = a + 1;
-      const c = a + 2;
-      const d = a + 3;
-
-      indices.push(a, c, b);
-      indices.push(b, c, d);
-    }
-
-    geometry.setAttribute('position', new BufferAttribute(new Float32Array(vertices), 3));
-    geometry.setIndex(new BufferAttribute(new Uint16Array(indices), 1));
-    geometry.computeVertexNormals();
-
-    return {
-      mesh: geometry,
-      topology: { shapeId }
-    };
-  }
 }
+
