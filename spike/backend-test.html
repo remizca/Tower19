@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenCascade Backend Test</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Courier New', monospace;
+      background: #1a202c;
+      color: #e2e8f0;
+      padding: 40px;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #90cdf4;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+    .info {
+      background: #2d3748;
+      border-left: 4px solid #4299e1;
+      padding: 16px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+    #output {
+      background: #000;
+      border: 1px solid #4a5568;
+      border-radius: 8px;
+      padding: 20px;
+      min-height: 400px;
+      font-size: 14px;
+      overflow-y: auto;
+      max-height: 600px;
+    }
+    .log-line {
+      margin-bottom: 4px;
+    }
+    .success { color: #68d391; }
+    .warning { color: #f6ad55; }
+    .error { color: #fc8181; }
+    .info-line { color: #90cdf4; }
+    button {
+      background: #4299e1;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover {
+      background: #3182ce;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔧 OpenCascade Backend Test</h1>
+    
+    <div class="info">
+      <strong>Purpose:</strong> Validate OpenCascadeBackend implementation with Web Worker architecture.
+      <br><strong>Status:</strong> Using placeholder meshes (triangulation export pending).
+      <br><strong>Expected:</strong> All operations complete successfully, 0ms blocking init time.
+    </div>
+    
+    <div id="output"></div>
+    
+    <button onclick="location.reload()">Run Test Again</button>
+  </div>
+  
+  <script type="module">
+    const output = document.getElementById('output');
+    
+    // Intercept console.log
+    const originalLog = console.log;
+    console.log = function(...args) {
+      originalLog.apply(console, args);
+      
+      const msg = args.join(' ');
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      
+      if (msg.includes('✓')) {
+        line.className += ' success';
+      } else if (msg.includes('⚠')) {
+        line.className += ' warning';
+      } else if (msg.includes('❌')) {
+        line.className += ' error';
+      } else if (msg.includes('[')) {
+        line.className += ' info-line';
+      }
+      
+      line.textContent = msg;
+      output.appendChild(line);
+      output.scrollTop = output.scrollHeight;
+    };
+    
+    // Import and run test
+    import('./backend-test.ts');
+  </script>
+</body>
+</html>

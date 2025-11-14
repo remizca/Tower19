@@ -145,13 +145,28 @@ Recent Progress (Nov 7, 2025)
 
 Known Issues
 - Expert difficulty generator not yet implemented
-- DXF export foundation created but not yet wired to UI
+- Mesh-based CSG limits analytic edge fidelity (no true fillet/chamfer curves yet)
+
+Recent Progress (Nov 14, 2025)
+
+- ✅ **DXF Export Complete (UI-06)**: Client-side R12 DXF writer with orthographic view projection
+  - Visible/hidden edge classification mapped to layers (OUTLINE/HIDDEN)
+  - Dimension entities exported as line + text pairs (DIAMETER / BBOX)
+  - Center lines emitted on CENTER layer with chain pattern metadata
+  - Convenience API `exportToDXFFromRecipe()` wired to UI button
+  - Manual chunk splitting keeps DXF bundle minimal (lazy-loaded)
 
 Next steps (prioritized)
-1. **Complete DXF export**: Wire up DXF generation with proper edge/dimension data
+
+1. **CAD Kernel WASM Spike**: Evaluate OpenCascade.js performance (bundle size, init time, API ergonomics)
 2. **Advanced 2D features**: Angular dimensions, extended section types (half, offset, broken-out)
 3. Create expert difficulty generator (8-12+ primitives, advanced features, combined ribs/webs/fillets)
 4. Migrate bookmarking/storage from localStorage to IndexedDB
 5. Add CI (GitHub Actions) that runs `npm run build` on PRs
+6. DXF enhancements: true DXF dimension entities, layer linetype/style refinement
 
 See `TODO.md`, `docs/progress/PROGRESS.md`, and `docs/roadmaps/` for project tracking and technical notes.
+
+CAD Kernel upgrade planning underway: see `docs/roadmaps/cad-kernel-evaluation.md`.
+
+**Current Sprint (Nov 14, 2025)**: OpenCascade.js WASM spike baseline captured (init 6.2–8.8s FAIL vs <2s target; primitives fast; fillet 716ms for 24 edges; triangulation 52–102ms). Proceeding with trimming strategy + boolean timing retest and evaluating hybrid vs full migration.

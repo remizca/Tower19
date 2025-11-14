@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenCascade.js - Web Worker Demo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      padding: 40px;
+      max-width: 800px;
+      width: 100%;
+    }
+    h1 {
+      color: #2d3748;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+    .subtitle {
+      color: #718096;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    .status-bar {
+      background: #f7fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 30px;
+    }
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+    }
+    .status-label {
+      font-weight: 600;
+      color: #4a5568;
+    }
+    .status-value {
+      font-family: 'Courier New', monospace;
+      color: #2d3748;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-loading {
+      background: #fef5e7;
+      color: #d68910;
+    }
+    .badge-ready {
+      background: #d4edda;
+      color: #155724;
+    }
+    .badge-error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    button:active:not(:disabled) {
+      transform: translateY(0);
+    }
+    button:disabled {
+      background: #cbd5e0;
+      cursor: not-allowed;
+    }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .metric {
+      background: #f7fafc;
+      border-radius: 8px;
+      padding: 16px;
+      border-left: 4px solid #667eea;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: #718096;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .metric-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #2d3748;
+    }
+    .log {
+      background: #1a202c;
+      border-radius: 8px;
+      padding: 16px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: #e2e8f0;
+      margin-top: 20px;
+    }
+    .log-entry {
+      margin-bottom: 4px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .log-time {
+      color: #90cdf4;
+    }
+    .log-info { color: #68d391; }
+    .log-error { color: #fc8181; }
+    .log-warn { color: #f6ad55; }
+    .highlight {
+      background: #fef5e7;
+      border-left: 4px solid #f39c12;
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    .highlight strong {
+      color: #d68910;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 OpenCascade.js Web Worker Demo</h1>
+    <p class="subtitle">Non-blocking initialization with instant page load</p>
+    
+    <div class="highlight">
+      <strong>✨ Key Benefit:</strong> Page loaded instantly! OpenCascade is initializing in the background without blocking the UI.
+    </div>
+    
+    <div class="status-bar">
+      <div class="status-row">
+        <span class="status-label">OCCT Status:</span>
+        <span id="ocStatus" class="status-badge badge-loading">Initializing...</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Init Time:</span>
+        <span id="initTime" class="status-value">—</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Page Load:</span>
+        <span id="pageLoad" class="status-value">—</span>
+      </div>
+    </div>
+    
+    <div class="controls">
+      <button id="btnBox" disabled>Create Box</button>
+      <button id="btnCylinder" disabled>Create Cylinder</button>
+      <button id="btnBoolean" disabled>Boolean Cut</button>
+      <button id="btnFillet" disabled>Apply Fillet</button>
+      <button id="btnTriangulate" disabled>Triangulate</button>
+    </div>
+    
+    <div class="metrics" id="metrics"></div>
+    
+    <div class="log" id="log"></div>
+  </div>
+  
+  <script type="module">
+    import { getWorkerClient } from './oc-worker-client.ts';
+    
+    const pageLoadTime = performance.now();
+    document.getElementById('pageLoad').textContent = `${pageLoadTime.toFixed(1)}ms (instant!)`;
+    
+    const logEl = document.getElementById('log');
+    const statusEl = document.getElementById('ocStatus');
+    const initTimeEl = document.getElementById('initTime');
+    const metricsEl = document.getElementById('metrics');
+    
+    function log(msg, level = 'info') {
+      const time = new Date().toISOString().split('T')[1].replace('Z', '');
+      const entry = document.createElement('div');
+      entry.className = `log-entry log-${level}`;
+      entry.innerHTML = `<span class="log-time">[${time}]</span> ${msg}`;
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(`[${level}] ${msg}`);
+    }
+    
+    function setStatus(status, className) {
+      statusEl.textContent = status;
+      statusEl.className = `status-badge ${className}`;
+    }
+    
+    function addMetric(label, value) {
+      const metric = document.createElement('div');
+      metric.className = 'metric';
+      metric.innerHTML = `
+        <div class="metric-label">${label}</div>
+        <div class="metric-value">${value}</div>
+      `;
+      metricsEl.appendChild(metric);
+    }
+    
+    function enableButtons() {
+      document.querySelectorAll('button').forEach(btn => btn.disabled = false);
+    }
+    
+    // Start initialization immediately (non-blocking!)
+    log('Page loaded - UI is interactive!', 'info');
+    log('Starting OpenCascade worker initialization in background...', 'info');
+    
+    const client = getWorkerClient();
+    
+    client.init().then(initMs => {
+      log(`✅ OpenCascade initialized in ${initMs.toFixed(0)}ms`, 'info');
+      initTimeEl.textContent = `${initMs.toFixed(0)}ms`;
+      setStatus('Ready', 'badge-ready');
+      enableButtons();
+      addMetric('Init Time', `${initMs.toFixed(0)}ms`);
+      addMetric('Page Load', `${pageLoadTime.toFixed(0)}ms`);
+      addMetric('Blocking Time', '0ms ✨');
+    }).catch(error => {
+      log(`❌ Initialization failed: ${error.message}`, 'error');
+      setStatus('Error', 'badge-error');
+    });
+    
+    // Button handlers
+    document.getElementById('btnBox').addEventListener('click', async () => {
+      const start = performance.now();
+      try {
+        log('Creating box primitive...', 'info');
+        await client.makeBox(100, 100, 50);
+        const time = performance.now() - start;
+        log(`✅ Box created in ${time.toFixed(2)}ms`, 'info');
+        addMetric('Box Creation', `${time.toFixed(2)}ms`);
+      } catch (error) {
+        log(`❌ Box creation failed: ${error.message}`, 'error');
+      }
+    });
+    
+    document.getElementById('btnCylinder').addEventListener('click', async () => {
+      const start = performance.now();
+      try {
+        log('Creating cylinder primitive...', 'info');
+        await client.makeCylinder(25, 80);
+        const time = performance.now() - start;
+        log(`✅ Cylinder created in ${time.toFixed(2)}ms`, 'info');
+        addMetric('Cylinder Creation', `${time.toFixed(2)}ms`);
+      } catch (error) {
+        log(`❌ Cylinder creation failed: ${error.message}`, 'error');
+      }
+    });
+    
+    document.getElementById('btnBoolean').addEventListener('click', async () => {
+      const start = performance.now();
+      try {
+        log('Performing boolean cut operation...', 'info');
+        await client.booleanCut(null, null);
+        const time = performance.now() - start;
+        log(`✅ Boolean cut completed in ${time.toFixed(2)}ms`, 'info');
+        addMetric('Boolean Cut', `${time.toFixed(2)}ms`);
+      } catch (error) {
+        log(`❌ Boolean operation failed: ${error.message}`, 'error');
+      }
+    });
+    
+    document.getElementById('btnFillet').addEventListener('click', async () => {
+      const start = performance.now();
+      try {
+        log('Applying fillet...', 'info');
+        await client.fillet(null, 5);
+        const time = performance.now() - start;
+        log(`✅ Fillet applied in ${time.toFixed(2)}ms`, 'info');
+        addMetric('Fillet', `${time.toFixed(2)}ms`);
+      } catch (error) {
+        log(`❌ Fillet failed: ${error.message}`, 'error');
+      }
+    });
+    
+    document.getElementById('btnTriangulate').addEventListener('click', async () => {
+      const start = performance.now();
+      try {
+        log('Triangulating shape...', 'info');
+        const result = await client.triangulate(null, 0.1);
+        const time = performance.now() - start;
+        log(`✅ Triangulation completed in ${time.toFixed(2)}ms`, 'info');
+        log(`   Vertices: ${result.vertices}, Triangles: ${result.triangles}`, 'info');
+        addMetric('Triangulation', `${time.toFixed(2)}ms`);
+      } catch (error) {
+        log(`❌ Triangulation failed: ${error.message}`, 'error');
+      }
+    });
+  </script>
+</body>
+</html>

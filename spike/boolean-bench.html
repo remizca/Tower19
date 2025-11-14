@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>OpenCascade Boolean Robustness Benchmark</title>
+  <style>
+    body{font-family:Segoe UI,Tahoma,sans-serif;margin:0;padding:20px;background:#f7f9fa;}
+    h1{margin-top:0;color:#2c3e50;}
+    .card{background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.12);max-width:980px;margin:0 auto;}
+    pre{background:#2d2d2d;color:#eee;padding:12px;border-radius:4px;overflow:auto;max-height:400px;font-size:12px;}
+    .metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0;}
+    .metric{background:#ecf0f1;padding:10px 14px;border-left:4px solid #3498db;border-radius:4px;font-size:13px;}
+    .fail{border-color:#e74c3c;} .warn{border-color:#f39c12;} .pass{border-color:#27ae60;}
+    button{background:#3498db;color:#fff;border:none;padding:10px 18px;border-radius:4px;cursor:pointer;margin-right:8px;} button:disabled{background:#95a5a6;cursor:not-allowed;}
+    .status{display:inline-block;padding:6px 12px;border-radius:4px;font-weight:600;margin-top:10px;}
+    .status.ready{background:#27ae60;color:#fff;} .status.loading{background:#f39c12;color:#fff;} .status.fail{background:#e74c3c;color:#fff;}
+    table{border-collapse:collapse;width:100%;font-size:12px;margin-top:10px;} th,td{border:1px solid #ccc;padding:4px 6px;text-align:right;} th{text-align:center;background:#fafafa;}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>OpenCascade Boolean Robustness Benchmark</h1>
+    <p>Runs 100 sequential boolean cuts (box minus multiple cylinders) to measure latency and success rate after constructor overload adjustments.</p>
+    <div id="status" class="status loading">Initializing...</div>
+    <div class="metrics" id="metrics"></div>
+    <button id="runBtn" disabled>Run 100 Boolean Cuts</button>
+    <button id="exportBtn" disabled>Export JSON Report</button>
+    <pre id="log"></pre>
+    <div id="summary"></div>
+  </div>
+  <script type="module">
+    import { initBenchmark, runBenchmark, exportResults } from './boolean-bench.ts';
+    
+    const runBtn = document.getElementById('runBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    
+    runBtn?.addEventListener('click', runBenchmark);
+    exportBtn?.addEventListener('click', exportResults);
+    
+    initBenchmark();
+  </script>
+</body>
+</html>

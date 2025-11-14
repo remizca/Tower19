@@ -5,6 +5,11 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/',
+  optimizeDeps: {
+    include: ['opencascade.js']
+  },
+  // Ensure Vite treats WASM and worker helper scripts from deps as assets
+  assetsInclude: ['**/*.wasm', '**/*.worker.js'],
   build: {
     outDir: 'dist',
     sourcemap: true,
