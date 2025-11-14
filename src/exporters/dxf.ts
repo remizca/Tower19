@@ -375,8 +375,6 @@ export function exportToDXF(options: DXFExportOptions): void {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-
-    console.log('[DXF Export] Successfully exported:', filename)
   } catch (error) {
     console.error('[DXF Export] Failed:', error)
     throw new Error(`DXF export failed: ${error instanceof Error ? error.message : 'Unknown error'}`)

@@ -125,8 +125,6 @@ export async function exportToPDF(options: PDFExportOptions): Promise<void> {
     // Download PDF
     const pdfFilename = filename || `${recipe.name.replace(/\s+/g, '-')}-drawing.pdf`
     pdf.save(pdfFilename)
-
-    console.log('[PDF Export] Successfully exported:', pdfFilename)
   } catch (error) {
     console.error('[PDF Export] Failed:', error)
     throw new Error(`PDF export failed: ${error instanceof Error ? error.message : 'Unknown error'}`)

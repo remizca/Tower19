@@ -14,7 +14,9 @@ export default defineConfig({
         manualChunks: {
           react: ['react', 'react-dom'],
           three: ['three'],
-          r3f: ['@react-three/fiber', '@react-three/csg']
+          r3f: ['@react-three/fiber', '@react-three/csg'],
+          pdf: ['jspdf', 'html2canvas'],
+          dxf: ['dxf-writer']
         }
       }
     }

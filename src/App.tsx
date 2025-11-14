@@ -66,26 +66,18 @@ function ModelRenderer({ recipe, onGeometryReady }: { recipe: PartRecipe | null;
   const geometryRef = useRef<BufferGeometry | null>(null)
 
   if (!recipe) {
-    console.log('[ModelRenderer] no recipe')
     return null
   }
-
-  console.log('[ModelRenderer] recipe:', recipe.name, 'primitives:', recipe.primitives.length, 'ops:', recipe.operations.length)
 
   // Find a base primitive (prefer a box, otherwise first primitive)
   const base = recipe.primitives.find((p) => p.kind === 'box') || recipe.primitives[0]
   if (!base) {
-    console.log('[ModelRenderer] no base primitive')
     return null
   }
-
-  console.log('[ModelRenderer] base:', base.kind, base.id)
 
   // For operations
   const subtractOps = recipe.operations.filter((op) => op.op === 'subtract')
   const unionOps = recipe.operations.filter((op) => op.op === 'union')
-
-  console.log('[ModelRenderer] unions:', unionOps.length, 'subtractions:', subtractOps.length)
 
   return (
     <group position={[0, 0, 0]}>
@@ -312,8 +304,6 @@ function App() {
       setRecipe(next)
       setCsgGeometry(null) // Clear old geometry
       setViewMode('3D') // Switch to 3D to capture new geometry
-      // Debug marker for deployed builds
-      console.log('[generate] seed', nextSeed, 'difficulty', difficulty, 'name', next.name)
     } catch (err) {
       console.error('[generate] failed', err)
     }
