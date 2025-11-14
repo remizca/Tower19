@@ -92,7 +92,7 @@ Environment: Firefox 145 (Win10 x64), local Vite dev.
 ### Fillet
 
 - 5 mm fillets applied across 24 edges: 716 ms
-   - Acceptable for batch operation but heavy for interactive edge-at-a-time filleting.
+  - Acceptable for batch operation but heavy for interactive edge-at-a-time filleting.
 
 ### Mesh Export (Triangulation)
 
@@ -134,9 +134,10 @@ Environment: Firefox 145 (Win10 x64), local Vite dev.
 **Architecture**:
 - `oc-worker.ts` - Worker script initializing OCCT in background thread
 - `oc-worker-client.ts` - Promise-based client wrapper with typed API
-- `worker-demo.html` - Demo page showing instant load capability
+- - `worker-demo.html` - Demo page showing instant load capability
 
 **Performance Results**:
+
 - **Blocking Time**: 0ms (vs 6000ms direct import) ✅
 - **Background Init**: 4.7s (non-blocking, UI responsive)
 - **Page Load**: ~50-100ms (instant UX)
@@ -152,6 +153,7 @@ Environment: Firefox 145 (Win10 x64), local Vite dev.
 | **Web Worker** | **0ms** ✅ | 4.7s | 12-15MB | Full | None | 438ms |
 
 **Why Web Worker Wins**:
+
 - ✅ Superior UX (instant page load vs 2-6s blocking)
 - ✅ Zero maintenance burden (vs ongoing trimmed build management)
 - ✅ Full OCCT features (vs limited custom build)
@@ -159,6 +161,7 @@ Environment: Firefox 145 (Win10 x64), local Vite dev.
 - ✅ Future-proof (no custom build fragility)
 
 **Files**:
+
 - Implementation: `spike/oc-worker.ts`, `spike/oc-worker-client.ts`
 - Demo: `spike/worker-demo.html`
 - Documentation: `spike/README.md` (Web Worker section)
@@ -202,7 +205,7 @@ Goal: Reduce init time (<3s) and compressed bundle (<20MB) by compiling a minima
 
 #### Validation After Trim
 
-**OBSOLETE - Trimmed build rejected in favor of Web Worker architecture**
+**Status**: OBSOLETE - Trimmed build rejected in favor of Web Worker architecture
 
 #### Worker Offload Prototype (Parallel Task)
 
@@ -232,6 +235,7 @@ Goal: Reduce init time (<3s) and compressed bundle (<20MB) by compiling a minima
 ❌ **REJECTED** - Not worth effort given Web Worker superiority
 
 **Rationale**:
+
 - Web Worker provides 0ms blocking (better than 2-3s trimmed target)
 - No maintenance burden (vs ongoing custom build management)
 - Full features preserved (vs limited trimmed functionality)
@@ -242,6 +246,7 @@ Goal: Reduce init time (<3s) and compressed bundle (<20MB) by compiling a minima
 ✅ **GO - Web Worker Architecture Validated**
 
 **Implementation Path**:
+
 1. Create `OpenCascadeBackend` class wrapping worker client
 2. Implement factory methods for primitives, booleans, fillets
 3. Add shape serialization for cross-thread transfer (as needed)
