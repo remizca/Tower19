@@ -3,6 +3,7 @@
 Lightweight web app to procedurally generate 3D practice parts (in millimetres), present an interactive 3D viewer, and produce ISO-compliant 2D CAD drawings (orthographic views + optional sections). The app is intended as a training aid for CAD users who want random part practice to rebuild in Fusion 360, Inventor, SolidWorks, or similar.
 
 Key features
+
 - Procedural 3D models with deterministic seeds and difficulty levels (Beginner / Intermediate / Expert)
 - Interactive 3D inspection (orbit/pan/zoom) using Three.js
 - Generate ISO-style orthographic 2D drawings (Front/Top/Right) in mm, with dimensioning and title block
@@ -11,9 +12,11 @@ Key features
 - Bookmark/save generated parts locally (IndexedDB) and export PDFs/SVGs for practice
 
 Deployment
+
 - Intended to deploy as a static web app (Vercel recommended) so users can access it without installation.
 
 Current Status
+
 - ✅ Project scaffold with React + TypeScript + Three.js + Vite
 - ✅ Interactive 3D viewer with OrbitControls
 - ✅ Local bookmarking with localStorage
@@ -45,6 +48,7 @@ Current Status
 - ⚠️ **Next**: UI integration (2D viewer), export pipeline (PDF/DXF), advanced features
 
 Recent Progress (Nov 11, 2025)
+
 - ✅ **Phase 4 Complete - Section Views**: ISO-compliant section views with dual-mode slicing
   - CSG slicing: Plane-triangle intersection with loop stitching (accurate geometry slicing)
   - Simplified slicing: Rectangular bounds + cylindrical holes (fallback mode)
@@ -59,6 +63,7 @@ Recent Progress (Nov 11, 2025)
   - Test suite validates zero collisions in output
 
 Recent Progress (Nov 8, 2025)
+
 - ✅ **SVG Integration Complete**: Edge extraction now powering SVG renderer
   - Replaced 105-line legacy extractEdges() function
   - SVG generation working with triangulated mesh edges
@@ -81,6 +86,7 @@ Recent Progress (Nov 8, 2025)
   - Ready for CSG integration
 
 Recent Progress (Nov 8, 2025)
+
 - ✅ **Phase 2 Complete - Dimensioning System**: ISO-compliant dimensioning with automatic placement
   - Linear dimensions (horizontal/vertical) with extension lines and arrowheads
   - Radial dimensions (Ø prefix) with center marks and leader lines
@@ -107,6 +113,7 @@ Recent Progress (Nov 8, 2025)
   - Tested with default (1:1), large (1:2), and tiny (5:1) parts
 
 Recent Progress (Nov 11, 2025)
+
 - ✅ **Phase 4 Complete - Section Views with Cutting Planes**: Full SVG integration
   - CSG-based and simplified slicing modes for section view generation
   - Hatch patterns at 45° with 3mm spacing using thin lines
@@ -129,6 +136,7 @@ Recent Progress (Nov 11, 2025)
   - Accurate 2D representation matches 3D model exactly
 
 Recent Progress (Nov 7, 2025)
+
 - ✅ **Ribs and webs features**: Complete structural reinforcement generators (ribs, webs, radial ribs)
 - ✅ **Intermediate difficulty generator implemented**: 4 complex strategies with 5-15 primitives each
 - ✅ **Shared features module**: Reusable helpers for chamfers, fillets, linear/circular patterns, ribs, webs
@@ -144,6 +152,7 @@ Recent Progress (Nov 7, 2025)
 - ✅ **Pattern generators**: Linear and circular hole patterns using position transforms
 
 Known Issues
+
 - Expert difficulty generator not yet implemented
 - Mesh-based CSG limits analytic edge fidelity (no true fillet/chamfer curves yet)
 
