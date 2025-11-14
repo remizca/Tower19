@@ -17,12 +17,14 @@ type WorkerRequest =
   | { id: string; type: 'booleanCut'; params: { resultId: string; baseId: string; toolId: string } }
   | { id: string; type: 'booleanFuse'; params: { resultId: string; shapes: string[] } }
   | { id: string; type: 'fillet'; params: { resultId: string; baseId: string; radius: number } }
-  | { id: string; type: 'triangulate'; params: { shapeId: string; deflection?: number } };
+  | { id: string; type: 'triangulate'; params: { shapeId: string; deflection?: number } }
+  | { id: string; type: 'extractEdges'; params: { shapeId: string; viewDirection: { x: number; y: number; z: number } } };
 
 type WorkerResponse = 
   | { id: string; type: 'init'; success: true; initMs: number }
   | { id: string; type: 'init'; success: false; error: string }
   | { id: string; type: 'triangulate'; success: true; result: { vertices: Float32Array; indices: Uint32Array; normals: Float32Array } }
+  | { id: string; type: 'extractEdges'; success: true; result: { edges: any[] } }
   | { id: string; success: true; result: any }
   | { id: string; success: false; error: string };
 
@@ -283,6 +285,81 @@ function triangulate(shapeId: string, deflection: number = 0.1) {
   };
 }
 
+// Helper: Extract edges from shape for 2D path generation
+function extractEdges(shapeId: string, viewDirection: { x: number; y: number; z: number }) {
+  const shape = shapeRegistry.get(shapeId);
+  if (!shape) throw new Error(`Shape not found: ${shapeId}`);
+  
+  const edges: any[] = [];
+  const explorer = new oc.TopExp_Explorer_2(shape, oc.TopAbs_ShapeEnum.TopAbs_EDGE, oc.TopAbs_ShapeEnum.TopAbs_SHAPE);
+  
+  while (explorer.More()) {
+    const edge = oc.TopoDS.Edge_1(explorer.Current());
+    
+    // Get curve from edge
+    const curve = oc.BRep_Tool.Curve_2(edge, 0, 1);
+    const handle = curve.get();
+    
+    if (!handle || handle.IsNull()) {
+      explorer.Next();
+      continue;
+    }
+    
+    // Get first and last parameters
+    const first = { current: 0 };
+    const last = { current: 0 };
+    const adaptorCurve = oc.BRep_Tool.Curve_2(edge, first, last);
+    
+    // Get start and end points
+    const startPnt = new oc.gp_Pnt_1();
+    const endPnt = new oc.gp_Pnt_1();
+    adaptorCurve.get().D0(first.current, startPnt);
+    adaptorCurve.get().D0(last.current, endPnt);
+    
+    const edgeData: any = {
+      start: { x: startPnt.X(), y: startPnt.Y(), z: startPnt.Z() },
+      end: { x: endPnt.X(), y: endPnt.Y(), z: endPnt.Z() },
+      visible: true
+    };
+    
+    // Determine edge type
+    const curveType = handle.DynamicType().Name();
+    
+    if (curveType.includes('Geom_Line')) {
+      edgeData.type = 'line';
+    } else if (curveType.includes('Geom_Circle')) {
+      edgeData.type = 'arc';
+      const circle = oc.Handle_Geom_Circle.DownCast(curve).get();
+      const center = circle.Location();
+      edgeData.center = { x: center.X(), y: center.Y(), z: center.Z() };
+      edgeData.radius = circle.Radius();
+      
+      // Calculate angles
+      const ax = circle.Axis();
+      const xAxis = circle.XAxis();
+      edgeData.startAngle = 0; // TODO: Calculate actual angles
+      edgeData.endAngle = Math.PI; // TODO: Calculate actual angles
+    } else if (curveType.includes('Geom_BSplineCurve')) {
+      edgeData.type = 'spline';
+      const spline = oc.Handle_Geom_BSplineCurve.DownCast(curve).get();
+      const controlPoints = [];
+      for (let i = 1; i <= spline.NbPoles(); i++) {
+        const pole = spline.Pole(i);
+        controlPoints.push({ x: pole.X(), y: pole.Y(), z: pole.Z() });
+      }
+      edgeData.controlPoints = controlPoints;
+    } else {
+      // Default to line for unknown types
+      edgeData.type = 'line';
+    }
+    
+    edges.push(edgeData);
+    explorer.Next();
+  }
+  
+  return { edges };
+}
+
 // Message handler
 self.onmessage = async (e: MessageEvent<WorkerRequest>) => {
   const req = e.data;
@@ -387,6 +464,13 @@ self.onmessage = async (e: MessageEvent<WorkerRequest>) => {
           result: { vertices, indices, normals }
         };
         (self as any).postMessage(response, [vertices.buffer, indices.buffer, normals.buffer]);
+        break;
+      }
+      
+      case 'extractEdges': {
+        const { shapeId, viewDirection } = req.params;
+        const result = extractEdges(shapeId, viewDirection);
+        self.postMessage({ id: req.id, type: 'extractEdges', success: true, result });
         break;
       }
       

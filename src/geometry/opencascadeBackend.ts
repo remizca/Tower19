@@ -224,14 +224,25 @@ export class OpenCascadeBackend implements GeometryBackend {
   }
 
   async extractAnalyticEdges(
-    _geometry: GeometryResult,
-    _viewDirection: Vector3
+    geometry: GeometryResult,
+    viewDirection: Vector3
   ): Promise<AnalyticEdge[]> {
     this.ensureInitialized();
     
-    // TODO: Implement analytic edge extraction from OCCT topology
-    // Would need to export edges from worker with curve information
-    throw new Error('Analytic edge extraction not yet implemented');
+    const topology = geometry.topology as { shapeId?: string } | undefined;
+    const shapeId = topology?.shapeId;
+    if (!shapeId) {
+      throw new Error('Geometry missing shape topology information');
+    }
+    
+    // Extract edges from worker
+    const edges = await this.client.extractEdges(shapeId, {
+      x: viewDirection.x,
+      y: viewDirection.y,
+      z: viewDirection.z
+    });
+    
+    return edges;
   }
 
   async applyTransform(

@@ -192,6 +192,14 @@ export class OpenCascadeWorkerClient {
   }
   
   /**
+   * Extract analytic edges from shape for 2D path generation
+   */
+  async extractEdges(shapeId: string, viewDirection: { x: number; y: number; z: number }): Promise<any[]> {
+    const response: any = await this.executeOperation('extractEdges', { shapeId, viewDirection });
+    return response.result.edges;
+  }
+  
+  /**
    * Terminate the worker
    */
   terminate(): void {
