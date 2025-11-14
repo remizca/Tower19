@@ -15,11 +15,11 @@ This roadmap defines the phased implementation approach for the 2D Drawing Engin
 **Completion Date**: November 8, 2025
 
 ### Completed Features
-- [x] Basic SVG generation
-- [x] Orthographic projection (front, top, right views)
-- [x] Edge extraction from 3D geometry
-- [x] Visible/hidden line classification
-- [x] Simple title block with essential fields
+- ✅ Basic SVG generation
+- ✅ Orthographic projectionfront, top, right views)
+- ✅ Edge extraction from 3D geometry
+- ✅ Visible/hidden line classification
+- ✅ Simple title block with essential fields
 
 ### Implementation Details
 - Created `src/drawing/edges.ts` (410 lines) with mesh-based edge extraction
@@ -43,12 +43,12 @@ This roadmap defines the phased implementation approach for the 2D Drawing Engin
 **Completion Date**: November 8, 2025
 
 ### Completed Features
-- [x] Linear dimension generation (horizontal, vertical, aligned)
-- [x] Radial dimension generation (R, Ø)
-- [x] Dimension placement algorithm
-- [x] Automatic bounding box dimensions
-- [x] Cylinder feature detection and diameter dimensions
-- [x] Text formatting per ISO 3098-2
+- ✅ Linear dimension generation (horizontal, vertical, aligned)
+- ✅ Radial dimension generation (R, Ø)
+- ✅ Dimension placement algorithm
+- ✅ Automatic bounding box dimensions
+- ✅ Cylinder feature detection and diameter dimensions
+- ✅ Text formatting per ISO 3098-2
 
 ### Implementation Details
 - Created `src/drawing/dimensions.ts` (600+ lines) - core logic
@@ -264,16 +264,16 @@ This roadmap defines the phased implementation approach for the 2D Drawing Engin
 ## Success Criteria
 
 ### Phase 1 ✅
-- [x] Generate SVG with 3 orthographic views
-- [x] Classify visible/hidden edges correctly
-- [x] Include basic title block
-- [x] Test with multiple fixture types
+- ✅ Generate SVG with 3 orthographic views
+- ✅ Classify visible/hidden edges correctly
+- ✅ Include basic title block
+- ✅ Test with multiple fixture types
 
 ### Phase 2 ✅
-- [x] Generate bounding box dimensions
-- [x] Detect and dimension cylindrical features
-- [x] Proper ISO formatting (no trailing zeros)
-- [x] Extension lines, arrowheads, text per ISO 129-1
+- ✅ Generate bounding box dimensions
+- ✅ Detect and dimension cylindrical features
+- ✅ Proper ISO formatting (no trailing zeros)
+- ✅ Extension lines, arrowheads, text per ISO 129-1
 
 ### Phase 3 (Pending)
 - [ ] Proper line weights throughout drawing

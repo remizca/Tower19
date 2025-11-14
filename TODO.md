@@ -2,46 +2,46 @@
 
 ## Core Features
 
-- [x] Draft app outline & feature suggestions
+- ✅ Draft app outline & feature suggestions
   - Produce a detailed outline of the app's features, UI flows, data model, ISO-compliant 2D drawing approach, difficulty levels, timer/bookmark/export behavior, and a prioritized roadmap.
-- [x] Setup deployment pipeline
+- ✅ Setup deployment pipeline
   - ✅ GitHub + Vercel configured and working
   - ✅ Build optimizations: manual chunk splitting for react/three/r3f
   - ✅ Fixed Vercel build errors (Ajv import resolved, outputDirectory configured)
   - ✅ 3D viewer renders correctly in production
-- [x] Design core data model
+- ✅ Design core data model
   - Define JSON schema for generated parts (primitives, operations, parameters, units mm, seed, difficulty, name, function, timestamps).
 
 ## 3D Model Generation (Priority: High)
 
-- [x] Expand procedural generator for shape variety
+- ✅ Expand procedural generator for shape variety
   - **Status**: ✅ Complete - Now generates 6 different part types
   - **Implemented**: Block-with-holes, L-bracket, T-bracket, Cylinder-with-cutouts, Stacked-blocks, Corner-bracket
   - **Beginner**: Simple combinations (2-4 primitives, basic subtractions and unions)
   - **Next**: Intermediate and Expert difficulty levels
   - **Details**: See `docs/progress/generator-variety.md`
-- [x] Implement CSG boolean operations
+- ✅ Implement CSG boolean operations
   - ✅ @react-three/csg working for subtraction and union operations
   - ✅ Fixed CSG Geometry structure (removed group wrappers that broke rendering)
   - ✅ Supports box, cylinder, sphere, cone, torus primitives
-- [x] Create diverse test fixtures
+- ✅ Create diverse test fixtures
   - ✅ L-shapes (`tests/fixtures/l-bracket.ts`)
   - ✅ T-shapes (`tests/fixtures/t-bracket.ts`)
   - ✅ Cylinder with cutouts (`tests/fixtures/cylinder-cutout.ts`)
   - ✅ Block with holes (`tests/fixtures/block-hole.ts`)
-- [x] Add more primitive types to generators
+- ✅ Add more primitive types to generators
   - ✅ Implemented sphere, cone (frustum), and torus primitives in generator
   - ✅ Updated 3D renderer to support subtraction/union with these primitives
   - ✅ Applied transforms for operation tools (position + axis-based rotation) in CSG renderer
   - ✅ Full rotation (rx, ry, rz) and scale support implemented in recipes and renderer
   - ✅ Added 'Block with Angled Holes' strategy demonstrating rotation transforms
-- [x] Implement feature generators
+- ✅ Implement feature generators
   - ✅ Patterns: linear array (3-5 holes along axis) and circular pattern (4-8 holes around cylinder)
   - ✅ Fillets and chamfers (added beginner strategies: Block with Chamfered Edges, Block with Edge Fillets)
   - ✅ Created shared features.ts module with reusable helpers for chamfers, fillets, linear/circular patterns
   - ✅ Ribs and webs (added beginner strategies: Block with Support Ribs, Bracket with Web Reinforcement)
   - ✅ Extended features.ts with generateRibFeatures(), generateWebFeatures(), generateRadialRibFeatures()
-- [x] Create intermediate difficulty generator
+- ✅ Create intermediate difficulty generator
   - ✅ 5-8 primitives per part
   - ✅ More complex boolean combinations (unions + subtractions)
   - ✅ Patterns and symmetry (circular, linear, mirror)
@@ -50,7 +50,7 @@
 
 ## 2D Drawing Engine (Priority: Medium)
 
-- [x] Specify 2D drawing engine & ISO conventions
+- ✅ Specify 2D drawing engine & ISO conventions
   - ✅ Created comprehensive specification: `docs/specs/iso-drawing-standards.md`
   - ✅ Documented ISO first-angle projection system (ISO 5456-2)
   - ✅ Line types and weights per ISO 128-24 (thick/thin, solid/dashed/chain)
@@ -61,7 +61,7 @@
   - ✅ View selection and arrangement strategies
   - ✅ Implementation roadmap with 5 phases
   - **Reference**: All standards documented with SVG implementation examples
-- [x] Implement SVG projection and rendering (PHASE 1 COMPLETE)
+- ✅ Implement SVG projection and rendering (PHASE 1 COMPLETE)
   - **Status**: ✅ Edge extraction and basic SVG generation complete
   - **Progress**: 
     - ✅ Created `src/drawing/edges.ts` with mesh-based edge extraction (410 lines)
@@ -83,7 +83,7 @@
     - Ray-casting visibility in projectEdges() (requires mesh access)
     - CSG mesh integration for accurate post-boolean edge visibility
     - Edge simplification/consolidation for cleaner drawings
-- [x] Add dimensions and annotations (PHASE 2 COMPLETE)
+- ✅ Add dimensions and annotations (PHASE 2 COMPLETE)
   - **Status**: ✅ ISO-compliant dimensioning system implemented
   - **Progress**:
     - ✅ Created `src/drawing/dimensions.ts` (600+ lines) - core logic module
@@ -114,30 +114,30 @@
     - Hole callouts (counterbores, countersinks)
     - Feature detection: slots, pockets, bosses
     - Dimension stacking for multiple parallel dimensions
-- [x] Implement section views (Phase 4 - COMPLETE Nov 11, 2025)
-  - [x] 2D-24: Section plane selection and cutting algorithm
-  - [x] 2D-25: Contour extraction (dual mode: CSG intersection + simplified fallback)
-  - [x] 2D-26: Hatch pattern rendering (45° lines, 3mm spacing per ISO 128-50)
-  - [x] 2D-27: CSG slicing with plane-mesh intersection and loop stitching
-  - [x] 2D-28: SVG integration with layout and cutting plane indicators
-- [x] Implement line weight system (Phase 3.1)
+- ✅ Implement section views (Phase 4 - COMPLETE Nov 11, 2025)
+  - ✅ 2D-24: Section plane selectionnd cutting algorithm
+  - ✅ 2D-25: Contour extraction (dual mode: CSG intersection + simplified fallback)
+  - ✅ 2D-26: Hatch pattern rendering (45° lines, 3mm spacing per ISO 128-50)
+  - ✅ 2D-27: CSG slicing with plane-mesh intersection and loop stitching
+  - ✅ 2D-28: SVG integration with layout and cutting plane indicators
+- ✅ Implement line weight system
   - ✅ Add thick (0.7mm) and thin (0.35mm) line weights per ISO 128-24
   - ✅ Created LineType enum with 8 ISO-compliant line types
   - ✅ Outlines use thick lines, dimensions/hatching/center lines use thin lines
-- [x] Implement center lines for cylindrical features (Phase 3.2)
+- ✅ Implement center lines for cylindrical features (Phase 3.2)
   - ✅ Add crossed chain lines (8,2,2,2 dasharray) showing axes of cylinders and cones
   - ✅ Extend beyond feature boundaries per ISO 128-24
   - ✅ Detect cylindrical primitives from recipe, calculate axis positions/orientations
   - ✅ Render chain lines with LineType.CENTER_LINE
   - ✅ Tested with block-hole fixture
-- [x] Implement scale selection algorithm (Phase 3.3)
+- ✅ Implement scale selection algorithm (Phase 3.3)
   - ✅ Automatically select standard scale (1:1, 1:2, 2:1, 1:5, 5:1, etc.)
   - ✅ Fit drawing within page margins using ISO 5455 scales
   - ✅ Compute usable page area, estimate view extents from bounding box
   - ✅ Pick largest standard scale that fits all views
   - ✅ Set view offsets to center in slots, update title block label
   - ✅ Tested with default, large, and tiny parts
-- [x] Implement dimension collision detection (Phase 3.4 - 2D-23)
+- ✅ Implement dimension collision detection (Phase 3.4 - 2D-23)
   - ✅ Detect overlapping dimension text and extension lines
   - ✅ Use priority-based relocation algorithm to prevent collisions
   - ✅ View-aware collision detection (only within same view)
@@ -168,7 +168,7 @@
   - [ ] Offline support / service worker
 - [ ] Scoring and timer implementation
   - Implement client-side timer, local records storage, prepare for optional cloud features later.
-- [x] MVP implementation
+- ✅ MVP implementation
   - ✅ Static web app with React + Three.js + Vite
   - ✅ Fully client-side, deployed to Vercel
   - ✅ Random 3D part generation working
@@ -178,5 +178,5 @@
 
 ## Infrastructure
 
-- [x] Add `tsconfig.node.json` for project reference
+- ✅ Add `tsconfig.node.json` for project reference
   - Create the node-specific tsconfig file so `tsconfig.json` project reference resolves (fix missing reference error).

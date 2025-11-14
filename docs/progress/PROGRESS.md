@@ -3,19 +3,19 @@
 This document tracks detailed implementation progress and technical decisions for each major feature area. While TODO.md shows high-level task status, this document captures the specifics of what has been implemented.
 
 ## Core Data Model ✓
-- [x] Defined PartRecipe type system in TypeScript
-- [x] Created JSON schema for validation
-- [x] Added Ajv validation helpers
-- [x] Implemented migration from legacy BeginnerRecipe format
-- [x] Added TypeScript strict checks
+- ✅ Defined PartRecipe type system in TypeScript
+- ✅ Created JSON schema for validation
+- ✅ Added Ajv validation helpers
+- ✅ Implemented migration from legacy BeginnerRecipe format
+- ✅ Added TypeScript strict checks
 
 ## 3D Generator Algorithms ✓
-- [x] Specified difficulty-based generation rules
-- [x] Documented heuristics for part complexity
-- [x] Listed required Three.js + CSG libraries
-- [x] Defined primitive generation approach
-- [x] Specified boolean operation rules
-- [x] **NEW (Nov 7, 2025)**: Implemented varied part generation strategies
+- ✅ Specified difficulty-based generation rules
+- ✅ Documented heuristics for part complexity
+- ✅ Listed required Three.js + CSG libraries
+- ✅ Defined primitive generation approach
+- ✅ Specified boolean operation rules
+- ✅ **NEW (Nov 7, 2025)**: Implemented varied part generation strategies
   - 6 different part types for beginner level
   - Deterministic variety using seed-based RNG
   - Test fixtures created for L-bracket, T-bracket, cylinder-cutout
@@ -23,26 +23,26 @@ This document tracks detailed implementation progress and technical decisions fo
   - Details: `docs/progress/generator-variety.md`
 
 ## CSG Implementation ✓
-- [x] Integrated @react-three/csg library
-- [x] Implemented boolean subtraction for holes
-- [x] Verified correct rendering in R3F
-- [x] Added type definitions for CSG operations
+- ✅ Integrated @react-three/csg library
+- ✅ Implemented boolean subtraction for holes
+- ✅ Verified correct rendering in R3F
+- ✅ Added type definitions for CSG operations
 
 ## UI/UX and Interactions ✅ COMPLETE (2D Viewer - Nov 11, 2025)
-- [x] Orbit controls (3D viewer)
-- [x] Pan controls (3D viewer)
-- [x] Zoom controls (3D viewer)
-- [x] View mode switcher (3D/2D tabs) (UI-02 - Nov 11, 2025)
-- [x] 2D Drawing Viewer component (UI-01 - Nov 11, 2025)
+- ✅ Orbit controls (3D viewer)
+- ✅ Pan controls (3D viewer)
+- ✅ Zoom controls (3D viewer)
+- ✅ View mode switcher (3D/2D tabs) (UI-02 - Nov 11, 2025)
+- ✅ 2D Drawing Viewer component (UI-01 - Nov 11, 2025)
   - Interactive pan/zoom controls for 2D drawings
   - Download SVG functionality
   - Part information overlay
   - Zoom percentage display
-- [x] Timer integration (UI-03 - Nov 11, 2025)
+- ✅ Timer integration (UI-03 - Nov 11, 2025)
   - Automatic timer start when viewing 2D drawings
   - Real-time display in MM:SS format
-- [x] Save/bookmark functionality
-- [x] Difficulty selector (Beginner/Intermediate)
+- ✅ Save/bookmark functionality
+- ✅ Difficulty selector (Beginner/Intermediate)
 - [ ] View presets (quick front/top/right views)
 - [ ] Export options (PDF/DXF/STP)
 
@@ -58,36 +58,36 @@ A centralized, actionable checklist for the 2D drawing engine lives here. Subtas
 
 **Overall Status**: Phase 4 Complete ✅ (Nov 11, 2025)
 
-- [x] ISO standard compliance (references added)
-- [x] Projection system documented (first-angle)
-- [x] Dimensioning rules (heuristics drafted)
-- [x] Line types (weights & patterns documented)
-- [x] Title block generation (template drafted)
-- [x] **Phase 1: Basic Projection & Rendering** (COMPLETE - Nov 7, 2025)
-- [x] **Phase 2: Dimensioning System** (COMPLETE - Nov 8, 2025)
-- [x] **Phase 3: Enhanced Drawing Features** (COMPLETE - Nov 8–11, 2025)
-- [x] **Phase 4: Section Views** (COMPLETE - Nov 11, 2025)
+- ✅ ISO standard compliance (references added)
+- ✅ Projection system documented (first-angle)
+- ✅ Dimensioning rules (heuristics drafted)
+- ✅ Line types (weights & patterns documented)
+- ✅ Title block generation (template drafted)
+- ✅ **Phase 1: Basic Projection & Rendering** (COMPLETE - Nov 7, 2025)
+- ✅ **Phase 2: Dimensioning System** (COMPLETE - Nov 8, 2025)
+- ✅ **Phase 3: Enhanced Drawing Features** (COMPLETE - Nov 8–11, 2025)
+- ✅ **Phase 4: Section Views** (COMPLETE - Nov 11, 2025)
 
 Detailed sub-tasks (tree):
 
 1. **Phase 1: Basic Projection & Rendering** ✅ COMPLETE (Nov 7, 2025)
-   - [x] Edge extraction from primitives (src/drawing/edges.ts - 410 lines)
-   - [x] Sharp edge detection (30° angle threshold)
-   - [x] Silhouette edge detection for view-dependent visibility
-   - [x] Orthographic projection (front/top/right views)
-   - [x] Visible/hidden line classification
-   - [x] SVG rendering with proper styling (solid/dashed lines)
-   - [x] Test suite validation (60-100 edges per view)
+   - ✅ Edge extraction from primitives (src/drawing/edges.ts - 410 lines)
+   - ✅ Sharp edge detection (30° angle threshold)
+   - ✅ Silhouette edge detection for view-dependent visibility
+   - ✅ Orthographic projection (front/top/right views)
+   - ✅ Visible/hidden line classification
+   - ✅ SVG rendering with proper styling (solid/dashed lines)
+   - ✅ Test suite validation (60-100 edges per view)
 
 2. **Phase 2: Dimensioning System** ✅ COMPLETE (Nov 8, 2025)
-   - [x] Core dimension types (Linear, Radial, Angular)
-   - [x] Bounding box dimensions (6 total across 3 views)
-   - [x] Feature dimensions (cylinder diameters with Ø prefix)
-   - [x] Automatic placement per ISO 129-1 (8mm offset, 6mm spacing)
-   - [x] Extension lines with gaps (2mm) and overhangs (3mm)
-   - [x] Arrowheads (filled polygons, 3mm×1mm, 3:1 ratio)
-   - [x] Dimension text formatting (Arial 3.5mm, no trailing zeros)
-   - [x] Center marks for radial features (crossed chain lines)
+   - ✅ Core dimension types (Linear, Radial, Angular)
+   - ✅ Bounding box dimensions (6 total across 3 views)
+   - ✅ Feature dimensions (cylinder diameters with Ø prefix)
+   - ✅ Automatic placement per ISO 129-1 (8mm offset, 6mm spacing)
+   - ✅ Extension lines with gaps (2mm) and overhangs (3mm)
+   - ✅ Arrowheads (filled polygons, 3mm×1mm, 3:1 ratio)
+   - ✅ Dimension text formatting (Arial 3.5mm, no trailing zeros)
+   - ✅ Center marks for radial features (crossed chain lines)
    - [x] SVG integration and rendering (src/drawing/dimensionsSVG.ts - 350 lines)
    - [x] Test validation (7 dimensions in block-hole.svg)
 
@@ -247,8 +247,8 @@ Files changed:
 - [ ] Offline capability testing
 
 ## Development Infrastructure ✓
-- [x] GitHub repository setup
-- [x] Vercel deployment configuration
-- [x] Build process optimization
-- [x] TypeScript project references
-- [x] Static deployment verification
+- ✅ GitHub repository setup
+- ✅ Vercel deployment configuration
+- ✅ Build process optimization
+- ✅ TypeScript project references
+- ✅ Static deployment verification
