@@ -83,7 +83,7 @@
   - Identified `opencascade.js` v1.1.1 (64MB unpacked; init currently 6.2–8.8s; exceeds <2s target)
   - Alternatives: JSCAD (2MB), verb.js (500KB) recorded
 - ✅ WASM spike: OpenCascade baseline evaluation
-  - Spike branch + HTML harness (`spike/opencascade-test.html`)
+  - Spike branch + HTML harness (`spike/worker-demo.html`)
   - Init time measured (6.2–8.8s) → FAIL threshold
   - Box primitive: 2ms; Cylinder: ~3–4ms after overload fix → PASS
   - Fillet (24 edges, 5mm): 716ms → BORDERLINE (needs async/offload)

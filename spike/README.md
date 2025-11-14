@@ -6,7 +6,7 @@
 
 ## Test Harness
 
-`opencascade-test.html` - Standalone browser test measuring:
+`worker-demo.html` - Standalone browser test measuring:
 - WASM module load time
 - OpenCascade initialization time
 - Primitive creation performance (box, cylinder)
@@ -22,12 +22,12 @@ npx vite spike --open
 ```
 
 ### Option 2: Direct file open
-Open `spike/opencascade-test.html` in Chrome/Edge (may have CORS issues)
+Open `spike/worker-demo.html` in Chrome/Edge (may have CORS issues)
 
 ### Option 3: Python HTTP server
 ```powershell
 python -m http.server 8080
-# Navigate to http://localhost:8080/spike/opencascade-test.html
+# Navigate to http://localhost:8080/spike/worker-demo.html
 ```
 
 ## Decision Criteria
