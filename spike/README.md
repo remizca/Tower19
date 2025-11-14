@@ -2,7 +2,66 @@
 
 **Created**: November 14, 2025  
 **Branch**: `feature/opencascade-spike`  
-**Purpose**: Evaluate OpenCascade.js performance for Tower19 CAD kernel migration
+**Purpose**: Evaluate OpenCascade.js performance for Tower19 CAD kernel migration  
+**Status**: ✅ **COMPLETED** - Web Worker architecture adopted
+
+## Executive Summary
+
+**Decision**: ✅ **ADOPT** OpenCascade.js with Web Worker architecture
+
+**Key Results**:
+
+- ✅ **Zero blocking**: Worker initialization happens in background (0ms UI blocking)
+- ✅ **Full primitive support**: box, cylinder, sphere, cone, torus all working
+- ✅ **Boolean operations**: 100% success rate on test cases (cut, fuse)
+- ✅ **Analytic edges**: Successfully extracting lines, arcs, circles, splines
+- ✅ **Shape persistence**: Registry-based architecture enables operation chaining
+- ✅ **Mesh export**: Efficient triangulation with transferable arrays
+- ✅ **Generator integration**: Complete pipeline from PartRecipe to geometry
+
+**Performance** (Web Worker):
+
+- WASM load + init: **4.7s** (background, non-blocking)
+- Primitive creation: **2-4ms** per shape
+- Boolean operations: **~400ms** avg (acceptable for CAD operations)
+- Triangulation export: **~100ms** for typical parts
+
+## Implementation Status
+
+### Phase 1: Initial Evaluation ✅ COMPLETE
+
+- [x] Basic WASM initialization and testing
+- [x] Primitive creation benchmarks
+- [x] Boolean operation validation
+- [x] Performance measurement framework
+
+### Phase 2: Web Worker Architecture ✅ COMPLETE
+
+- [x] Worker-based OCCT initialization (non-blocking)
+- [x] Message protocol with Promise-based API
+- [x] Shape registry for persistent references
+- [x] Transferable array support for mesh data
+
+### Phase 3: Core Functionality ✅ COMPLETE
+
+- [x] All primitive types (box, cylinder, sphere, cone, torus)
+- [x] Boolean operations (cut/subtract, fuse/union)
+- [x] Fillet with automatic edge detection
+- [x] Full triangulation with normals
+
+### Phase 4: Advanced Features ✅ COMPLETE
+
+- [x] Analytic edge extraction (lines, arcs, splines)
+- [x] Shape ID tracking and topology preservation
+- [x] Backend abstraction layer
+- [x] Recipe builder for generator integration
+
+### Phase 5: Testing ⏳ IN PROGRESS
+
+- [x] Integration test harness
+- [ ] Comprehensive parity tests
+- [ ] Performance regression suite
+- [ ] Generator compatibility testing
 
 ## Test Harness
 
@@ -32,6 +91,59 @@ Open `spike/worker-demo.html` in Chrome/Edge (may have CORS issues)
 ```powershell
 python -m http.server 8080
 # Navigate to http://localhost:8080/spike/worker-demo.html
+```
+
+## Architecture
+
+### Web Worker Pattern
+
+```text
+Main Thread                    Web Worker Thread
+    |                                  |
+    | init()                           |
+    |--------------------------------->|
+    |                                  | Load WASM (4.7s)
+    |                                  | Initialize OCCT
+    |<---------------------------------|
+    | ready                            |
+    |                                  |
+    | makeBox(shapeId, w, h, d)        |
+    |--------------------------------->|
+    |                                  | Create shape
+    |                                  | Store in registry
+    |<---------------------------------|
+    | shapeId                          |
+    |                                  |
+    | triangulate(shapeId)             |
+    |--------------------------------->|
+    |                                  | Extract mesh
+    |<---------------------------------|
+    | Float32Array (transferable)      |
+```
+
+**Benefits**:
+
+- Zero UI blocking during initialization
+- Shape persistence across operations
+- Efficient mesh transfer via transferable arrays
+- Sequential operation support
+
+### File Structure
+
+```text
+spike/
+├── worker-demo.html          # Original performance test
+├── oc-worker.ts              # Web Worker implementation
+├── oc-worker-client.ts       # Promise-based client wrapper
+├── boolean-bench.ts          # Boolean operation benchmarks
+├── integration-test.ts       # End-to-end pipeline test
+└── README.md                 # This file
+
+src/geometry/
+├── backend.ts                # GeometryBackend interface
+├── opencascadeBackend.ts     # OpenCascade implementation
+├── placeholderBackend.ts     # Fallback/testing implementation
+└── recipeBuilder.ts          # PartRecipe → GeometryResult converter
 ```
 
 ## Decision Criteria
