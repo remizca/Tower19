@@ -18,12 +18,14 @@ This checklist defines the testing approach for the procedural part generation s
 **Goal**: Verify that fixed seeds produce consistent, expected outputs
 
 **Approach**:
+
 - Create fixture files with known seeds
 - Generate parts from fixtures
 - Assert specific properties (primitive counts, dimensions, operations)
 - Use snapshot testing for recipe JSON
 
 **Status**: ✅ Implemented
+
 - Created fixtures in `tests/fixtures/`:
   - `block-hole.ts` - Simple block with holes
   - `l-bracket.ts` - L-shaped bracket
@@ -32,7 +34,8 @@ This checklist defines the testing approach for the procedural part generation s
 - Verification test confirms variety: `npm run test:generator`
 
 **Test Files**:
-```
+
+```text
 tests/
   fixtures/
     block-hole.ts          ✅ Created
@@ -45,6 +48,7 @@ tests/
 ```
 
 **Example Test Case**:
+
 ```typescript
 describe('Beginner Generator', () => {
   it('should generate block-hole fixture consistently', () => {
@@ -68,6 +72,7 @@ describe('Beginner Generator', () => {
 **Properties to Test**:
 
 #### Geometric Invariants
+
 - [ ] No negative dimensions (width, height, depth > 0)
 - [ ] Minimum wall thickness maintained (>= 1mm)
 - [ ] Bounding box contains all primitive positions
@@ -75,6 +80,7 @@ describe('Beginner Generator', () => {
 - [ ] Pattern spacing prevents overlap
 
 #### Recipe Invariants
+
 - [ ] Valid JSON Schema (passes Ajv validation)
 - [ ] All primitive IDs unique
 - [ ] All operation references valid (target/tool IDs exist)
@@ -82,11 +88,13 @@ describe('Beginner Generator', () => {
 - [ ] At least one base primitive (union/base operation)
 
 #### Difficulty Level Invariants
+
 - [ ] Beginner: 2-4 primitives, 1-3 operations
 - [ ] Intermediate: 5-8 primitives, 4-7 operations
 - [ ] Advanced: 9-15 primitives, 8-14 operations
 
 **Example Property Test**:
+
 ```typescript
 import fc from 'fast-check';
 
@@ -114,6 +122,7 @@ describe('Generator Properties', () => {
 ```
 
 **Testing Library**:
+
 - Use `fast-check` for property-based testing
 - Run with many iterations (1000+ seeds)
 - Shrink failures to minimal reproducible case
@@ -125,6 +134,7 @@ describe('Generator Properties', () => {
 **Goal**: Verify that generated parts render correctly and look reasonable
 
 **Approach**:
+
 - Generate parts from test seeds
 - Render to canvas using Three.js
 - Capture screenshots or GLTF exports
@@ -133,6 +143,7 @@ describe('Generator Properties', () => {
 **Test Cases**:
 
 #### Smoke Tests
+
 - [ ] Generate and render beginner parts (seeds 1-10)
 - [ ] Generate and render intermediate parts (seeds 100-110)
 - [ ] Generate and render advanced parts (seeds 1000-1010)
@@ -140,17 +151,20 @@ describe('Generator Properties', () => {
 - [ ] Verify CSG operations complete successfully
 
 #### Visual Regression Tests
+
 - [ ] Capture canvas screenshots for reference seeds
 - [ ] Store baselines in `tests/visual-baselines/`
 - [ ] Compare new renders against baselines
 - [ ] Flag significant visual differences
 
 #### Export Tests
+
 - [ ] Export to GLTF and verify file validity
 - [ ] Export to SVG drawing and verify structure
 - [ ] Export to STL and verify mesh integrity
 
 **Example Integration Test**:
+
 ```typescript
 describe('Visual Integration', () => {
   it('should render block-hole without errors', async () => {
@@ -183,16 +197,19 @@ describe('Visual Integration', () => {
 ## Test Coverage Goals
 
 ### Minimum Coverage (Phase 1) ✅
+
 - ✅ At least 4 fixture types created
 - ✅ Generator verification test passes
 - [ ] Unit tests for each generator difficulty level
 
 ### Target Coverage (Phase 2) ⏳
+
 - [ ] 80%+ code coverage for generator logic
 - [ ] Property-based tests running with 1000+ iterations
 - [ ] Visual regression baselines for 30+ reference parts
 
 ### Ideal Coverage (Phase 3) 🔮
+
 - [ ] 90%+ code coverage including edge cases
 - [ ] Property-based tests cover all invariants
 - [ ] Visual regression tests integrated into CI/CD
@@ -203,6 +220,7 @@ describe('Visual Integration', () => {
 ## Test Data and Fixtures
 
 ### Existing Fixtures ✅
+
 1. **block-hole.ts** - Simple block with centered hole
    - Seed: 12345
    - Primitives: Box + Cylinder
@@ -228,6 +246,7 @@ describe('Visual Integration', () => {
    - Tests: Subtractive features
 
 ### Needed Fixtures ⏳
+
 - [ ] Block with chamfered edges
 - [ ] Block with filleted edges
 - [ ] Part with radial pattern (bolt holes)
@@ -241,12 +260,14 @@ describe('Visual Integration', () => {
 ## Testing Tools and Libraries
 
 ### Current Stack ✅
+
 - **Vitest**: Test runner
 - **@testing-library/react**: Component testing
 - **Three.js**: 3D rendering
 - **Ajv**: JSON Schema validation
 
 ### Recommended Additions ⏳
+
 - [ ] **fast-check**: Property-based testing
 - [ ] **jest-image-snapshot**: Visual regression
 - [ ] **pixelmatch**: Image comparison
@@ -258,6 +279,7 @@ describe('Visual Integration', () => {
 ## Running Tests
 
 ### Unit Tests
+
 ```bash
 npm run test              # Run all tests
 npm run test:unit         # Unit tests only
@@ -266,11 +288,13 @@ npm run test:coverage     # With coverage report
 ```
 
 ### Generator Verification
+
 ```bash
 npm run test:generator    # Verify generator variety
 ```
 
 ### Visual Tests (Future)
+
 ```bash
 npm run test:visual       # Visual regression tests
 npm run test:visual:update # Update baselines
@@ -281,6 +305,7 @@ npm run test:visual:update # Update baselines
 ## Test Checklist Summary
 
 ### Immediate (Phase 1) ⏳
+
 - ✅ Create test fixtures (4+ types)
 - [ ] Unit tests for beginner generator
 - [ ] Unit tests for intermediate generator
@@ -288,6 +313,7 @@ npm run test:visual:update # Update baselines
 - [ ] Basic rendering smoke tests
 
 ### Short-term (Phase 2) ⏳
+
 - [ ] Property-based tests (geometric invariants)
 - [ ] Property-based tests (recipe invariants)
 - [ ] Property-based tests (difficulty constraints)
@@ -296,6 +322,7 @@ npm run test:visual:update # Update baselines
 - [ ] Performance benchmarks
 
 ### Long-term (Phase 3) 🔮
+
 - [ ] Advanced fixture coverage (10+ types)
 - [ ] Comprehensive property testing (all invariants)
 - [ ] CI/CD integration for visual tests
@@ -307,18 +334,21 @@ npm run test:visual:update # Update baselines
 ## Success Metrics
 
 ### Test Quality
+
 - All tests pass on main branch
 - No flaky tests (consistent results)
 - Fast test execution (<30s for unit tests)
 - Clear failure messages
 
 ### Coverage
+
 - 80%+ code coverage for generator logic
 - 100% coverage for core algorithms
 - All difficulty levels tested
 - All primitive types tested
 
 ### Reliability
+
 - Property tests run 1000+ iterations without failure
 - Visual tests detect regressions
 - Generated parts always validate against schema
@@ -335,6 +365,7 @@ npm run test:visual:update # Update baselines
 ---
 
 **Related Documents**:
+
 - `docs/generators/algorithms.md` - Generator algorithms
 - `docs/progress/generator-variety.md` - Implementation details
 - `TODO.md` - Active task list

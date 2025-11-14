@@ -1,5 +1,5 @@
 // Boolean benchmark logic extracted to avoid Vite import-analysis errors on inline scripts
-import { loadOC } from './oc-init';
+import { getWorkerClient } from './oc-worker-client';
 
 let oc: any;
 let initMs = 0;
@@ -154,9 +154,13 @@ export async function initBenchmark() {
   const runBtn = document.getElementById('runBtn') as HTMLButtonElement;
   if (!statusEl || !runBtn) return;
 
-  const loaded = await loadOC();
-  oc = loaded.oc;
-  initMs = loaded.initMs;
+  const client = getWorkerClient();
+  const start = performance.now();
+  await client.init();
+  initMs = performance.now() - start;
+  
+  // Note: Worker client doesn't expose raw OC instance
+  // Boolean operations will use worker methods instead
   statusEl.textContent = 'Ready';
   statusEl.className = 'status ready';
   runBtn.disabled = false;
