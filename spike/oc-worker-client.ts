@@ -3,6 +3,7 @@ export class OpenCascadeWorkerClient {
   private worker: Worker | null = null;
   private initPromise: Promise<number> | null = null;
   private requestId = 0;
+  private shapeIdCounter = 0;
   private pendingRequests = new Map<string, { resolve: (value: any) => void; reject: (error: Error) => void }>();
   
   constructor() {}
@@ -61,7 +62,8 @@ export class OpenCascadeWorkerClient {
             if (pending) {
               this.pendingRequests.delete(msg.id);
               if (msg.success) {
-                pending.resolve(msg.result);
+                // For most operations, resolve with the response itself
+                pending.resolve(msg);
               } else {
                 pending.reject(new Error(msg.error));
               }
@@ -110,35 +112,83 @@ export class OpenCascadeWorkerClient {
    * Create a box primitive
    */
   async makeBox(w: number, h: number, d: number): Promise<string> {
-    return this.executeOperation('makeBox', { w, h, d });
+    const shapeId = this.generateShapeId();
+    await this.executeOperation('makeBox', { shapeId, w, h, d });
+    return shapeId;
   }
   
   /**
    * Create a cylinder primitive
    */
   async makeCylinder(r: number, h: number): Promise<string> {
-    return this.executeOperation('makeCylinder', { r, h });
+    const shapeId = this.generateShapeId();
+    await this.executeOperation('makeCylinder', { shapeId, r, h });
+    return shapeId;
+  }
+  
+  /**
+   * Create a sphere primitive
+   */
+  async makeSphere(radius: number): Promise<string> {
+    const shapeId = this.generateShapeId();
+    await this.executeOperation('makeSphere', { shapeId, radius });
+    return shapeId;
+  }
+  
+  /**
+   * Create a cone primitive
+   */
+  async makeCone(radius1: number, radius2: number, height: number): Promise<string> {
+    const shapeId = this.generateShapeId();
+    await this.executeOperation('makeCone', { shapeId, radius1, radius2, height });
+    return shapeId;
+  }
+  
+  /**
+   * Create a torus primitive
+   */
+  async makeTorus(majorRadius: number, minorRadius: number): Promise<string> {
+    const shapeId = this.generateShapeId();
+    await this.executeOperation('makeTorus', { shapeId, majorRadius, minorRadius });
+    return shapeId;
   }
   
   /**
    * Perform boolean cut operation
    */
-  async booleanCut(baseShape: any, toolShape: any): Promise<string> {
-    return this.executeOperation('booleanCut', { baseShape, toolShape });
+  async booleanCut(baseShapeId: string, toolShapeId: string): Promise<string> {
+    const resultId = this.generateShapeId();
+    await this.executeOperation('booleanCut', { resultId, baseId: baseShapeId, toolId: toolShapeId });
+    return resultId;
   }
   
   /**
-   * Apply fillet to shape
+   * Perform boolean fuse (union) operation
    */
-  async fillet(shape: any, radius: number): Promise<string> {
-    return this.executeOperation('fillet', { shape, radius });
+  async booleanFuse(shapeIds: string[]): Promise<string> {
+    const resultId = this.generateShapeId();
+    await this.executeOperation('booleanFuse', { resultId, shapes: shapeIds });
+    return resultId;
   }
   
   /**
-   * Triangulate shape and get mesh stats
+   * Apply fillet to shape (modifies shape in place)
    */
-  async triangulate(shape: any, deflection: number): Promise<{ vertices: number; triangles: number }> {
-    return this.executeOperation('triangulate', { shape, deflection });
+  async fillet(shapeId: string, radius: number): Promise<{ shapeId: string; edgeCount: number }> {
+    const response: any = await this.executeOperation('fillet', { baseId: shapeId, radius });
+    return { shapeId: response.shapeId, edgeCount: response.edgeCount };
+  }
+  
+  /**
+   * Triangulate shape and get mesh data
+   */
+  async triangulate(shapeId: string, deflection: number = 0.1): Promise<{ 
+    vertices: Float32Array; 
+    indices: Uint32Array; 
+    normals: Float32Array 
+  }> {
+    const response: any = await this.executeOperation('triangulate', { shapeId, deflection });
+    return response.result;
   }
   
   /**
@@ -155,6 +205,10 @@ export class OpenCascadeWorkerClient {
   
   private generateId(): string {
     return `req_${++this.requestId}_${Date.now()}`;
+  }
+  
+  private generateShapeId(): string {
+    return `shape_${++this.shapeIdCounter}_${Date.now()}`;
   }
 }
 

@@ -3,18 +3,26 @@
 let oc: any = null;
 let initPromise: Promise<any> | null = null;
 
+// Shape registry for persistent shape references
+const shapeRegistry = new Map<string, any>();
+
 // Message types for worker communication
 type WorkerRequest = 
   | { id: string; type: 'init' }
-  | { id: string; type: 'makeBox'; params: { w: number; h: number; d: number } }
-  | { id: string; type: 'makeCylinder'; params: { r: number; h: number } }
-  | { id: string; type: 'booleanCut'; params: { baseShape: any; toolShape: any } }
-  | { id: string; type: 'fillet'; params: { shape: any; radius: number } }
-  | { id: string; type: 'triangulate'; params: { shape: any; deflection: number } };
+  | { id: string; type: 'makeBox'; params: { shapeId: string; w: number; h: number; d: number } }
+  | { id: string; type: 'makeCylinder'; params: { shapeId: string; r: number; h: number } }
+  | { id: string; type: 'makeSphere'; params: { shapeId: string; radius: number } }
+  | { id: string; type: 'makeCone'; params: { shapeId: string; radius1: number; radius2: number; height: number } }
+  | { id: string; type: 'makeTorus'; params: { shapeId: string; majorRadius: number; minorRadius: number } }
+  | { id: string; type: 'booleanCut'; params: { resultId: string; baseId: string; toolId: string } }
+  | { id: string; type: 'booleanFuse'; params: { resultId: string; shapes: string[] } }
+  | { id: string; type: 'fillet'; params: { resultId: string; baseId: string; radius: number } }
+  | { id: string; type: 'triangulate'; params: { shapeId: string; deflection?: number } };
 
 type WorkerResponse = 
   | { id: string; type: 'init'; success: true; initMs: number }
   | { id: string; type: 'init'; success: false; error: string }
+  | { id: string; type: 'triangulate'; success: true; result: { vertices: Float32Array; indices: Uint32Array; normals: Float32Array } }
   | { id: string; success: true; result: any }
   | { id: string; success: false; error: string };
 
@@ -71,8 +79,52 @@ function makeCylinder(r: number, h: number) {
   throw new Error('MakeCylinder overloads not found');
 }
 
+// Helper: Make sphere
+function makeSphere(radius: number) {
+  if (oc.BRepPrimAPI_MakeSphere_1) return new oc.BRepPrimAPI_MakeSphere_1(radius);
+  if (oc.BRepPrimAPI_MakeSphere_5) {
+    const center = new oc.gp_Pnt_3(0, 0, 0);
+    return new oc.BRepPrimAPI_MakeSphere_5(center, radius);
+  }
+  throw new Error('MakeSphere overloads not found');
+}
+
+// Helper: Make cone (frustum)
+function makeCone(radius1: number, radius2: number, height: number) {
+  if (oc.BRepPrimAPI_MakeCone_1) return new oc.BRepPrimAPI_MakeCone_1(radius1, radius2, height);
+  if (oc.BRepPrimAPI_MakeCone_2) {
+    const axis = new oc.gp_Ax2_2(
+      new oc.gp_Pnt_3(0, 0, 0),
+      new oc.gp_Dir_4(0, 0, 1),
+      new oc.gp_Dir_4(1, 0, 0)
+    );
+    return new oc.BRepPrimAPI_MakeCone_2(axis, radius1, radius2, height);
+  }
+  throw new Error('MakeCone overloads not found');
+}
+
+// Helper: Make torus
+function makeTorus(majorRadius: number, minorRadius: number) {
+  if (oc.BRepPrimAPI_MakeTorus_1) return new oc.BRepPrimAPI_MakeTorus_1(majorRadius, minorRadius);
+  if (oc.BRepPrimAPI_MakeTorus_2) {
+    const axis = new oc.gp_Ax2_2(
+      new oc.gp_Pnt_3(0, 0, 0),
+      new oc.gp_Dir_4(0, 0, 1),
+      new oc.gp_Dir_4(1, 0, 0)
+    );
+    return new oc.BRepPrimAPI_MakeTorus_2(axis, majorRadius, minorRadius);
+  }
+  throw new Error('MakeTorus overloads not found');
+}
+
 // Helper: Boolean cut operation
-function booleanCut(baseShape: any, toolShape: any) {
+function booleanCut(baseId: string, toolId: string): any {
+  const baseShape = shapeRegistry.get(baseId);
+  const toolShape = shapeRegistry.get(toolId);
+  
+  if (!baseShape) throw new Error(`Base shape not found: ${baseId}`);
+  if (!toolShape) throw new Error(`Tool shape not found: ${toolId}`);
+  
   // Try numbered variants systematically
   const variants = ['BRepAlgoAPI_Cut_1', 'BRepAlgoAPI_Cut_2', 'BRepAlgoAPI_Cut_3', 'BRepAlgoAPI_Cut_4'];
   
@@ -91,8 +143,49 @@ function booleanCut(baseShape: any, toolShape: any) {
   throw new Error('No Cut variant accepted 2 parameters');
 }
 
+// Helper: Boolean fuse (union) operation
+function booleanFuse(shapeIds: string[]): any {
+  if (shapeIds.length < 2) {
+    throw new Error('Fuse requires at least 2 shapes');
+  }
+  
+  const shapes = shapeIds.map(id => {
+    const shape = shapeRegistry.get(id);
+    if (!shape) throw new Error(`Shape not found: ${id}`);
+    return shape;
+  });
+  
+  // Start with first two shapes
+  let result = shapes[0];
+  
+  for (let i = 1; i < shapes.length; i++) {
+    const variants = ['BRepAlgoAPI_Fuse_1', 'BRepAlgoAPI_Fuse_2', 'BRepAlgoAPI_Fuse_3'];
+    
+    let fused = null;
+    for (const variantName of variants) {
+      if (oc[variantName]) {
+        try {
+          const fuse = new oc[variantName](result, shapes[i]);
+          fused = fuse.Shape();
+          break;
+        } catch (e: any) {
+          continue;
+        }
+      }
+    }
+    
+    if (!fused) throw new Error('No Fuse variant succeeded');
+    result = fused;
+  }
+  
+  return result;
+}
+
 // Helper: Fillet operation
-function fillet(shape: any, radius: number) {
+function fillet(baseId: string, radius: number) {
+  const shape = shapeRegistry.get(baseId);
+  if (!shape) throw new Error(`Shape not found: ${baseId}`);
+  
   const filletMaker = new oc.BRepFilletAPI_MakeFillet(shape, oc.ChFi3d_FilletShape.ChFi3d_Rational);
   
   // Add fillet to all edges
@@ -108,28 +201,86 @@ function fillet(shape: any, radius: number) {
   return { shape: filletMaker.Shape(), edgeCount };
 }
 
-// Helper: Triangulate shape and extract mesh
-function triangulate(shape: any, deflection: number) {
+// Helper: Triangulate shape and extract mesh data
+function triangulate(shapeId: string, deflection: number = 0.1) {
+  const shape = shapeRegistry.get(shapeId);
+  if (!shape) throw new Error(`Shape not found: ${shapeId}`);
+  
+  // Triangulate the shape
   new oc.BRepMesh_IncrementalMesh_2(shape, deflection, false, deflection, false);
   
-  let vertexCount = 0;
-  let triangleCount = 0;
+  const vertices: number[] = [];
+  const indices: number[] = [];
+  const normals: number[] = [];
+  let vertexOffset = 0;
   
   const explorer = new oc.TopExp_Explorer_2(shape, oc.TopAbs_ShapeEnum.TopAbs_FACE, oc.TopAbs_ShapeEnum.TopAbs_SHAPE);
+  
   while (explorer.More()) {
     const face = oc.TopoDS.Face_1(explorer.Current());
     const location = new oc.TopLoc_Location_1();
     const triangulation = oc.BRep_Tool.Triangulation(face, location);
     
     if (triangulation && !triangulation.IsNull()) {
-      vertexCount += triangulation.NbNodes();
-      triangleCount += triangulation.NbTriangles();
+      const transformation = location.Transformation();
+      const nodeCount = triangulation.NbNodes();
+      const triangleCount = triangulation.NbTriangles();
+      
+      // Extract vertices
+      for (let i = 1; i <= nodeCount; i++) {
+        const node = triangulation.Node(i);
+        const transformed = node.Transformed(transformation);
+        vertices.push(transformed.X(), transformed.Y(), transformed.Z());
+      }
+      
+      // Extract normals (use face normal for now)
+      const surface = oc.BRep_Tool.Surface_2(face);
+      for (let i = 1; i <= nodeCount; i++) {
+        const node = triangulation.Node(i);
+        const uv = triangulation.UVNode(i);
+        
+        try {
+          const normalCalc = new oc.GeomLProp_SLProps_2(surface, uv.X(), uv.Y(), 1, 0.01);
+          const normal = normalCalc.Normal();
+          
+          // Flip normal if face is reversed
+          if (face.Orientation_1() === oc.TopAbs_Orientation.TopAbs_REVERSED) {
+            normals.push(-normal.X(), -normal.Y(), -normal.Z());
+          } else {
+            normals.push(normal.X(), normal.Y(), normal.Z());
+          }
+        } catch {
+          // Fallback to flat normal if calculation fails
+          normals.push(0, 0, 1);
+        }
+      }
+      
+      // Extract indices
+      for (let i = 1; i <= triangleCount; i++) {
+        const triangle = triangulation.Triangle(i);
+        let i1 = triangle.Value(1) - 1;
+        let i2 = triangle.Value(2) - 1;
+        let i3 = triangle.Value(3) - 1;
+        
+        // Flip winding if face is reversed
+        if (face.Orientation_1() === oc.TopAbs_Orientation.TopAbs_REVERSED) {
+          indices.push(vertexOffset + i1, vertexOffset + i3, vertexOffset + i2);
+        } else {
+          indices.push(vertexOffset + i1, vertexOffset + i2, vertexOffset + i3);
+        }
+      }
+      
+      vertexOffset += nodeCount;
     }
     
     explorer.Next();
   }
   
-  return { vertexCount, triangleCount };
+  return {
+    vertices: new Float32Array(vertices),
+    indices: new Uint32Array(indices),
+    normals: new Float32Array(normals)
+  };
 }
 
 // Message handler
@@ -159,39 +310,83 @@ self.onmessage = async (e: MessageEvent<WorkerRequest>) => {
     
     switch (req.type) {
       case 'makeBox': {
-        const { w, h, d } = req.params;
+        const { shapeId, w, h, d } = req.params;
         const maker = makeBox(w, h, d);
         const shape = maker.Shape();
-        // Note: Can't transfer shape directly, would need serialization for complex use cases
-        // For now, just confirm success
-        self.postMessage({ id: req.id, success: true, result: 'box_created' });
+        shapeRegistry.set(shapeId, shape);
+        self.postMessage({ id: req.id, type: 'makeBox', success: true, shapeId });
         break;
       }
       
       case 'makeCylinder': {
-        const { r, h } = req.params;
+        const { shapeId, r, h } = req.params;
         const maker = makeCylinder(r, h);
         const shape = maker.Shape();
-        self.postMessage({ id: req.id, success: true, result: 'cylinder_created' });
+        shapeRegistry.set(shapeId, shape);
+        self.postMessage({ id: req.id, type: 'makeCylinder', success: true, shapeId });
+        break;
+      }
+      
+      case 'makeSphere': {
+        const { shapeId, radius } = req.params;
+        const shape = makeSphere(radius);
+        shapeRegistry.set(shapeId, shape);
+        self.postMessage({ id: req.id, type: 'makeSphere', success: true, shapeId });
+        break;
+      }
+      
+      case 'makeCone': {
+        const { shapeId, radius1, radius2, height } = req.params;
+        const shape = makeCone(radius1, radius2, height);
+        shapeRegistry.set(shapeId, shape);
+        self.postMessage({ id: req.id, type: 'makeCone', success: true, shapeId });
+        break;
+      }
+      
+      case 'makeTorus': {
+        const { shapeId, majorRadius, minorRadius } = req.params;
+        const shape = makeTorus(majorRadius, minorRadius);
+        shapeRegistry.set(shapeId, shape);
+        self.postMessage({ id: req.id, type: 'makeTorus', success: true, shapeId });
         break;
       }
       
       case 'booleanCut': {
-        // For boolean ops, would need shape serialization
-        // For spike, we'll keep operations in worker and just return metrics
-        self.postMessage({ id: req.id, success: true, result: 'cut_performed' });
+        const { resultId, baseId, toolId } = req.params;
+        const resultShape = booleanCut(baseId, toolId);
+        shapeRegistry.set(resultId, resultShape);
+        self.postMessage({ id: req.id, type: 'booleanCut', success: true, shapeId: resultId });
+        break;
+      }
+      
+      case 'booleanFuse': {
+        const { resultId, shapes } = req.params;
+        const resultShape = booleanFuse(shapes);
+        shapeRegistry.set(resultId, resultShape);
+        self.postMessage({ id: req.id, type: 'booleanFuse', success: true, shapeId: resultId });
         break;
       }
       
       case 'fillet': {
-        // Similar - would need shape transfer
-        self.postMessage({ id: req.id, success: true, result: 'fillet_applied' });
+        const { baseId, radius } = req.params;
+        const { shape: resultShape, edgeCount } = fillet(baseId, radius);
+        shapeRegistry.set(baseId, resultShape); // Replace original shape
+        self.postMessage({ id: req.id, type: 'fillet', success: true, shapeId: baseId, edgeCount });
         break;
       }
       
       case 'triangulate': {
-        // Similar - return mesh data instead of shape
-        self.postMessage({ id: req.id, success: true, result: { vertices: 0, triangles: 0 } });
+        const { shapeId, deflection = 0.1 } = req.params;
+        const { vertices, indices, normals } = triangulate(shapeId, deflection);
+        
+        // Send with transferable arrays for zero-copy transfer
+        const response: WorkerResponse = {
+          id: req.id,
+          type: 'triangulate',
+          success: true,
+          result: { vertices, indices, normals }
+        };
+        (self as any).postMessage(response, [vertices.buffer, indices.buffer, normals.buffer]);
         break;
       }
       
