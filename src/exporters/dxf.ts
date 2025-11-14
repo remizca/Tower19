@@ -10,7 +10,11 @@
 
 import type { PartRecipe } from '../types/part'
 import type { Edge } from '../drawing/edges'
+import { extractGeometryEdges, extractRecipeEdges } from '../drawing/edges'
 import type { Dimension } from '../drawing/dimensions'
+import { generateDimensions, DEFAULT_DIMENSION_CONFIG } from '../drawing/dimensions'
+import type { BufferGeometry, Matrix4 } from 'three'
+import { Matrix4 as ThreeMatrix4, Vector3 as ThreeVec3 } from 'three'
 
 export interface DXFExportOptions {
   /** Part recipe for metadata */
@@ -38,6 +42,78 @@ const DXF_LAYERS = {
   DIMENSIONS: { name: 'DIMENSIONS', color: 6, lineType: 'CONTINUOUS' }, // Magenta, solid
   CENTERLINES: { name: 'CENTERLINES', color: 4, lineType: 'CENTER' },  // Cyan, center
   TEXT: { name: 'TEXT', color: 7, lineType: 'CONTINUOUS' }       // White, solid
+}
+
+type View = 'front' | 'top' | 'right'
+
+interface ViewConfig {
+  matrix: Matrix4
+  name: string
+}
+
+// Minimal view configuration (no offsets; DXF uses direct mm coordinates)
+const VIEW_CONFIGS: Record<View, ViewConfig> = {
+  front: {
+    matrix: new ThreeMatrix4(),
+    name: 'Front View'
+  },
+  top: {
+    matrix: new ThreeMatrix4().makeRotationX(-Math.PI / 2),
+    name: 'Top View'
+  },
+  right: {
+    matrix: new ThreeMatrix4().makeRotationY(Math.PI / 2),
+    name: 'Right View'
+  }
+}
+
+function projectEdgesForView(allEdges: Edge[], view: View): { visible: Edge[]; hidden: Edge[] } {
+  const cfg = VIEW_CONFIGS[view]
+  const visible: Edge[] = []
+  const hidden: Edge[] = []
+
+  allEdges.forEach((edge) => {
+    const v1 = edge.start.clone().applyMatrix4(cfg.matrix) as ThreeVec3
+    const v2 = edge.end.clone().applyMatrix4(cfg.matrix) as ThreeVec3
+
+    // Skip degenerate edges after projection
+    if (Math.abs(v2.x - v1.x) < 0.01 && Math.abs(v2.y - v1.y) < 0.01) {
+      return
+    }
+
+    // Viewer looks along -Z in our convention; more negative Z is closer
+    const p1InFront = v1.z < -0.0001
+    const p2InFront = v2.z < -0.0001
+    const p1Behind = v1.z > 0.0001
+    const p2Behind = v2.z > 0.0001
+
+    // If both endpoints are behind the view plane, skip
+    if (p1Behind && p2Behind) {
+      return
+    }
+
+    // DXF coordinates: keep Y up (no SVG flip)
+    const start = new ThreeVec3(v1.x, v1.y, 0)
+    const end = new ThreeVec3(v2.x, v2.y, 0)
+
+    const classified: Edge = { start, end }
+    if (p1InFront || p2InFront) {
+      visible.push(classified)
+    } else {
+      hidden.push(classified)
+    }
+  })
+
+  return { visible, hidden }
+}
+
+function buildEdgesByView(recipe: PartRecipe, geometry?: BufferGeometry) {
+  const baseEdges = geometry ? extractGeometryEdges(geometry) : extractRecipeEdges(recipe)
+  return {
+    front: projectEdgesForView(baseEdges, 'front'),
+    top: projectEdgesForView(baseEdges, 'top'),
+    right: projectEdgesForView(baseEdges, 'right')
+  }
 }
 
 /**
@@ -379,6 +455,29 @@ export function exportToDXF(options: DXFExportOptions): void {
     console.error('[DXF Export] Failed:', error)
     throw new Error(`DXF export failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
+}
+
+/**
+ * Convenience API: export directly from a recipe and optional CSG geometry.
+ * Builds edges (per view) and dimensions, then writes a DXF file.
+ */
+export function exportToDXFFromRecipe(params: {
+  recipe: PartRecipe
+  geometry?: BufferGeometry | null
+  filename?: string
+  scale?: number
+}): void {
+  const { recipe, geometry, filename, scale = 1 } = params
+  const edges = buildEdgesByView(recipe, geometry ?? undefined)
+  const dimensions = generateDimensions(recipe, DEFAULT_DIMENSION_CONFIG)
+
+  exportToDXF({
+    recipe,
+    edges,
+    dimensions,
+    filename,
+    scale
+  })
 }
 
 /**

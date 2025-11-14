@@ -8,4 +8,4 @@
  */
 
 export { exportToPDF, isPDFExportSupported, type PDFExportOptions } from './pdf'
-export { exportToDXF, isDXFExportSupported, type DXFExportOptions } from './dxf'
+export { exportToDXF, exportToDXFFromRecipe, isDXFExportSupported, type DXFExportOptions } from './dxf'

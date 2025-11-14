@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import type PartRecipe from '../types/part'
 import { generateDrawing } from '../drawing/svg'
 import type { BufferGeometry } from 'three'
-import { exportToPDF, isPDFExportSupported } from '../exporters'
+import { exportToPDF, isPDFExportSupported, exportToDXFFromRecipe, isDXFExportSupported } from '../exporters'
 
 interface DrawingViewerProps {
   recipe: PartRecipe
@@ -123,6 +123,25 @@ export function DrawingViewer({ recipe, geometry, onTimerUpdate }: DrawingViewer
     }
   }
 
+  // Download DXF
+  const handleDownloadDXF = () => {
+    if (!isDXFExportSupported()) {
+      console.error('[DrawingViewer] DXF export not supported')
+      return
+    }
+    try {
+      exportToDXFFromRecipe({
+        recipe,
+        geometry: geometry ?? undefined,
+        filename: `${recipe.name.replace(/\s+/g, '-')}-drawing.dxf`,
+        scale: 1
+      })
+    } catch (error) {
+      console.error('[DrawingViewer] DXF export failed:', error)
+      alert('DXF export failed. Please try again.')
+    }
+  }
+
   // Format time as MM:SS
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -184,6 +203,9 @@ export function DrawingViewer({ recipe, geometry, onTimerUpdate }: DrawingViewer
         </button>
         <button onClick={handleDownloadPDF} style={{ padding: '4px 8px' }}>
           📑 PDF
+        </button>
+        <button onClick={handleDownloadDXF} style={{ padding: '4px 8px' }}>
+          📐 DXF
         </button>
         <span style={{ alignSelf: 'center', opacity: 0.8 }}>
           Zoom: {(scale * 100).toFixed(0)}%
