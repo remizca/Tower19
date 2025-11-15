@@ -7,6 +7,7 @@ This document defines the coding conventions for Tower19. It is tailored to our 
 - Vite build tooling
 
 Goals
+
 - Readable, predictable, and type-safe code
 - Small composable modules, minimal side-effects
 - Deterministic generation (seeded RNG) for reproducibility
@@ -22,12 +23,14 @@ Goals
 - Prefer narrow function signatures. Validate inputs at module boundaries.
 
 ### Naming
+
 - Files: kebab-case or lowerCamel for utilities (e.g., `svg.ts`, `validate.ts`).
 - Types/Interfaces/Enums: PascalCase (e.g., `PartRecipe`, `PrimitiveKind`).
 - Constants: UPPER_SNAKE_CASE when module-level and immutable.
 - Functions/variables: lowerCamelCase.
 
 ### Modules and dependencies
+
 - Keep imports explicit. Avoid deep default exports for shared utilities; prefer named exports.
 - Group related exports in a single index if it improves ergonomics; avoid circular deps.
 
@@ -41,6 +44,7 @@ Goals
 - Avoid prop drilling; consider context only if multiple siblings need shared state.
 
 ### Styling & UI
+
 - Keep inline styles minimal for overlays/tooling. Prefer CSS modules or a light utility when styles grow.
 - Ensure overlay controls have `pointer-events: auto` to remain interactive above the canvas.
 
@@ -99,4 +103,3 @@ Goals
 
 - No network calls or secret usage at runtime. App is fully client-side.
 - Local storage only for bookmarks; plan IndexedDB migration for larger data.
-

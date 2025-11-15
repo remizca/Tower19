@@ -5,13 +5,16 @@ Status: ✅ Complete - Web Worker Solution Validated
 Owner: Geometry Upgrade Initiative
 
 ## Objective
+
 Elevate geometry fidelity beyond mesh + CSG booleans by introducing an analytic / B-Rep kernel that provides:
+
 - Precise surfaces (NURBS / planes / cylinders) for accurate edges in 2D drawings
 - Robust feature operations (fillet, chamfer, shell, draft) with stable topology
 - Parametric feature layer enabling semantic dimensioning and future regeneration
 - Improved DXF export (true arcs, circles, splines, dimension entities) and PDF clarity
 
 ## Candidates (Initial Shortlist)
+
 | Kernel / Option | Type | Pros | Cons | NPM Package | Size |
 |-----------------|------|------|------|-------------|------|
 | OpenCascade WASM | Full B-Rep | Mature, fillets/drafts/shell, boolean robustness, many examples | Large WASM (~8–15MB), complexity, longer init time | `opencascade.js` v1.1.1 | 64MB unpacked |
@@ -23,6 +26,7 @@ Elevate geometry fidelity beyond mesh + CSG booleans by introducing an analytic 
 | Onshape / Cloud APIs | SaaS CAD | Offload compute, robust features | Requires network/API, licensing constraints | N/A | - |
 
 ## Phase Plan
+
 1. Adapter Layer (Low Risk)
    - Define `GeometryBackend` interface (createPrimitive, booleanOp, filletEdge, exportMesh, exportAnalyticEdges).
    - Implement mesh/CSG adapter (current system) as baseline; feature parity harness.
@@ -40,6 +44,7 @@ Elevate geometry fidelity beyond mesh + CSG booleans by introducing an analytic 
    - WASM size trimming (strip unused OCCT modules, compression, code splitting).
 
 ## Evaluation Metrics
+
 - Bundle Impact: Added compressed WASM size vs baseline bundle delta.
 - Init Time: Time to ready state (wasm instantiate + first primitive) on mid-tier laptop.
 - Boolean Robustness: Failure rate on 100 random complex parts compared to mesh CSG.
@@ -50,6 +55,7 @@ Elevate geometry fidelity beyond mesh + CSG booleans by introducing an analytic 
 ## Research Findings (Nov 14, 2025)
 
 ### OpenCascade.js (Primary Candidate)
+
 - **Package**: `opencascade.js` v1.1.1 on npm
 - **Size**: 64MB unpacked (~12-15MB compressed WASM)
 - **API**: Exposes full OCCT C++ API via Emscripten bindings
@@ -58,10 +64,12 @@ Elevate geometry fidelity beyond mesh + CSG booleans by introducing an analytic 
 - **License**: LGPL (OpenCascade) - attribution required
 
 ### Lightweight Alternatives
+
 - **JSCAD** (`@jscad/modeling`): 2MB, pure JS CSG (no B-Rep)
 - **verb.js** (`verb-nurbs-web`): 500KB, NURBS only (no solids/booleans)
 
 ### Decision Criteria
+
 - If bundle size < 20MB compressed + init < 2s → proceed with OpenCascade
 - If bundle size > 20MB or init > 3s → consider hybrid (mesh preview, OCCT export only)
 
@@ -132,6 +140,7 @@ Environment: Firefox 145 (Win10 x64), local Vite dev.
 **Status**: ✅ Complete and validated
 
 **Architecture**:
+
 - `oc-worker.ts` - Worker script initializing OCCT in background thread
 - `oc-worker-client.ts` - Promise-based client wrapper with typed API
 - - `worker-demo.html` - Demo page showing instant load capability
@@ -264,7 +273,7 @@ Proceed with `OpenCascadeBackend` implementation using Web Worker architecture.
 - ❌ Hybrid approach: Not needed - Web Worker provides instant UX with full features
 - ⚠️ Licensing: LGPL (OpenCascade) - attribution required in app
 
-## Immediate Tasks (Updated Nov 14, 2025)
+## Immediate Tasks (Updated Nov 15, 2025)
 
 - ✅ Search for existing CAD kernels in repo (confirmed absence)
 - ✅ Create `GeometryBackend` interface and mesh CSG adapter (baseline) — See `src/geometry/backend.ts`, `src/geometry/meshBackend.ts`
@@ -277,9 +286,16 @@ Proceed with `OpenCascadeBackend` implementation using Web Worker architecture.
   - ✅ Create primitives + boolean
   - ✅ Triangulate to Three.js mesh
   - ✅ Implement Web Worker architecture
-- ☐ **NEXT**: Implement `OpenCascadeBackend` class using worker client
-- ☐ Adapter parity testing harness (generate 100 random parts, compare outputs)
-- ☐ Feature metadata layer scaffold in `PartRecipe` type
+- ✅ Implement `OpenCascadeBackend` class using worker client — See `src/geometry/opencascadeBackend.ts`
+  - ✅ Shape serialization protocol with registry
+  - ✅ Full triangulation export with typed arrays
+  - ✅ All primitives: box, cylinder, sphere, cone, torus
+  - ✅ Boolean operations: cut (subtract), fuse (union)
+  - ✅ Fillet with automatic edge detection
+  - ✅ Analytic edge extraction for 2D drawings
+- ✅ Recipe builder integration — See `src/geometry/recipeBuilder.ts`
+- ✅ Adapter parity testing harness — See `spike/parity-tests.ts`
+- ☐ Feature metadata layer scaffold in `PartRecipe` type (FUTURE)
 
 ## Risk Mitigation
 
@@ -288,13 +304,11 @@ Proceed with `OpenCascadeBackend` implementation using Web Worker architecture.
 - Progressive enhancement: only exports use kernel initially.
 - Structured benchmarks recorded (script `npm run bench:geometry`).
 
-
 ## DXF Export Enhancements (Post-Kernel)
 
 - Emit true circles/arcs for cylindrical edges.
 - Use DXF DIMENSION entities (linear, radial) tied to parametric features.
 - Hatch regions defined by analytic loops (avoid segment clipping artifacts).
-
 
 ## Next Review
 

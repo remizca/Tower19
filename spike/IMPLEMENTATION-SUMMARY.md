@@ -13,6 +13,7 @@ Successfully evaluated and implemented OpenCascade.js integration using Web Work
 ### 1. Performance Analysis ✅
 
 **Baseline Metrics** (Direct Import):
+
 - Init time: 6.2-8.8s blocking ❌
 - Box creation: 2ms ✅
 - Cylinder creation: 3-4ms ✅
@@ -21,6 +22,7 @@ Successfully evaluated and implemented OpenCascade.js integration using Web Work
 - Triangulation: 52-102ms ✅
 
 **Boolean Robustness Test**:
+
 - 100 randomized box-minus-cylinder sequences
 - 414 total boolean cuts executed
 - 100% success rate (0 failures)
@@ -31,6 +33,7 @@ Successfully evaluated and implemented OpenCascade.js integration using Web Work
 **Conclusion**: NOT WORTH EFFORT
 
 **Findings**:
+
 - Potential reduction: 30-40% size (8-10MB) + exceptions disabled = 40-50% (4-5MB)
 - Init time improvement: 6s → 2-3s (borderline)
 - Costs:
@@ -44,6 +47,7 @@ Successfully evaluated and implemented OpenCascade.js integration using Web Work
 **Implementation**: `spike/oc-worker.ts` + `spike/oc-worker-client.ts`
 
 **Results**:
+
 - Blocking time: **0ms** (vs 6000ms) ✅
 - Background init: 4.7s (non-blocking)
 - Page load: ~50-100ms (instant UX)
@@ -66,6 +70,7 @@ Successfully evaluated and implemented OpenCascade.js integration using Web Work
 **Implementation**: `src/geometry/opencascadeBackend.ts`
 
 **Features**:
+
 - Implements `GeometryBackend` interface
 - Wraps `oc-worker-client` for non-blocking operations
 - Internal shape registry with unique IDs
@@ -74,6 +79,7 @@ Successfully evaluated and implemented OpenCascade.js integration using Web Work
 - Box and cylinder primitive support
 
 **Test Suite**:
+
 - `spike/backend-test.ts` - Automated validation
 - `spike/backend-test.html` - Interactive harness
 - All core operations validated
@@ -83,17 +89,20 @@ Successfully evaluated and implemented OpenCascade.js integration using Web Work
 ## Files Created/Modified
 
 ### Core Implementation
+
 - `spike/oc-worker.ts` - Web Worker script (206 lines)
 - `spike/oc-worker-client.ts` - Promise-based client (180 lines)
 - `spike/worker-demo.html` - Non-blocking demo page
 - `src/geometry/opencascadeBackend.ts` - Backend adapter (330+ lines)
 
 ### Testing & Validation
+
 - `spike/boolean-bench.ts` - Robustness benchmark
 - `spike/backend-test.ts` - Backend validation
 - `spike/backend-test.html` - Interactive test harness
 
 ### Documentation
+
 - `spike/README.md` - Complete spike documentation
 - `TODO.md` - Updated with Web Worker results
 - `docs/roadmaps/cad-kernel-evaluation.md` - Final decision documented
@@ -101,6 +110,7 @@ Successfully evaluated and implemented OpenCascade.js integration using Web Work
 ## Key Technical Insights
 
 ### 1. Boolean API Fix
+
 ```typescript
 // ❌ WRONG - Type casting breaks overload resolution
 const cut = new (oc as any).BRepAlgoAPI_Cut_1(base, tool);
@@ -110,6 +120,7 @@ const cut = new oc['BRepAlgoAPI_Cut_1'](base, tool);
 ```
 
 ### 2. Web Worker Module Import
+
 ```typescript
 // Must use destructured named import
 const { initOpenCascade } = await import('opencascade.js');
@@ -117,6 +128,7 @@ oc = await initOpenCascade();
 ```
 
 ### 3. Worker Creation (Vite)
+
 ```typescript
 new Worker(new URL('./oc-worker.ts', import.meta.url), { type: 'module' })
 ```
@@ -126,6 +138,7 @@ new Worker(new URL('./oc-worker.ts', import.meta.url), { type: 'module' })
 ### ✅ GO - Web Worker Architecture
 
 **Rationale**:
+
 1. Eliminates UI blocking (0ms vs 6000ms)
 2. Maintains full OCCT features
 3. Zero maintenance burden
@@ -135,6 +148,7 @@ new Worker(new URL('./oc-worker.ts', import.meta.url), { type: 'module' })
 ### ❌ NO-GO - Custom Trimmed Build
 
 **Rationale**:
+
 1. Web Worker provides better UX (0ms blocking > 2-3s blocking)
 2. High maintenance cost (ongoing)
 3. Loss of error handling
@@ -144,25 +158,30 @@ new Worker(new URL('./oc-worker.ts', import.meta.url), { type: 'module' })
 ## Next Steps
 
 ### Phase 1: Shape Serialization (High Priority)
+
 - Implement protocol for transferring shapes between worker/main thread
 - Options: JSON serialization, TransferableObject pattern, or shape handles
 
 ### Phase 2: OCCT Triangulation Export (High Priority)
+
 - Update worker to return OCCT-triangulated meshes
 - Replace placeholder geometry with real triangulation
 - Implement `triangulate()` worker operation with mesh data return
 
 ### Phase 3: Full Primitive Support (Medium Priority)
+
 - Add sphere, cone, torus to worker operations
 - Implement corresponding worker handlers
 - Update backend to support all primitive types
 
 ### Phase 4: Analytic Edge Extraction (Medium Priority)
+
 - Extract lines, arcs, circles from OCCT topology
 - Return analytic edge data for 2D drawing engine
 - Implement `extractAnalyticEdges()` fully
 
 ### Phase 5: Production Integration (Low Priority)
+
 - Wire OpenCascadeBackend to part generator
 - Add feature flag for gradual rollout
 - Create adapter parity testing harness (100 random parts)
@@ -171,6 +190,7 @@ new Worker(new URL('./oc-worker.ts', import.meta.url), { type: 'module' })
 ## Success Metrics
 
 ✅ **All Targets Met**:
+
 - [x] Blocking time < 100ms (achieved: 0ms)
 - [x] Boolean robustness > 95% (achieved: 100%)
 - [x] Non-blocking architecture validated
@@ -195,7 +215,7 @@ new Worker(new URL('./oc-worker.ts', import.meta.url), { type: 'module' })
 
 ## References
 
-- OpenCascade.js: https://github.com/donalffons/opencascade.js
+- OpenCascade.js: <https://github.com/donalffons/opencascade.js>
 - Spike documentation: `spike/README.md`
 - Roadmap: `docs/roadmaps/cad-kernel-evaluation.md`
 - TODO: `TODO.md` (CAD Kernel Evaluation section)
