@@ -110,7 +110,7 @@ This document tracks implementation status for each major feature area. For deta
 
 - [ ] Angular dimensions for chamfers/bevels
 - [ ] Extended section types (half, offset, broken-out)
-- [ ] Analytic edge extraction (via CAD kernel)
+- ✅ Analytic edge extraction (via OpenCascade CAD kernel - implemented in spike/)
 - [ ] True DXF dimension entities
 
 ### Infrastructure Enhancements
