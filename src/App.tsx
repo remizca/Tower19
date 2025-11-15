@@ -10,6 +10,9 @@ import migrateLegacyBeginnerToPartRecipe from './storage/migrate'
 import { Geometry, Base, Subtraction, Addition } from '@react-three/csg'
 import { DrawingViewer } from './viewers/DrawingViewer'
 import type { BufferGeometry } from 'three'
+import { BackendFactory, type BackendType } from './geometry/backendFactory'
+import type { GeometryBackend } from './geometry/backend'
+import { BackendModelRenderer } from './components/BackendModelRenderer'
 
 // Helper to compute position, rotation, and scale from transform + axis fallback
 function computeTransform(
@@ -265,6 +268,14 @@ function App() {
   const [recipe, setRecipe] = useState<PartRecipe | null>(() => generateBeginnerPartRecipe(seed))
   const [viewMode, setViewMode] = useState<'3D' | '2D'>('3D')
   const [csgGeometry, setCsgGeometry] = useState<BufferGeometry | null>(null)
+  
+  // Backend state
+  const [useBackend, setUseBackend] = useState(false) // Feature flag - can enable in UI later
+  const [backend, setBackend] = useState<GeometryBackend | null>(null)
+  const [backendType, setBackendType] = useState<BackendType>('mesh')
+  const [backendInitializing, setBackendInitializing] = useState(false)
+  const [backendError, setBackendError] = useState<string | null>(null)
+  
   const [bookmarks, setBookmarks] = useState<PartRecipe[]>(() => {
     try {
       const raw = localStorage.getItem('tower19:bookmarks')
@@ -290,6 +301,52 @@ function App() {
       return []
     }
   })
+  
+  // Initialize backend on mount or when backend type changes
+  useEffect(() => {
+    if (!useBackend) {
+      setBackend(null)
+      setBackendError(null)
+      return
+    }
+    
+    let cancelled = false
+    
+    async function initBackend() {
+      setBackendInitializing(true)
+      setBackendError(null)
+      
+      try {
+        const recommendedType = BackendFactory.getRecommendedBackend()
+        setBackendType(recommendedType)
+        
+        const newBackend = await BackendFactory.createBackend({
+          type: recommendedType,
+          enableFallback: true,
+          initTimeout: 15000
+        })
+        
+        if (cancelled) return
+        
+        setBackend(newBackend)
+        setBackendInitializing(false)
+        console.log(`[App] Backend initialized: ${recommendedType}`)
+      } catch (error) {
+        if (cancelled) return
+        
+        const message = error instanceof Error ? error.message : 'Failed to initialize backend'
+        console.error('[App] Backend initialization failed:', error)
+        setBackendError(message)
+        setBackendInitializing(false)
+      }
+    }
+    
+    initBackend()
+    
+    return () => {
+      cancelled = true
+    }
+  }, [useBackend])
 
   const generate = () => {
     const nextSeed = Date.now()
@@ -351,6 +408,27 @@ function App() {
         </select>
         <button onClick={saveBookmark}>Save / Bookmark</button>
         <span style={{ alignSelf: 'center', opacity: 0.7 }}>seed: {seed}</span>
+        
+        {/* Backend toggle */}
+        <label style={{ alignSelf: 'center', display: 'flex', gap: 4, alignItems: 'center', marginLeft: 8, padding: '4px 8px', background: 'rgba(255,255,255,0.06)', borderRadius: 4 }}>
+          <input 
+            type="checkbox" 
+            checked={useBackend} 
+            onChange={(e) => setUseBackend(e.target.checked)}
+            disabled={backendInitializing}
+          />
+          <span style={{ fontSize: '0.9em' }}>
+            Use Backend
+            {backendInitializing && ' (initializing...)'}
+            {backend && ` (${backendType})`}
+          </span>
+        </label>
+        
+        {backendError && (
+          <span style={{ alignSelf: 'center', color: '#ff6b6b', fontSize: '0.85em' }}>
+            Backend error: {backendError}
+          </span>
+        )}
       </div>
 
       {/* View mode tabs */}
@@ -402,7 +480,15 @@ function App() {
         <Canvas>
           <ambientLight intensity={0.6} />
           <pointLight position={[100, 100, 100]} />
-          <ModelRenderer recipe={recipe} onGeometryReady={handleGeometryReady} />
+          {useBackend && backend ? (
+            <BackendModelRenderer 
+              recipe={recipe} 
+              backend={backend}
+              onGeometryReady={handleGeometryReady}
+            />
+          ) : (
+            <ModelRenderer recipe={recipe} onGeometryReady={handleGeometryReady} />
+          )}
           <Controls />
         </Canvas>
       )}

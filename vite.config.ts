@@ -26,6 +26,15 @@ export default defineConfig({
       }
     }
   },
+  worker: {
+    format: 'es', // Use ES modules for workers
+    rollupOptions: {
+      output: {
+        format: 'es',
+        entryFileNames: 'assets/[name]-[hash].js'
+      }
+    }
+  },
   server: {
     port: 3000,
     host: true
