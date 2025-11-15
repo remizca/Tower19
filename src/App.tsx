@@ -399,34 +399,36 @@ function App() {
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
-      {/* Top controls */}
-      <div style={{ position: 'absolute', zIndex: 10, left: 12, top: 12, display: 'flex', gap: 8, pointerEvents: 'auto' }}>
+      {/* Top controls - Main row */}
+      <div style={{ position: 'absolute', zIndex: 10, left: 12, top: 12, display: 'flex', gap: 8, pointerEvents: 'auto', flexWrap: 'wrap', maxWidth: 'calc(100vw - 300px)' }}>
         <button onClick={generate}>Generate</button>
         <select value={difficulty} onChange={handleDifficultyChange} style={{ padding: '4px 8px' }}>
           <option>Beginner</option>
           <option>Intermediate</option>
         </select>
         <button onClick={saveBookmark}>Save / Bookmark</button>
-        <span style={{ alignSelf: 'center', opacity: 0.7 }}>seed: {seed}</span>
-        
-        {/* Backend toggle */}
-        <label style={{ alignSelf: 'center', display: 'flex', gap: 4, alignItems: 'center', marginLeft: 8, padding: '4px 8px', background: 'rgba(255,255,255,0.06)', borderRadius: 4 }}>
+        <span style={{ alignSelf: 'center', opacity: 0.7, fontSize: '0.9em' }}>seed: {seed}</span>
+      </div>
+      
+      {/* Backend controls - Separate row */}
+      <div style={{ position: 'absolute', zIndex: 10, left: 12, top: 52, display: 'flex', gap: 8, pointerEvents: 'auto', alignItems: 'center' }}>
+        <label style={{ display: 'flex', gap: 4, alignItems: 'center', padding: '4px 8px', background: 'rgba(255,255,255,0.06)', borderRadius: 4, fontSize: '0.85em' }}>
           <input 
             type="checkbox" 
             checked={useBackend} 
             onChange={(e) => setUseBackend(e.target.checked)}
             disabled={backendInitializing}
           />
-          <span style={{ fontSize: '0.9em' }}>
-            Use Backend
-            {backendInitializing && ' (initializing...)'}
+          <span>
+            Backend
+            {backendInitializing && ' (init...)'}
             {backend && ` (${backendType})`}
           </span>
         </label>
         
         {backendError && (
-          <span style={{ alignSelf: 'center', color: '#ff6b6b', fontSize: '0.85em' }}>
-            Backend error: {backendError}
+          <span style={{ color: '#ff6b6b', fontSize: '0.8em', maxWidth: '300px' }}>
+            {backendError}
           </span>
         )}
       </div>
@@ -434,7 +436,7 @@ function App() {
       {/* View mode tabs */}
       <div style={{
         position: 'absolute',
-        zIndex: 10,
+        zIndex: 20,
         left: '50%',
         transform: 'translateX(-50%)',
         top: 12,
@@ -454,7 +456,8 @@ function App() {
             border: 'none',
             borderRadius: 4,
             cursor: 'pointer',
-            fontWeight: viewMode === '3D' ? 600 : 400
+            fontWeight: viewMode === '3D' ? 600 : 400,
+            pointerEvents: 'auto'
           }}
         >
           3D Model
@@ -468,7 +471,8 @@ function App() {
             border: 'none',
             borderRadius: 4,
             cursor: 'pointer',
-            fontWeight: viewMode === '2D' ? 600 : 400
+            fontWeight: viewMode === '2D' ? 600 : 400,
+            pointerEvents: 'auto'
           }}
         >
           2D Drawing
